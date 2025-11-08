@@ -51,16 +51,16 @@ description: "Task list for StudyBuddy platform implementation"
   - `tests/{unit,integration,e2e,factories}/__init__.py`
   - `scripts/`, `docker/`, `kubernetes/`, `alembic/versions/`
 
-- [ ] T011 [P] Create domain subdirectories:
+- [x] T011 [P] Create domain subdirectories: ✅ Created
   - `app/domain/{entities,value_objects,enums}/__init__.py`
 
-- [ ] T012 [P] Create application subdirectories:
+- [x] T012 [P] Create application subdirectories: ✅ Created
   - `app/application/{services,schemas,interfaces}/__init__.py`
 
-- [ ] T013 [P] Create infrastructure subdirectories:
+- [x] T013 [P] Create infrastructure subdirectories: ✅ Created
   - `app/infrastructure/{database/models,repositories,cache,storage,email,external}/__init__.py`
 
-- [ ] T014 [P] Create API subdirectories:
+- [x] T014 [P] Create API subdirectories: ✅ Created
   - `app/api/{v1/endpoints,v1/middleware,v1/dependencies,websocket}/__init__.py`
 
 ### Docker Configuration
