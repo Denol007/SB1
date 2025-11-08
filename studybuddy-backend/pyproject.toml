@@ -1,0 +1,200 @@
+[project]
+name = "studybuddy"
+version = "0.1.0"
+description = "StudyBuddy - Social networking platform for university students and prospective students"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    # FastAPI Framework
+    "fastapi>=0.104.0",
+    "uvicorn[standard]>=0.24.0",
+    "python-multipart>=0.0.6",
+    
+    # Database
+    "sqlalchemy[asyncio]>=2.0.23",
+    "asyncpg>=0.29.0",
+    "alembic>=1.12.1",
+    
+    # Redis & Caching
+    "redis[hiredis]>=5.0.1",
+    "hiredis>=2.2.3",
+    
+    # Background Tasks
+    "celery[redis]>=5.3.4",
+    
+    # Authentication & Security
+    "pyjwt[crypto]>=2.8.0",
+    "passlib[bcrypt]>=1.7.4",
+    "python-jose[cryptography]>=3.3.0",
+    "httpx>=0.25.2",
+    
+    # Validation & Serialization
+    "pydantic>=2.5.0",
+    "pydantic-settings>=2.1.0",
+    "email-validator>=2.1.0",
+    
+    # Monitoring & Logging
+    "structlog>=23.2.0",
+    "prometheus-fastapi-instrumentator>=6.1.0",
+    "sentry-sdk[fastapi]>=1.38.0",
+    
+    # Utilities
+    "python-dotenv>=1.0.0",
+    "tzdata>=2023.3",
+]
+
+[project.optional-dependencies]
+dev = [
+    # Testing
+    "pytest>=7.4.3",
+    "pytest-asyncio>=0.21.1",
+    "pytest-cov>=4.1.0",
+    "pytest-mock>=3.12.0",
+    "httpx>=0.25.2",
+    "factory-boy>=3.3.0",
+    "faker>=20.1.0",
+    
+    # Code Quality
+    "black>=23.12.0",
+    "ruff>=0.1.7",
+    "mypy>=1.7.1",
+    "pre-commit>=3.6.0",
+    
+    # Type Stubs
+    "types-passlib>=1.7.7",
+    "types-python-jose>=3.3.4",
+    "types-redis>=4.6.0",
+    
+    # Development Tools
+    "ipython>=8.18.1",
+    "ipdb>=0.13.13",
+]
+
+s3 = [
+    "boto3>=1.34.0",
+    "botocore>=1.34.0",
+]
+
+all = [
+    "studybuddy[dev,s3]",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["app"]
+
+[tool.black]
+line-length = 100
+target-version = ["py311", "py312"]
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+  | alembic/versions
+)/
+'''
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "C",   # flake8-comprehensions
+    "B",   # flake8-bugbear
+    "UP",  # pyupgrade
+]
+ignore = [
+    "E501",  # line too long (handled by black)
+    "B008",  # do not perform function calls in argument defaults
+    "C901",  # too complex (will be enforced separately)
+]
+exclude = [
+    ".git",
+    ".mypy_cache",
+    ".ruff_cache",
+    ".venv",
+    "venv",
+    "alembic/versions",
+    "__pycache__",
+]
+
+[tool.ruff.per-file-ignores]
+"__init__.py" = ["F401"]  # unused imports in __init__.py
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = false
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+follow_imports = "normal"
+ignore_missing_imports = false
+strict_equality = true
+strict_optional = true
+plugins = ["pydantic.mypy"]
+
+[[tool.mypy.overrides]]
+module = [
+    "celery.*",
+    "redis.*",
+    "factory.*",
+    "faker.*",
+    "prometheus_fastapi_instrumentator.*",
+]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = "-ra -q --strict-markers --strict-config"
+testpaths = ["tests"]
+pythonpath = ["."]
+asyncio_mode = "auto"
+markers = [
+    "unit: Unit tests",
+    "integration: Integration tests",
+    "e2e: End-to-end tests",
+    "us1: User Story 1 - Authentication & Verification",
+    "us2: User Story 2 - Community Management",
+    "us3: User Story 3 - Social Feed",
+    "us4: User Story 4 - Event Management",
+    "us5: User Story 5 - Real-Time Chat",
+    "us6: User Story 6 - Moderation",
+    "us7: User Story 7 - Search",
+    "us8: User Story 8 - Analytics",
+    "us9: User Story 9 - Notifications",
+    "us10: User Story 10 - Multi-University Affiliation",
+]
+
+[tool.coverage.run]
+source = ["app"]
+omit = [
+    "*/tests/*",
+    "*/alembic/*",
+    "*/__init__.py",
+]
+
+[tool.coverage.report]
+precision = 2
+show_missing = true
+skip_covered = false
+fail_under = 80
