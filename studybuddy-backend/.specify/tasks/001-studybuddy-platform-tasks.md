@@ -46,7 +46,7 @@ description: "Task list for StudyBuddy platform implementation"
 
 ### Directory Structure
 
-- [ ] T010 Create core directory structure:
+- [x] T010 Create core directory structure: ✅ Created
   - `app/{core,domain,application,infrastructure,api,tasks}/__init__.py`
   - `tests/{unit,integration,e2e,factories}/__init__.py`
   - `scripts/`, `docker/`, `kubernetes/`, `alembic/versions/`
