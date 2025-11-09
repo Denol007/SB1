@@ -266,12 +266,12 @@ description: "Task list for StudyBuddy platform implementation"
   - Test `confirm_verification()`
   - Test `is_verified_for_university()`
 
-- [ ] T066 [P] [US1] Integration test: `tests/integration/api/test_auth_endpoints.py`
+- [x] T066 [P] [US1] Integration test: `tests/integration/api/test_auth_endpoints.py`
   - Test `POST /api/v1/auth/google` OAuth flow
   - Test `POST /api/v1/auth/refresh` token refresh
   - Test `POST /api/v1/auth/logout`
 
-- [ ] T067 [P] [US1] Integration test: `tests/integration/api/test_verification_endpoints.py`
+- [x] T067 [P] [US1] Integration test: `tests/integration/api/test_verification_endpoints.py`
   - Test `POST /api/v1/verifications` request
   - Test `POST /api/v1/verifications/confirm/{token}`
   - Test `GET /api/v1/verifications/me`
