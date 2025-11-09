@@ -256,7 +256,7 @@ description: "Task list for StudyBuddy platform implementation"
 - [x] T063 [P] [US1] Create test factories in `tests/factories/verification_factory.py` ✅
   - `VerificationFactory`, `UniversityFactory`
 
-- [ ] T064 [P] [US1] Unit test: `tests/unit/services/test_auth_service.py`
+- [x] T064 [P] [US1] Unit test: `tests/unit/services/test_auth_service.py` ✅
   - Test `create_user_from_google()`
   - Test `generate_tokens()`
   - Test `refresh_access_token()`
