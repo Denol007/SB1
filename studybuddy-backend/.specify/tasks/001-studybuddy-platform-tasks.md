@@ -154,7 +154,7 @@ description: "Task list for StudyBuddy platform implementation"
   - `hash_password()` - Bcrypt hashing
   - `verify_password()` - Password verification
 
-- [ ] T044 Create `app/infrastructure/external/google_oauth.py` - Google OAuth client
+- [x] T044 Create `app/infrastructure/external/google_oauth.py` - Google OAuth client ✅
   - `get_authorization_url()`
   - `exchange_code_for_token()`
   - `get_user_info()`
