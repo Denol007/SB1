@@ -171,7 +171,7 @@ description: "Task list for StudyBuddy platform implementation"
 
 ### Background Tasks
 
-- [ ] T047 Create `app/tasks/celery_app.py` - Celery configuration
+- [x] T047 Create `app/tasks/celery_app.py` - Celery configuration ✅
   - Redis broker setup
   - Task routing
   - Retry configuration with exponential backoff
