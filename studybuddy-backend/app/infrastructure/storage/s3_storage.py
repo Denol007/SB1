@@ -40,17 +40,22 @@ class S3Storage(StorageBackend):
         self.aws_region = aws_region
 
         # Create S3 client
-        client_kwargs = {
-            "service_name": "s3",
-            "aws_access_key_id": aws_access_key_id,
-            "aws_secret_access_key": aws_secret_access_key,
-            "region_name": aws_region,
-        }
-
+        # Create S3 client with explicit parameters for better type checking
         if endpoint_url:
-            client_kwargs["endpoint_url"] = endpoint_url
-
-        self.s3_client = boto3.client(**client_kwargs)
+            self.s3_client = boto3.client(
+                "s3",
+                aws_access_key_id=aws_access_key_id,
+                aws_secret_access_key=aws_secret_access_key,
+                region_name=aws_region,
+                endpoint_url=endpoint_url,
+            )
+        else:
+            self.s3_client = boto3.client(
+                "s3",
+                aws_access_key_id=aws_access_key_id,
+                aws_secret_access_key=aws_secret_access_key,
+                region_name=aws_region,
+            )
 
     async def upload(self, file_path: str, destination: str) -> str:
         """
