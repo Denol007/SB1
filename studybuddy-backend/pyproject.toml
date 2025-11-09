@@ -142,6 +142,7 @@ exclude = [
 
 [tool.ruff.per-file-ignores]
 "__init__.py" = ["F401"]  # unused imports in __init__.py
+"tests/integration/**/*.py" = ["F821"]  # mock variables from decorators in skipped tests
 
 [tool.mypy]
 python_version = "3.11"

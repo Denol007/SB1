@@ -45,14 +45,14 @@ class TestGoogleOAuthFlow:
         assert "state" in data
         assert "client_id" in data["authorization_url"]
 
-    @patch("app.api.v1.endpoints.auth.GoogleOAuthClient")
-    @patch("app.api.v1.endpoints.auth.AuthService")
-    def test_google_auth_callback_creates_user_and_returns_tokens(
-        self, mock_auth_service_class, mock_oauth_client_class
-    ):
+    def test_google_auth_callback_creates_user_and_returns_tokens(self):
         """Should exchange code for tokens and create/return user with JWT tokens."""
         # Skip until endpoint is implemented
         pytest.skip("Auth endpoints not yet implemented (T091)")
+
+        # TODO (T091): Add @patch decorators when implementing endpoint:
+        # @patch("app.api.v1.endpoints.auth.GoogleOAuthClient")
+        # @patch("app.api.v1.endpoints.auth.AuthService")
 
         # Arrange
         mock_oauth_client = MagicMock()
