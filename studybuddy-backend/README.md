@@ -77,13 +77,14 @@ StudyBuddy is a comprehensive social platform designed to connect university stu
 
 ### Prerequisites
 
-- Python 3.11+
-- Docker & Docker Compose
-- Git
+- **Python 3.12+** (3.11+ supported)
+- **Docker & Docker Compose** (for running services)
+- **Git** (for version control)
+- **uv** (Python package manager - installed below)
 
 ### Setup (5 minutes)
 
-1. **Install uv (Python package manager)**
+1. **Install uv (Fast Python package manager)**
 
    ```bash
    curl -LsSf https://astral.sh/uv/install.sh | sh
@@ -94,22 +95,39 @@ StudyBuddy is a comprehensive social platform designed to connect university stu
    ```bash
    git clone https://github.com/Denol007/SB1.git
    cd SB1/studybuddy-backend
-   cp .env.example .env  # Edit with your configuration
+   cp .env.example .env
+   # Edit .env with your Google OAuth credentials and other settings
    ```
 
-3. **Start development environment**
+3. **Start development environment** (includes PostgreSQL, Redis, API, Celery, Flower)
 
    ```bash
-   chmod +x scripts/dev.sh
    ./scripts/dev.sh
    ```
 
-4. **Access the API**
-   - Swagger UI: <http://localhost:8000/docs>
-   - ReDoc: <http://localhost:8000/redoc>
-   - Health Check: <http://localhost:8000/health>
+   This command starts all services via Docker Compose:
+   - 🐘 PostgreSQL on `localhost:5432`
+   - 🔴 Redis on `localhost:6379`
+   - 🚀 FastAPI API on `localhost:8000`
+   - 🌸 Flower (Celery monitoring) on `localhost:5555`
 
-See [QUICKSTART.md](QUICKSTART.md) for detailed instructions.
+4. **Access the application**
+   - **API Documentation**: <http://localhost:8000/docs> (Swagger UI)
+   - **Alternative Docs**: <http://localhost:8000/redoc> (ReDoc)
+   - **Health Check**: <http://localhost:8000/health>
+   - **Celery Monitor**: <http://localhost:5555> (Flower)
+
+5. **Other useful commands**
+
+   ```bash
+   ./scripts/dev.sh logs      # View logs
+   ./scripts/dev.sh stop      # Stop services
+   ./scripts/dev.sh restart   # Restart services
+   ./scripts/dev.sh down      # Stop and remove containers
+   ./scripts/dev.sh clean     # Clean everything including volumes
+   ```
+
+📖 See [QUICKSTART.md](QUICKSTART.md) for detailed setup instructions and troubleshooting.
 
 ## 📖 Documentation
 
@@ -121,23 +139,26 @@ See [QUICKSTART.md](QUICKSTART.md) for detailed instructions.
 
 ## 🛠️ Technology Stack
 
-| Category | Technology |
-|----------|-----------|
-| **Framework** | FastAPI 0.104+ |
-| **Language** | Python 3.11+ |
-| **Database** | PostgreSQL 15+ |
-| **ORM** | SQLAlchemy 2.0+ (async) |
-| **Migrations** | Alembic |
-| **Cache** | Redis 7+ |
-| **Task Queue** | Celery |
-| **Validation** | Pydantic V2 |
-| **Authentication** | OAuth2, JWT |
-| **File Storage** | S3-compatible (MinIO/AWS) |
-| **WebSockets** | FastAPI built-in + Redis Pub/Sub |
-| **Testing** | pytest, pytest-asyncio |
-| **Code Quality** | Black, Ruff, MyPy |
-| **Monitoring** | Prometheus, Sentry, Structlog |
-| **Containerization** | Docker, Kubernetes |
+| Category | Technology | Version |
+|----------|-----------|---------|
+| **Framework** | FastAPI | 0.121+ |
+| **Language** | Python | 3.12+ |
+| **Database** | PostgreSQL | 15+ |
+| **ORM** | SQLAlchemy (async) | 2.0+ |
+| **Migrations** | Alembic | 1.17+ |
+| **Cache/Queue** | Redis | 7+ |
+| **Task Queue** | Celery | 5.5+ |
+| **Validation** | Pydantic V2 | 2.12+ |
+| **Authentication** | OAuth2, JWT | - |
+| **File Storage** | S3-compatible (MinIO/AWS) | - |
+| **WebSockets** | FastAPI + Redis Pub/Sub | - |
+| **Testing** | pytest, pytest-asyncio | 8.4+ |
+| **Code Quality** | Black, Ruff, MyPy, Bandit | Latest |
+| **Package Manager** | uv | 0.9.8+ |
+| **Monitoring** | Prometheus, Sentry, Structlog | Latest |
+| **Container Runtime** | Docker | 28.3+ |
+| **Orchestration** | Kubernetes | 1.28+ |
+| **CI/CD** | GitHub Actions | - |
 
 ## 📊 Project Structure
 
@@ -382,4 +403,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Built with ❤️ for the student community**
 
-**Version**: 0.1.0 | **Status**: In Development | **Last Updated**: 2025-11-08
+Version: 0.1.0 | Last Updated: 2025-01-20
