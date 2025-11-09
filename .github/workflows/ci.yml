@@ -209,6 +209,9 @@ jobs:
     name: Security Scan
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    permissions:
+      contents: read
+      security-events: write  # Required for CodeQL SARIF upload
     defaults:
       run:
         working-directory: studybuddy-backend
@@ -233,14 +236,15 @@ jobs:
 
       - name: Run Bandit (security scan)
         run: |
-          uv run bandit -r app/ --format json --output bandit-report.json
+          mkdir -p reports
+          uv run bandit -r app/ --format json --output reports/bandit-report.json || true
         continue-on-error: true
 
       - name: Upload Bandit report
         uses: actions/upload-artifact@v4
         with:
           name: bandit-security-report
-          path: studybuddy-backend/bandit-report.json
+          path: studybuddy-backend/reports/bandit-report.json
           retention-days: 30
         if: always()
 
@@ -250,13 +254,13 @@ jobs:
           scan-type: 'fs'
           scan-ref: './studybuddy-backend'
           format: 'sarif'
-          output: 'trivy-results.sarif'
+          output: 'studybuddy-backend/reports/trivy-results.sarif'
         continue-on-error: true
 
       - name: Upload Trivy results to GitHub Security
         uses: github/codeql-action/upload-sarif@v3
         with:
-          sarif_file: 'studybuddy-backend/trivy-results.sarif'
+          sarif_file: 'studybuddy-backend/reports/trivy-results.sarif'
         if: always()
 
   summary:

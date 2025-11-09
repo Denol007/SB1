@@ -9,7 +9,7 @@ on:
 env:
   PYTHON_VERSION: "3.12"
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+  IMAGE_NAME: denol007/sb1  # Must be lowercase for container registry
 
 jobs:
   build-and-push:

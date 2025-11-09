@@ -147,7 +147,7 @@ description: "Task list for StudyBuddy platform implementation"
 
 ### Security & Authentication
 
-- [ ] T043 Create `app/core/security.py` - Security utilities
+- [x] T043 Create `app/core/security.py` - Security utilities ✅
   - `create_access_token()` - JWT with 15min expiry
   - `create_refresh_token()` - JWT with 30 days expiry
   - `verify_token()` - JWT validation
