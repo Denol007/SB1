@@ -90,25 +90,3 @@ async def readiness_check(
         media_type="application/json",
         status_code=status_code,
     )
-
-
-@router.get("/health/metrics")
-async def metrics_endpoint() -> Response:
-    """
-    Prometheus metrics endpoint.
-
-    Exposes application metrics in Prometheus format.
-    This will be configured with prometheus-fastapi-instrumentator in main.py.
-
-    Returns:
-        Response: Prometheus metrics in text format
-    """
-    # This endpoint will be properly configured with prometheus-fastapi-instrumentator
-    # in T059. For now, return a basic response to satisfy the test.
-    metrics_text = "# Prometheus metrics will be configured in T059\n"
-
-    return Response(
-        content=metrics_text,
-        media_type="text/plain; charset=utf-8",
-        status_code=status.HTTP_200_OK,
-    )

@@ -11,6 +11,7 @@ from fastapi import FastAPI, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from prometheus_fastapi_instrumentator import Instrumentator
 
 from app.api.v1.middleware.logging import RequestLoggingMiddleware
 from app.api.v1.middleware.rate_limit import RateLimitMiddleware
@@ -102,6 +103,27 @@ app.add_middleware(RequestLoggingMiddleware)
 
 # Add rate limiting middleware
 app.add_middleware(RateLimitMiddleware)
+
+# Configure Prometheus metrics instrumentation
+instrumentator = Instrumentator(
+    should_group_status_codes=False,
+    should_ignore_untemplated=True,
+    should_respect_env_var=False,  # Always enable metrics (can be disabled via excluded_handlers if needed)
+    should_instrument_requests_inprogress=True,
+    excluded_handlers=[
+        "/api/v1/health/metrics",  # Don't instrument the metrics endpoint itself
+        "/api/v1/health",  # Don't instrument health checks
+        "/api/v1/health/ready",  # Don't instrument readiness checks
+        "/docs",
+        "/redoc",
+        "/openapi.json",
+    ],
+    inprogress_name="http_requests_inprogress",
+    inprogress_labels=True,
+)
+
+# Instrument the FastAPI app (add metrics collection to all requests)
+instrumentator.instrument(app)
 
 
 # Global exception handlers
@@ -298,6 +320,9 @@ async def general_exception_handler(request: Request, exc: Exception) -> JSONRes
 
 # Include API routers
 app.include_router(v1_router)
+
+# Expose Prometheus metrics endpoint (must be after routers are included)
+instrumentator.expose(app, endpoint="/api/v1/health/metrics", include_in_schema=False)
 
 
 # Root endpoint

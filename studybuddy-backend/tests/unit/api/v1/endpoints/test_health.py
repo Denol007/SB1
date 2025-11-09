@@ -123,10 +123,10 @@ class TestMetricsEndpoint:
         response = client.get("/api/v1/health/metrics")
 
         assert response.status_code == 200
-        assert response.headers["content-type"] == "text/plain; charset=utf-8"
-
-        # Check that response contains Prometheus metrics
         content = response.text
-        assert len(content) > 0
-        # Prometheus metrics should contain HELP and TYPE comments
-        assert "#" in content or "http_requests" in content.lower()
+
+        # Verify response contains Prometheus metrics
+        # Check for common Prometheus metric indicators
+        assert any(
+            keyword in content for keyword in ["# HELP", "# TYPE", "http_request", "process_"]
+        ), "Response should contain Prometheus metrics format"
