@@ -201,18 +201,18 @@ description: "Task list for StudyBuddy platform implementation"
   - Startup/shutdown events
   - Include routers
 
-- [ ] T054 Create `app/api/v1/router.py` - Main API router aggregator
+- [x] T054 Create `app/api/v1/router.py` - Main API router aggregator ✅
 
-- [ ] T055 Create `app/api/v1/middleware/rate_limit.py` - Rate limiting middleware
+- [x] T055 Create `app/api/v1/middleware/rate_limit.py` - Rate limiting middleware ✅
   - 100 req/min per authenticated user
   - 20 req/min per IP for unauthenticated
   - 5 req/min for auth endpoints
 
-- [ ] T056 Create `app/api/v1/middleware/logging.py` - Request/response logging
+- [x] T056 Create `app/api/v1/middleware/logging.py` - Request/response logging ✅
   - Log request ID, method, path, user ID
   - Log response status, duration
 
-- [ ] T057 Create `app/api/v1/dependencies/auth.py` - Authentication dependencies
+- [x] T057 Create `app/api/v1/dependencies/auth.py` - Authentication dependencies ✅
   - `get_current_user()` - Validates JWT and returns user
   - `get_current_active_user()` - Ensures user not deleted
   - `require_verified_student()` - Checks verification status
