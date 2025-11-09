@@ -161,11 +161,11 @@ description: "Task list for StudyBuddy platform implementation"
 
 ### Cache & Redis
 
-- [ ] T045 Create `app/infrastructure/cache/redis_client.py` - Redis connection
+- [x] T045 Create `app/infrastructure/cache/redis_client.py` - Redis connection ✅
   - Async Redis client
   - Connection pool configuration
 
-- [ ] T046 Create `app/infrastructure/cache/cache_service.py` - Caching utilities
+- [x] T046 Create `app/infrastructure/cache/cache_service.py` - Caching utilities ✅
   - `get()`, `set()`, `delete()` with TTL
   - Namespace-based keys (user:123, community:456)
 
