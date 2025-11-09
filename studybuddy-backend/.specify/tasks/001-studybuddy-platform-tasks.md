@@ -224,7 +224,7 @@ description: "Task list for StudyBuddy platform implementation"
   - `GET /health/ready` - Readiness check (DB, Redis connectivity)
   - `GET /health/metrics` - Prometheus metrics
 
-- [ ] T059 Configure `prometheus-fastapi-instrumentator` in `app/main.py`
+- [x] T059 Configure `prometheus-fastapi-instrumentator` in `app/main.py` ✅
 
 - [ ] T060 Create `app/infrastructure/external/sentry_client.py` - Sentry integration
 
