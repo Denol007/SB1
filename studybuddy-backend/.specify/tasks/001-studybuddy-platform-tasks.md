@@ -178,16 +178,16 @@ description: "Task list for StudyBuddy platform implementation"
 
 ### File Storage
 
-- [x] T048 Create `app/infrastructure/storage/base.py` - Abstract storage interface
+- [x] T048 Create `app/infrastructure/storage/base.py` - Abstract storage interface ✅
   - `upload()`, `delete()`, `get_url()` methods
 
-- [x] T049 [P] Create `app/infrastructure/storage/local_storage.py` - Local file system (dev)
-- [x] T050 [P] Create `app/infrastructure/storage/s3_storage.py` - S3-compatible storage (prod)
+- [x] T049 [P] Create `app/infrastructure/storage/local_storage.py` - Local file system (dev) ✅
+- [x] T050 [P] Create `app/infrastructure/storage/s3_storage.py` - S3-compatible storage (prod) ✅
 
 ### Email Service
 
-- [ ] T051 Create `app/infrastructure/email/base.py` - Abstract email interface
-- [ ] T052 Create `app/infrastructure/email/smtp_email.py` - SMTP implementation
+- [x] T051 Create `app/infrastructure/email_service/base.py` - Abstract email interface ✅
+- [x] T052 Create `app/infrastructure/email_service/smtp_email.py` - SMTP implementation ✅
   - `send_verification_email()`
   - `send_event_reminder()`
   - Template rendering

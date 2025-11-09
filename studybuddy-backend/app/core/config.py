@@ -73,6 +73,10 @@ class Settings(BaseSettings):
     SMTP_PASSWORD: str = ""
     SMTP_FROM_EMAIL: str = "noreply@studybuddy.com"
     SMTP_FROM_NAME: str = "StudyBuddy"
+    SMTP_USE_TLS: bool = True
+
+    # Frontend URL for email links
+    FRONTEND_URL: str = "http://localhost:3000"
 
     # File Storage
     STORAGE_TYPE: str = "local"  # local or s3
@@ -216,6 +220,15 @@ class Settings(BaseSettings):
             True if APP_ENV is 'testing', False otherwise
         """
         return self.APP_ENV == "testing"
+
+    @property
+    def SMTP_USERNAME(self) -> str:
+        """Get SMTP username (alias for SMTP_USER).
+
+        Returns:
+            SMTP username for authentication
+        """
+        return self.SMTP_USER
 
 
 # Global settings instance
