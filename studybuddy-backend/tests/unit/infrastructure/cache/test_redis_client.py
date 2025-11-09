@@ -10,6 +10,7 @@ Following TDD principles:
 from unittest.mock import AsyncMock, patch
 
 import pytest
+import pytest_asyncio
 
 from app.infrastructure.cache.redis_client import (
     RedisClient,
@@ -27,13 +28,17 @@ def mock_redis():
     return mock
 
 
-@pytest.fixture(autouse=True)
+@pytest_asyncio.fixture(autouse=True)
 async def cleanup_redis_client():
-    """Reset global Redis client between tests."""
-    yield
-    # Clean up the global singleton after each test
+    """Reset global Redis client before and after each test."""
+    # Clean up before test
     import app.infrastructure.cache.redis_client as redis_module
 
+    redis_module._redis_client = None
+
+    yield
+
+    # Clean up after test
     redis_module._redis_client = None
 
 

@@ -9,8 +9,13 @@ they should be imported and included here.
 
 from fastapi import APIRouter
 
+from app.api.v1.endpoints import health
+
 # Create main v1 router
 router = APIRouter(prefix="/api/v1", tags=["v1"])
+
+# Include health check endpoints
+router.include_router(health.router)
 
 # TODO: Import and include endpoint routers as they are created
 # Example:
