@@ -12,6 +12,9 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
+from app.api.v1.middleware.logging import RequestLoggingMiddleware
+from app.api.v1.middleware.rate_limit import RateLimitMiddleware
+from app.api.v1.router import router as v1_router
 from app.core.config import settings
 from app.core.exceptions import (
     BadRequestException,
@@ -93,6 +96,12 @@ app.add_middleware(
     allow_methods=settings.CORS_ALLOW_METHODS,
     allow_headers=settings.CORS_ALLOW_HEADERS,
 )
+
+# Add request logging middleware
+app.add_middleware(RequestLoggingMiddleware)
+
+# Add rate limiting middleware
+app.add_middleware(RateLimitMiddleware)
 
 
 # Global exception handlers
@@ -285,6 +294,10 @@ async def general_exception_handler(request: Request, exc: Exception) -> JSONRes
             "type": exc.__class__.__name__,
         },
     )
+
+
+# Include API routers
+app.include_router(v1_router)
 
 
 # Root endpoint
