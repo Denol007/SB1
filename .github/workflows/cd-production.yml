@@ -111,9 +111,6 @@ jobs:
     environment:
       name: production
       url: https://api.studybuddy.example.com
-    defaults:
-      run:
-        working-directory: studybuddy-backend
 
     steps:
       - name: Checkout code
@@ -152,18 +149,18 @@ jobs:
 
       - name: Update image tag in deployment
         run: |
-          cd kubernetes
+          cd studybuddy-backend/kubernetes
           sed -i "s|IMAGE_TAG|${{ needs.build-and-push.outputs.image-tag }}|g" api-deployment.yaml
           sed -i "s|IMAGE_TAG|${{ needs.build-and-push.outputs.image-tag }}|g" celery-deployment.yaml
 
       - name: Apply Kubernetes manifests
         run: |
-          kubectl apply -f kubernetes/namespace.yaml --namespace=studybuddy-prod || true
-          kubectl apply -f kubernetes/configmap.yaml --namespace=studybuddy-prod
-          kubectl apply -f kubernetes/api-deployment.yaml --namespace=studybuddy-prod
-          kubectl apply -f kubernetes/celery-deployment.yaml --namespace=studybuddy-prod
-          kubectl apply -f kubernetes/ingress.yaml --namespace=studybuddy-prod
-          kubectl apply -f kubernetes/hpa.yaml --namespace=studybuddy-prod
+          kubectl apply -f studybuddy-backend/kubernetes/namespace.yaml --namespace=studybuddy-prod || true
+          kubectl apply -f studybuddy-backend/kubernetes/configmap.yaml --namespace=studybuddy-prod
+          kubectl apply -f studybuddy-backend/kubernetes/api-deployment.yaml --namespace=studybuddy-prod
+          kubectl apply -f studybuddy-backend/kubernetes/celery-deployment.yaml --namespace=studybuddy-prod
+          kubectl apply -f studybuddy-backend/kubernetes/ingress.yaml --namespace=studybuddy-prod
+          kubectl apply -f studybuddy-backend/kubernetes/hpa.yaml --namespace=studybuddy-prod
 
       - name: Wait for rollout to complete
         run: |

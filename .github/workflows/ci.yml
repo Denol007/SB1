@@ -19,9 +19,6 @@ jobs:
     name: Lint Code
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    defaults:
-      run:
-        working-directory: studybuddy-backend
 
     steps:
       - name: Checkout code
@@ -49,18 +46,22 @@ jobs:
 
       - name: Install dependencies
         run: |
+          cd studybuddy-backend
           uv sync --extra dev
 
       - name: Run Black (format check)
         run: |
+          cd studybuddy-backend
           uv run black --check --diff app/ tests/
 
       - name: Run Ruff (linting)
         run: |
+          cd studybuddy-backend
           uv run ruff check app/ tests/
 
       - name: Run MyPy (type checking)
         run: |
+          cd studybuddy-backend
           uv run mypy app/
         continue-on-error: true  # Don't fail CI yet (no code to check)
 
@@ -68,9 +69,6 @@ jobs:
     name: Run Tests
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    defaults:
-      run:
-        working-directory: studybuddy-backend
 
     services:
       postgres:
@@ -135,6 +133,7 @@ jobs:
 
       - name: Install dependencies
         run: |
+          cd studybuddy-backend
           uv sync --extra dev
 
       - name: Run tests with coverage
