@@ -168,8 +168,8 @@ minversion = "7.0"
 addopts = "-ra -q --strict-markers --strict-config"
 testpaths = ["tests"]
 pythonpath = ["."]
-asyncio_mode = "auto"
 markers = [
+    "asyncio: Mark test as async",
     "unit: Unit tests",
     "integration: Integration tests",
     "e2e: End-to-end tests",

@@ -178,11 +178,11 @@ description: "Task list for StudyBuddy platform implementation"
 
 ### File Storage
 
-- [ ] T048 Create `app/infrastructure/storage/base.py` - Abstract storage interface
+- [x] T048 Create `app/infrastructure/storage/base.py` - Abstract storage interface
   - `upload()`, `delete()`, `get_url()` methods
 
-- [ ] T049 [P] Create `app/infrastructure/storage/local_storage.py` - Local file system (dev)
-- [ ] T050 [P] Create `app/infrastructure/storage/s3_storage.py` - S3-compatible storage (prod)
+- [x] T049 [P] Create `app/infrastructure/storage/local_storage.py` - Local file system (dev)
+- [x] T050 [P] Create `app/infrastructure/storage/s3_storage.py` - S3-compatible storage (prod)
 
 ### Email Service
 
