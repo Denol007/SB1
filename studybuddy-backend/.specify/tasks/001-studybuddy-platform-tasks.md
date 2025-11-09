@@ -131,19 +131,19 @@ description: "Task list for StudyBuddy platform implementation"
 
 ### Database Setup
 
-- [ ] T038 Create `app/infrastructure/database/base.py` - SQLAlchemy base class
+- [x] T038 Create `app/infrastructure/database/base.py` - SQLAlchemy base class ✅
   - Async engine configuration
   - Declarative base with UUID primary keys
   - Timestamp mixin (created_at, updated_at)
 
-- [ ] T039 Create `app/infrastructure/database/session.py` - Database session management
+- [x] T039 Create `app/infrastructure/database/session.py` - Database session management ✅
   - Async session factory
   - Connection pooling (min: 5, max: 20)
   - Dependency for FastAPI
 
-- [ ] T040 Initialize Alembic (`alembic init alembic`)
-- [ ] T041 Configure `alembic.ini` for async SQLAlchemy
-- [ ] T042 Update `alembic/env.py` for async migrations
+- [x] T040 Initialize Alembic (`alembic init alembic`) ✅
+- [x] T041 Configure `alembic.ini` for async SQLAlchemy ✅
+- [x] T042 Update `alembic/env.py` for async migrations ✅
 
 ### Security & Authentication
 

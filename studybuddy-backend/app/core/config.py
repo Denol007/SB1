@@ -49,6 +49,7 @@ class Settings(BaseSettings):
     DATABASE_MAX_OVERFLOW: int = 10
     DATABASE_POOL_TIMEOUT: int = 30
     DATABASE_POOL_RECYCLE: int = 3600
+    DATABASE_ECHO: bool = False  # Set to True to log all SQL statements
 
     # Redis
     REDIS_URL: str = Field(..., description="Redis connection URL")
