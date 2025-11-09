@@ -276,7 +276,7 @@ description: "Task list for StudyBuddy platform implementation"
   - Test `POST /api/v1/verifications/confirm/{token}`
   - Test `GET /api/v1/verifications/me`
 
-- [ ] T068 [US1] E2E test: `tests/e2e/test_registration_flow.py`
+- [x] T068 [US1] E2E test: `tests/e2e/test_registration_flow.py`
   - Complete flow: OAuth → Register → Request verification → Confirm → Access verified community
 
 ### Domain Models for User Story 1
