@@ -61,7 +61,7 @@ check_docker() {
         print_error "Docker is not installed. Please install Docker first."
         exit 1
     fi
-    
+
     if ! command -v docker-compose &> /dev/null && ! docker compose version &> /dev/null; then
         print_error "Docker Compose is not installed. Please install Docker Compose first."
         exit 1
@@ -87,10 +87,10 @@ check_env() {
 start_services() {
     print_header
     print_info "Starting StudyBuddy backend services..."
-    
+
     cd "$PROJECT_ROOT"
     docker compose -f "$DOCKER_COMPOSE_FILE" up -d
-    
+
     print_success "Services started!"
     echo ""
     print_info "Services running:"
@@ -171,9 +171,9 @@ build_services() {
 main() {
     check_docker
     check_env
-    
+
     COMMAND="${1:-start}"
-    
+
     case $COMMAND in
         start)
             start_services

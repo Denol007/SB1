@@ -1,0 +1,348 @@
+name: CD - Deploy to Production
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*'
+  workflow_dispatch:  # Allow manual trigger
+    inputs:
+      version:
+        description: 'Version to deploy (e.g., v1.0.0)'
+        required: true
+        type: string
+
+env:
+  PYTHON_VERSION: "3.12"
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build-and-push:
+    name: Build and Push Production Image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    outputs:
+      image-tag: ${{ steps.meta.outputs.tags }}
+      image-digest: ${{ steps.build.outputs.digest }}
+      version: ${{ steps.version.outputs.version }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Determine version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "version=${{ inputs.version }}" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            echo "version=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          else
+            echo "version=prod-$(date +%Y%m%d-%H%M%S)" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha,prefix=prod-
+            type=raw,value=production-latest
+            type=raw,value=${{ steps.version.outputs.version }}
+
+      - name: Build and push Docker image
+        id: build
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./docker/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache-prod
+          cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache-prod,mode=max
+          build-args: |
+            ENVIRONMENT=production
+
+      - name: Sign the image with cosign
+        run: |
+          echo "Image signing would go here (cosign)"
+          # cosign sign --key cosign.key ${{ steps.meta.outputs.tags }}
+
+  approval:
+    name: Manual Approval Required
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    environment:
+      name: production-approval
+      url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+    steps:
+      - name: Wait for approval
+        run: |
+          echo "⏳ Waiting for manual approval to deploy to production..."
+          echo "Image: ${{ needs.build-and-push.outputs.image-tag }}"
+          echo "Version: ${{ needs.build-and-push.outputs.version }}"
+
+  deploy-to-kubernetes:
+    name: Deploy to Production Kubernetes
+    runs-on: ubuntu-latest
+    needs: [build-and-push, approval]
+    environment:
+      name: production
+      url: https://api.studybuddy.example.com
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure kubectl
+        uses: azure/k8s-set-context@v4
+        with:
+          method: kubeconfig
+          kubeconfig: ${{ secrets.KUBE_CONFIG_PRODUCTION }}
+
+      - name: Create namespace if not exists
+        run: |
+          kubectl create namespace studybuddy-prod --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Create/update secrets
+        run: |
+          kubectl create secret generic studybuddy-secrets \
+            --from-literal=DATABASE_URL="${{ secrets.PROD_DATABASE_URL }}" \
+            --from-literal=REDIS_URL="${{ secrets.PROD_REDIS_URL }}" \
+            --from-literal=SECRET_KEY="${{ secrets.PROD_SECRET_KEY }}" \
+            --from-literal=JWT_SECRET_KEY="${{ secrets.PROD_JWT_SECRET_KEY }}" \
+            --from-literal=GOOGLE_CLIENT_ID="${{ secrets.PROD_GOOGLE_CLIENT_ID }}" \
+            --from-literal=GOOGLE_CLIENT_SECRET="${{ secrets.PROD_GOOGLE_CLIENT_SECRET }}" \
+            --from-literal=SMTP_PASSWORD="${{ secrets.PROD_SMTP_PASSWORD }}" \
+            --from-literal=SENTRY_DSN="${{ secrets.PROD_SENTRY_DSN }}" \
+            --from-literal=AWS_ACCESS_KEY_ID="${{ secrets.PROD_AWS_ACCESS_KEY_ID }}" \
+            --from-literal=AWS_SECRET_ACCESS_KEY="${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}" \
+            --namespace=studybuddy-prod \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Backup current deployment
+        run: |
+          kubectl get deployment studybuddy-api -n studybuddy-prod -o yaml > backup-deployment-${{ github.run_number }}.yaml || true
+        continue-on-error: true
+
+      - name: Update image tag in deployment
+        run: |
+          cd kubernetes
+          sed -i "s|IMAGE_TAG|${{ needs.build-and-push.outputs.image-tag }}|g" api-deployment.yaml
+          sed -i "s|IMAGE_TAG|${{ needs.build-and-push.outputs.image-tag }}|g" celery-deployment.yaml
+
+      - name: Apply Kubernetes manifests
+        run: |
+          kubectl apply -f kubernetes/namespace.yaml --namespace=studybuddy-prod || true
+          kubectl apply -f kubernetes/configmap.yaml --namespace=studybuddy-prod
+          kubectl apply -f kubernetes/api-deployment.yaml --namespace=studybuddy-prod
+          kubectl apply -f kubernetes/celery-deployment.yaml --namespace=studybuddy-prod
+          kubectl apply -f kubernetes/ingress.yaml --namespace=studybuddy-prod
+          kubectl apply -f kubernetes/hpa.yaml --namespace=studybuddy-prod
+
+      - name: Wait for rollout to complete
+        run: |
+          kubectl rollout status deployment/studybuddy-api --namespace=studybuddy-prod --timeout=10m
+          kubectl rollout status deployment/studybuddy-celery-worker --namespace=studybuddy-prod --timeout=10m
+
+      - name: Run database migrations
+        run: |
+          kubectl run migration-job-${{ github.run_number }} \
+            --image=${{ needs.build-and-push.outputs.image-tag }} \
+            --restart=Never \
+            --namespace=studybuddy-prod \
+            --env-from=secret/studybuddy-secrets \
+            --command -- uv run alembic upgrade head
+
+      - name: Wait for migration to complete
+        run: |
+          kubectl wait --for=condition=complete --timeout=10m \
+            pod/migration-job-${{ github.run_number }} \
+            --namespace=studybuddy-prod
+
+      - name: Get deployment status
+        run: |
+          kubectl get pods --namespace=studybuddy-prod
+          kubectl get services --namespace=studybuddy-prod
+          kubectl get ingress --namespace=studybuddy-prod
+          kubectl get hpa --namespace=studybuddy-prod
+
+  smoke-tests:
+    name: Run Smoke Tests
+    runs-on: ubuntu-latest
+    needs: deploy-to-kubernetes
+
+    steps:
+      - name: Wait for deployment to stabilize
+        run: sleep 60
+
+      - name: Check API health endpoint
+        run: |
+          response=$(curl -s -o /dev/null -w "%{http_code}" https://api.studybuddy.example.com/health)
+          if [ $response -eq 200 ]; then
+            echo "✅ Health check passed!"
+          else
+            echo "❌ Health check failed with status code: $response"
+            exit 1
+          fi
+
+      - name: Check readiness endpoint
+        run: |
+          response=$(curl -s -o /dev/null -w "%{http_code}" https://api.studybuddy.example.com/health/ready)
+          if [ $response -eq 200 ]; then
+            echo "✅ Readiness check passed!"
+          else
+            echo "❌ Readiness check failed with status code: $response"
+            exit 1
+          fi
+
+      - name: Check API docs endpoint
+        run: |
+          response=$(curl -s -o /dev/null -w "%{http_code}" https://api.studybuddy.example.com/docs)
+          if [ $response -eq 200 ]; then
+            echo "✅ API docs accessible!"
+          else
+            echo "⚠️ API docs not accessible (status: $response)"
+          fi
+
+      - name: Test authentication endpoint
+        run: |
+          response=$(curl -s -o /dev/null -w "%{http_code}" https://api.studybuddy.example.com/api/v1/auth/google)
+          if [ $response -eq 200 ] || [ $response -eq 307 ] || [ $response -eq 302 ]; then
+            echo "✅ Auth endpoint responding!"
+          else
+            echo "❌ Auth endpoint failed with status code: $response"
+            exit 1
+          fi
+
+  rollback:
+    name: Rollback on Failure
+    runs-on: ubuntu-latest
+    needs: [deploy-to-kubernetes, smoke-tests]
+    if: failure()
+    environment:
+      name: production
+
+    steps:
+      - name: Configure kubectl
+        uses: azure/k8s-set-context@v4
+        with:
+          method: kubeconfig
+          kubeconfig: ${{ secrets.KUBE_CONFIG_PRODUCTION }}
+
+      - name: Rollback deployment
+        run: |
+          echo "⚠️ Rolling back production deployment..."
+          kubectl rollout undo deployment/studybuddy-api --namespace=studybuddy-prod
+          kubectl rollout undo deployment/studybuddy-celery-worker --namespace=studybuddy-prod
+
+      - name: Wait for rollback to complete
+        run: |
+          kubectl rollout status deployment/studybuddy-api --namespace=studybuddy-prod --timeout=5m
+          kubectl rollout status deployment/studybuddy-celery-worker --namespace=studybuddy-prod --timeout=5m
+
+      - name: Verify rollback health
+        run: |
+          sleep 30
+          response=$(curl -s -o /dev/null -w "%{http_code}" https://api.studybuddy.example.com/health)
+          if [ $response -eq 200 ]; then
+            echo "✅ Rollback successful, health check passed!"
+          else
+            echo "❌ Rollback failed, health check returned: $response"
+            echo "🚨 Manual intervention required!"
+            exit 1
+          fi
+
+  notify:
+    name: Notify Deployment Status
+    runs-on: ubuntu-latest
+    needs: [build-and-push, deploy-to-kubernetes, smoke-tests]
+    if: always()
+
+    steps:
+      - name: Create deployment record
+        if: success()
+        run: |
+          echo "📝 Recording production deployment..."
+          echo "Version: ${{ needs.build-and-push.outputs.version }}"
+          echo "Image: ${{ needs.build-and-push.outputs.image-tag }}"
+          echo "Digest: ${{ needs.build-and-push.outputs.image-digest }}"
+          echo "Timestamp: $(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+          echo "Actor: ${{ github.actor }}"
+
+      - name: Deployment Success
+        if: |
+          needs.build-and-push.result == 'success' &&
+          needs.deploy-to-kubernetes.result == 'success' &&
+          needs.smoke-tests.result == 'success'
+        run: |
+          echo "🎉 Production deployment successful!"
+          echo "Version: ${{ needs.build-and-push.outputs.version }}"
+          echo "Image: ${{ needs.build-and-push.outputs.image-tag }}"
+
+      - name: Deployment Failed
+        if: |
+          needs.build-and-push.result == 'failure' ||
+          needs.deploy-to-kubernetes.result == 'failure' ||
+          needs.smoke-tests.result == 'failure'
+        run: |
+          echo "❌ Production deployment failed!"
+          echo "Check logs and rollback status"
+          exit 1
+
+      # Optional: Add notification integrations
+      # - name: Send Slack notification
+      #   uses: slackapi/slack-github-action@v1
+      #   with:
+      #     payload: |
+      #       {
+      #         "text": "🚀 Production Deployment: ${{ job.status }}",
+      #         "blocks": [
+      #           {
+      #             "type": "section",
+      #             "text": {
+      #               "type": "mrkdwn",
+      #               "text": "Production deployment *${{ job.status }}*\nVersion: ${{ needs.build-and-push.outputs.version }}\nCommit: ${{ github.sha }}\nActor: ${{ github.actor }}"
+      #             }
+      #           }
+      #         ]
+      #       }
+      #   env:
+      #     SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      # - name: Create GitHub Release
+      #   if: success() && startsWith(github.ref, 'refs/tags/')
+      #   uses: actions/create-release@v1
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   with:
+      #     tag_name: ${{ needs.build-and-push.outputs.version }}
+      #     release_name: Release ${{ needs.build-and-push.outputs.version }}
+      #     body: |
+      #       Production deployment of version ${{ needs.build-and-push.outputs.version }}
+      #
+      #       Image: ${{ needs.build-and-push.outputs.image-tag }}
+      #       Digest: ${{ needs.build-and-push.outputs.image-digest }}
+      #     draft: false
+      #     prerelease: false

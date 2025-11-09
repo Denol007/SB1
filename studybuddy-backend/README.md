@@ -21,6 +21,7 @@ StudyBuddy is a comprehensive social platform designed to connect university stu
 ## ✨ Features
 
 ### Core Functionality
+
 - ✅ **User Authentication** - Google OAuth 2.0 with JWT tokens
 - ✅ **Student Verification** - University email domain validation
 - ✅ **Hierarchical Communities** - Universities, departments, clubs, and more
@@ -33,6 +34,7 @@ StudyBuddy is a comprehensive social platform designed to connect university stu
 - ✅ **Analytics** - User metrics, engagement tracking, conversion funnels
 
 ### Technical Highlights
+
 - 🚀 **High Performance** - Async/await, Redis caching, database optimization
 - 🔒 **Security First** - JWT auth, rate limiting, input validation, CORS
 - 📈 **Horizontally Scalable** - Stateless API, Redis pub/sub for WebSockets
@@ -65,6 +67,7 @@ StudyBuddy is a comprehensive social platform designed to connect university stu
 ```
 
 **Design Pattern**: Hexagonal Architecture (Ports and Adapters)
+
 - Clear separation of concerns
 - Business logic independent of frameworks
 - Easy to test and maintain
@@ -73,6 +76,7 @@ StudyBuddy is a comprehensive social platform designed to connect university stu
 ## 🚀 Quick Start
 
 ### Prerequisites
+
 - Python 3.11+
 - Docker & Docker Compose
 - Git
@@ -80,11 +84,13 @@ StudyBuddy is a comprehensive social platform designed to connect university stu
 ### Setup (5 minutes)
 
 1. **Install uv (Python package manager)**
+
    ```bash
    curl -LsSf https://astral.sh/uv/install.sh | sh
    ```
 
 2. **Clone and configure**
+
    ```bash
    git clone https://github.com/Denol007/SB1.git
    cd SB1/studybuddy-backend
@@ -92,15 +98,16 @@ StudyBuddy is a comprehensive social platform designed to connect university stu
    ```
 
 3. **Start development environment**
+
    ```bash
    chmod +x scripts/dev.sh
    ./scripts/dev.sh
    ```
 
 4. **Access the API**
-   - Swagger UI: http://localhost:8000/docs
-   - ReDoc: http://localhost:8000/redoc
-   - Health Check: http://localhost:8000/health
+   - Swagger UI: <http://localhost:8000/docs>
+   - ReDoc: <http://localhost:8000/redoc>
+   - Health Check: <http://localhost:8000/health>
 
 See [QUICKSTART.md](QUICKSTART.md) for detailed instructions.
 
@@ -237,17 +244,20 @@ uv run celery -A app.tasks.celery_app flower
 ## 🚢 Deployment
 
 ### Local Development
+
 ```bash
 ./scripts/dev.sh
 ```
 
 ### Staging (Automatic on push to `develop`)
+
 ```bash
 git push origin develop
 # GitHub Actions automatically deploys to staging
 ```
 
 ### Production (Manual approval required)
+
 ```bash
 git push origin main
 # GitHub Actions builds and awaits manual approval
@@ -255,6 +265,7 @@ git push origin main
 ```
 
 ### Manual Kubernetes Deployment
+
 ```bash
 # Apply manifests
 kubectl apply -f kubernetes/
@@ -344,21 +355,25 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🗺️ Roadmap
 
 ### Phase 1: MVP (Weeks 1-10) ✅
+
 - [x] Authentication and user management
 - [x] Communities and memberships
 - [x] Social feed (posts, reactions, comments)
 
 ### Phase 2: Real-time Features (Weeks 11-18) 🚧
+
 - [ ] WebSocket chat implementation
 - [ ] Event management system
 - [ ] Real-time notifications
 
 ### Phase 3: Safety & Discovery (Weeks 19-24) 📋
+
 - [ ] Content moderation system
 - [ ] Global search functionality
 - [ ] Advanced filtering
 
 ### Phase 4: Premium Features (Weeks 25-30) 📋
+
 - [ ] Analytics dashboard
 - [ ] Data export capabilities
 - [ ] API access for institutions

@@ -1,8 +1,8 @@
 # Feature Specification: StudyBuddy Social Platform Backend
 
-**Feature Branch**: `001-studybuddy-platform`  
-**Created**: 2025-11-08  
-**Status**: Draft  
+**Feature Branch**: `001-studybuddy-platform`
+**Created**: 2025-11-08
+**Status**: Draft
 **Input**: User description: "Build a social networking platform backend (StudyBuddy) for university students and prospective students"
 
 ## Executive Summary
@@ -10,6 +10,7 @@
 StudyBuddy is a social networking platform designed to connect university students, prospective students, and educational communities. The platform facilitates knowledge sharing, event organization, and peer-to-peer communication within a verified, university-focused ecosystem.
 
 **Core Value Propositions:**
+
 - Verified student communities with institutional trust
 - Prospective student guidance through direct connection with current students
 - Event-driven engagement for campus activities
@@ -30,7 +31,7 @@ A prospective student visits StudyBuddy to explore university communities, creat
 
 1. **Given** a new visitor on StudyBuddy, **When** they click "Sign in with Google", **Then** they are redirected to Google OAuth consent screen
 2. **Given** successful Google authentication, **When** they complete the OAuth flow, **Then** a user account is created with their Google profile data (name, email, avatar)
-3. **Given** a registered user with a university email (e.g., john@stanford.edu), **When** they request verification for Stanford University community, **Then** a verification email with a unique token is sent to their university email
+3. **Given** a registered user with a university email (e.g., <john@stanford.edu>), **When** they request verification for Stanford University community, **Then** a verification email with a unique token is sent to their university email
 4. **Given** a verification email sent, **When** the user clicks the verification link within 24 hours, **Then** their account is marked as verified for that university
 5. **Given** an expired verification token (>24h), **When** user clicks the link, **Then** they receive an error message and option to request a new verification email
 6. **Given** a verified student, **When** they view university communities, **Then** they can access private university content
@@ -223,6 +224,7 @@ A transfer student or dual-enrollment student verifies their email for multiple 
 ### Functional Requirements
 
 #### Authentication & Authorization
+
 - **FR-001**: System MUST support Google OAuth 2.0 for user authentication
 - **FR-002**: System MUST generate JWT access tokens (15-minute expiry) and refresh tokens (7-day expiry)
 - **FR-003**: System MUST store refresh tokens in HTTP-only cookies for security
@@ -230,6 +232,7 @@ A transfer student or dual-enrollment student verifies their email for multiple 
 - **FR-005**: System MUST validate JWT tokens on all protected endpoints
 
 #### User Management
+
 - **FR-006**: System MUST create user profiles with fields: name, email, bio (max 500 chars), avatar URL, created_at, updated_at
 - **FR-007**: System MUST support avatar image upload (max 5MB, formats: JPG, PNG, WebP)
 - **FR-008**: System MUST validate university email domains against a whitelist of recognized institutions
@@ -237,6 +240,7 @@ A transfer student or dual-enrollment student verifies their email for multiple 
 - **FR-010**: System MUST provide user search by name with autocomplete (min 3 characters)
 
 #### Student Verification
+
 - **FR-011**: System MUST send verification emails with unique tokens to university email addresses
 - **FR-012**: System MUST expire verification tokens after 24 hours
 - **FR-013**: System MUST track verification status per university per user (verified, pending, expired)
@@ -244,6 +248,7 @@ A transfer student or dual-enrollment student verifies their email for multiple 
 - **FR-015**: System MUST log all verification attempts with timestamp, IP address, and result
 
 #### Communities
+
 - **FR-016**: System MUST support community types: university, business, student_council, hobby
 - **FR-017**: System MUST support visibility settings: public (anyone can view/join), private (invite-only, searchable), closed (invite-only, not searchable)
 - **FR-018**: System MUST support hierarchical communities with parent-child relationships (max depth: 3 levels)
@@ -253,6 +258,7 @@ A transfer student or dual-enrollment student verifies their email for multiple 
 - **FR-022**: System MUST support community metadata: name, description (max 2000 chars), created_at, member_count
 
 #### Social Feed
+
 - **FR-023**: System MUST allow community members to create posts with rich text content (max 10,000 chars)
 - **FR-024**: System MUST support media attachments on posts (max 10 files, 20MB total, formats: images, PDFs)
 - **FR-025**: System MUST support reaction types: like, love, celebrate, support
@@ -265,6 +271,7 @@ A transfer student or dual-enrollment student verifies their email for multiple 
 - **FR-032**: System MUST sort feed by: most recent, most reactions, most comments
 
 #### Events
+
 - **FR-033**: System MUST support event types: online, offline, hybrid
 - **FR-034**: System MUST require event fields: title, description, type, start_time, end_time, location (for offline/hybrid)
 - **FR-035**: System MUST support participant limits (optional)
@@ -275,6 +282,7 @@ A transfer student or dual-enrollment student verifies their email for multiple 
 - **FR-040**: System MUST track registration timestamp and attendance status
 
 #### Real-Time Chat
+
 - **FR-041**: System MUST support chat types: direct (1-on-1), group, community
 - **FR-042**: System MUST use WebSocket protocol for real-time message delivery
 - **FR-043**: System MUST support special "prospective ↔ verified student" chat type with visual indicator
@@ -287,6 +295,7 @@ A transfer student or dual-enrollment student verifies their email for multiple 
 - **FR-050**: System MUST implement message queue for offline users
 
 #### Moderation
+
 - **FR-051**: System MUST allow reporting of posts, comments, messages, and users
 - **FR-052**: System MUST support report reasons: spam, harassment, inappropriate_content, misinformation, other
 - **FR-053**: System MUST create moderation queue entries for all reports
@@ -297,6 +306,7 @@ A transfer student or dual-enrollment student verifies their email for multiple 
 - **FR-058**: System MUST support ban durations: temporary (specify days), permanent
 
 #### Analytics (Premium Feature)
+
 - **FR-059**: System MUST track user metrics: DAU (Daily Active Users), WAU, MAU
 - **FR-060**: System MUST track content metrics: post count, reaction count, comment count per period
 - **FR-061**: System MUST track event metrics: registration count, attendance rate, no-show rate
@@ -307,6 +317,7 @@ A transfer student or dual-enrollment student verifies their email for multiple 
 - **FR-066**: System MUST retain historical data: 30 days (free), 1 year (premium)
 
 #### Search
+
 - **FR-067**: System MUST support global search across: communities, users, posts, events
 - **FR-068**: System MUST provide autocomplete suggestions (min 3 characters, top 5 results)
 - **FR-069**: System MUST support filters: entity type, date range, community scope
@@ -315,6 +326,7 @@ A transfer student or dual-enrollment student verifies their email for multiple 
 - **FR-072**: System MUST sanitize search inputs to prevent SQL injection
 
 #### Notifications
+
 - **FR-073**: System MUST support notification types: mention, reaction, comment, message, event_reminder, event_update
 - **FR-074**: System MUST deliver notifications via: WebSocket (real-time), email (configurable)
 - **FR-075**: System MUST allow users to configure notification preferences per type and per channel
@@ -325,6 +337,7 @@ A transfer student or dual-enrollment student verifies their email for multiple 
 ### Non-Functional Requirements
 
 #### Performance
+
 - **NFR-001**: System MUST respond to 95% of API requests within 200ms (read operations)
 - **NFR-002**: System MUST respond to 95% of API requests within 500ms (write operations)
 - **NFR-003**: System MUST deliver WebSocket messages with <100ms latency
@@ -332,12 +345,14 @@ A transfer student or dual-enrollment student verifies their email for multiple 
 - **NFR-005**: System MUST cache frequently accessed data (user profiles, community metadata) in Redis with 5-minute TTL
 
 #### Scalability
+
 - **NFR-006**: System MUST be stateless to enable horizontal scaling
 - **NFR-007**: System MUST use connection pooling for database (min: 5, max: 20 per instance)
 - **NFR-008**: System MUST process background jobs (emails, notifications) via Celery task queue
 - **NFR-009**: System MUST support database read replicas for analytics queries
 
 #### Security
+
 - **NFR-010**: System MUST hash passwords with bcrypt (cost factor: 12) if supporting email/password auth
 - **NFR-011**: System MUST sanitize all user input to prevent XSS attacks
 - **NFR-012**: System MUST use parameterized queries or ORM to prevent SQL injection
@@ -349,6 +364,7 @@ A transfer student or dual-enrollment student verifies their email for multiple 
 - **NFR-018**: System MUST validate file uploads for type, size, and malware
 
 #### Reliability
+
 - **NFR-019**: System MUST achieve 99.9% uptime (excluding planned maintenance)
 - **NFR-020**: System MUST implement health check endpoints: `/health` (liveness), `/health/ready` (readiness)
 - **NFR-021**: System MUST implement graceful degradation: if Redis fails, serve uncached data
@@ -356,6 +372,7 @@ A transfer student or dual-enrollment student verifies their email for multiple 
 - **NFR-023**: System MUST implement retry logic with exponential backoff for external API calls
 
 #### Monitoring & Observability
+
 - **NFR-024**: System MUST use structured JSON logging in production
 - **NFR-025**: System MUST include request_id in all logs for request tracing
 - **NFR-026**: System MUST redact PII from logs (passwords, tokens, credit cards)
@@ -364,12 +381,14 @@ A transfer student or dual-enrollment student verifies their email for multiple 
 - **NFR-029**: System MUST log all moderation actions, verification attempts, and security events
 
 #### Compliance & Privacy
+
 - **NFR-030**: System MUST support GDPR compliance: data export, right to deletion
 - **NFR-031**: System MUST implement soft deletes for user data (allow recovery within 30 days)
 - **NFR-032**: System MUST anonymize user data in analytics after account deletion
 - **NFR-033**: System MUST provide clear privacy policy and terms of service acceptance tracking
 
 #### Documentation
+
 - **NFR-034**: System MUST provide OpenAPI 3.0 documentation at `/docs` (Swagger UI)
 - **NFR-035**: System MUST provide ReDoc documentation at `/redoc`
 - **NFR-036**: System MUST include example requests/responses in API documentation
@@ -379,92 +398,110 @@ A transfer student or dual-enrollment student verifies their email for multiple 
 ### Key Entities
 
 #### User
+
 - **Purpose**: Represents a platform user (student, prospective student, admin)
 - **Key Attributes**: id (UUID), google_id (unique), email, name, bio, avatar_url, role, created_at, updated_at, deleted_at
 - **Relationships**: Has many verifications, memberships, posts, messages, reactions, reports
 
 #### Verification
+
 - **Purpose**: Tracks student verification status for universities
 - **Key Attributes**: id (UUID), user_id, university_id, email, token (hashed), status (pending/verified/expired), verified_at, expires_at
 - **Relationships**: Belongs to user, belongs to university
 
 #### University
+
 - **Purpose**: Represents educational institutions with verified domains
 - **Key Attributes**: id (UUID), name, domain, logo_url, country, created_at
 - **Relationships**: Has many verifications, has many communities
 
 #### Community
+
 - **Purpose**: Organizational unit for content (university, club, department)
 - **Key Attributes**: id (UUID), name, description, type, visibility, parent_id, requires_verification, avatar_url, cover_url, member_count, created_at
 - **Relationships**: Belongs to parent community, has many child communities, has many memberships, posts, events
 
 #### Membership
+
 - **Purpose**: Tracks user membership in communities with roles
 - **Key Attributes**: id (UUID), user_id, community_id, role (admin/moderator/member), joined_at
 - **Relationships**: Belongs to user, belongs to community
 
 #### Post
+
 - **Purpose**: User-generated content within communities
 - **Key Attributes**: id (UUID), author_id, community_id, content (rich text), attachments (JSON array), is_pinned, edited_at, created_at, deleted_at
 - **Relationships**: Belongs to author (user), belongs to community, has many reactions, comments
 
 #### Reaction
+
 - **Purpose**: User reactions to posts (like, love, etc.)
 - **Key Attributes**: id (UUID), user_id, post_id, reaction_type (enum), created_at
 - **Relationships**: Belongs to user, belongs to post
 - **Constraints**: Unique constraint on (user_id, post_id)
 
 #### Comment
+
 - **Purpose**: Nested comments on posts
 - **Key Attributes**: id (UUID), author_id, post_id, parent_comment_id, content, created_at, deleted_at
 - **Relationships**: Belongs to author (user), belongs to post, belongs to parent comment (self-referential)
 
 #### Event
+
 - **Purpose**: Community events with registration tracking
 - **Key Attributes**: id (UUID), community_id, creator_id, title, description, type (online/offline/hybrid), location, start_time, end_time, participant_limit, status, created_at
 - **Relationships**: Belongs to community, belongs to creator (user), has many registrations
 
 #### EventRegistration
+
 - **Purpose**: Tracks user registration for events
 - **Key Attributes**: id (UUID), event_id, user_id, status (registered/waitlisted/attended/no_show), registered_at
 - **Relationships**: Belongs to event, belongs to user
 
 #### Chat
+
 - **Purpose**: Container for messages (direct, group, community)
 - **Key Attributes**: id (UUID), type (direct/group/community), name, community_id (nullable), created_at
 - **Relationships**: Has many participants, has many messages
 
 #### ChatParticipant
+
 - **Purpose**: Tracks users in chats
 - **Key Attributes**: id (UUID), chat_id, user_id, joined_at, last_read_at
 - **Relationships**: Belongs to chat, belongs to user
 
 #### Message
+
 - **Purpose**: Individual messages within chats
 - **Key Attributes**: id (UUID), chat_id, sender_id, content, attachments (JSON array), created_at, deleted_at
 - **Relationships**: Belongs to chat, belongs to sender (user), has many read receipts
 
 #### MessageReadReceipt
+
 - **Purpose**: Tracks when messages are read
 - **Key Attributes**: id (UUID), message_id, user_id, read_at
 - **Relationships**: Belongs to message, belongs to user
 
 #### Report
+
 - **Purpose**: User reports of content/users
 - **Key Attributes**: id (UUID), reporter_id, reported_user_id (nullable), reported_content_id (nullable), reported_content_type (enum), reason, details, status (pending/resolved/dismissed), created_at
 - **Relationships**: Belongs to reporter (user), polymorphic to reported content (post/comment/message/user)
 
 #### ModerationAction
+
 - **Purpose**: Log of moderation actions taken
 - **Key Attributes**: id (UUID), moderator_id, report_id, action_type (remove/warn/ban), reason, target_id, target_type, created_at
 - **Relationships**: Belongs to moderator (user), belongs to report
 
 #### Notification
+
 - **Purpose**: User notifications for various events
 - **Key Attributes**: id (UUID), user_id, type (mention/reaction/comment/message/event), title, content, link, is_read, created_at
 - **Relationships**: Belongs to user
 
 #### AnalyticsMetric
+
 - **Purpose**: Stores analytics data points
 - **Key Attributes**: id (UUID), community_id, metric_type, metric_value, period_start, period_end, created_at
 - **Relationships**: Belongs to community
@@ -472,6 +509,7 @@ A transfer student or dual-enrollment student verifies their email for multiple 
 ## Technical Architecture
 
 ### Technology Stack
+
 - **Backend Framework**: FastAPI (Python 3.11+)
 - **Database**: PostgreSQL 15+ with TimescaleDB extension (for time-series analytics)
 - **ORM**: SQLAlchemy 2.0 with Alembic migrations
@@ -485,11 +523,13 @@ A transfer student or dual-enrollment student verifies their email for multiple 
 - **API Documentation**: OpenAPI 3.0 (auto-generated via FastAPI)
 
 ### API Versioning
+
 - URL-based versioning: `/api/v1/`, `/api/v2/`
 - Maintain backward compatibility for one major version
 - Deprecation warnings via response headers: `Deprecated: true`, `Sunset: 2026-01-01`
 
 ### Database Design Principles
+
 - Use UUIDs for all primary keys (prevents enumeration attacks)
 - Implement soft deletes with `deleted_at` timestamp
 - Add indexes on all foreign keys and frequently queried fields
@@ -498,6 +538,7 @@ A transfer student or dual-enrollment student verifies their email for multiple 
 - Use database migrations exclusively (never manual schema changes)
 
 ### WebSocket Architecture
+
 - Connection authentication via JWT in query parameter or header
 - Redis pub/sub for multi-instance message distribution
 - Heartbeat/ping mechanism (30-second interval) to detect dead connections
@@ -505,6 +546,7 @@ A transfer student or dual-enrollment student verifies their email for multiple 
 - Connection pooling: max 10,000 concurrent connections per instance
 
 ### Background Jobs
+
 - **Email Delivery**: Verification emails, event reminders, notifications
 - **Event Reminders**: Scheduled 24 hours before event start
 - **Analytics Aggregation**: Daily rollup of metrics (DAU, WAU, MAU)
@@ -512,12 +554,14 @@ A transfer student or dual-enrollment student verifies their email for multiple 
 - **Notification Dispatch**: Batch email notifications (digest emails)
 
 ### File Upload Handling
+
 - Direct upload to S3 with pre-signed URLs (reduce backend load)
 - File validation: type whitelist (MIME type), size limits, virus scanning (ClamAV)
 - Image processing: thumbnail generation, format conversion (WebP)
 - CDN integration for serving uploaded files (CloudFront)
 
 ### Rate Limiting Strategy
+
 - **Global**: 100 req/min per authenticated user, 20 req/min per IP (unauthenticated)
 - **Authentication**: 5 req/min per IP (prevent brute force)
 - **Message Sending**: 10 messages/min per user (prevent spam)
@@ -526,7 +570,9 @@ A transfer student or dual-enrollment student verifies their email for multiple 
 - Implementation: Redis-based token bucket algorithm
 
 ### Error Handling
+
 - Consistent error response format:
+
 ```json
 {
   "error": {
@@ -541,9 +587,11 @@ A transfer student or dual-enrollment student verifies their email for multiple 
   }
 }
 ```
+
 - HTTP status codes: 400 (validation), 401 (auth), 403 (forbidden), 404 (not found), 409 (conflict), 429 (rate limit), 500 (server error)
 
 ### Security Measures
+
 - **Input Validation**: Pydantic models for all requests
 - **Output Encoding**: Escape HTML/JavaScript in responses
 - **CSRF Protection**: Token validation for state-changing operations (non-GET)
@@ -556,12 +604,14 @@ A transfer student or dual-enrollment student verifies their email for multiple 
 ## API Endpoints Overview
 
 ### Authentication
+
 - `POST /api/v1/auth/google` - Initiate Google OAuth flow
 - `POST /api/v1/auth/google/callback` - Handle OAuth callback, issue tokens
 - `POST /api/v1/auth/refresh` - Refresh access token using refresh token
 - `POST /api/v1/auth/logout` - Invalidate refresh token
 
 ### Users
+
 - `GET /api/v1/users/me` - Get current user profile
 - `PATCH /api/v1/users/me` - Update current user profile
 - `DELETE /api/v1/users/me` - Delete account (GDPR)
@@ -569,12 +619,14 @@ A transfer student or dual-enrollment student verifies their email for multiple 
 - `GET /api/v1/users/search?q={query}` - Search users
 
 ### Verification
+
 - `POST /api/v1/verifications` - Request student verification
 - `POST /api/v1/verifications/confirm/{token}` - Confirm verification
 - `GET /api/v1/verifications/me` - List my verifications
 - `POST /api/v1/verifications/{verification_id}/resend` - Resend verification email
 
 ### Communities
+
 - `GET /api/v1/communities` - List communities (with filters)
 - `POST /api/v1/communities` - Create community
 - `GET /api/v1/communities/{community_id}` - Get community details
@@ -586,6 +638,7 @@ A transfer student or dual-enrollment student verifies their email for multiple 
 - `PATCH /api/v1/communities/{community_id}/members/{user_id}` - Update member role
 
 ### Posts
+
 - `GET /api/v1/communities/{community_id}/posts` - List posts in community
 - `POST /api/v1/communities/{community_id}/posts` - Create post
 - `GET /api/v1/posts/{post_id}` - Get post details
@@ -596,12 +649,14 @@ A transfer student or dual-enrollment student verifies their email for multiple 
 - `DELETE /api/v1/posts/{post_id}/reactions` - Remove reaction
 
 ### Comments
+
 - `GET /api/v1/posts/{post_id}/comments` - List comments on post
 - `POST /api/v1/posts/{post_id}/comments` - Create comment
 - `PATCH /api/v1/comments/{comment_id}` - Update comment
 - `DELETE /api/v1/comments/{comment_id}` - Delete comment
 
 ### Events
+
 - `GET /api/v1/communities/{community_id}/events` - List events
 - `POST /api/v1/communities/{community_id}/events` - Create event
 - `GET /api/v1/events/{event_id}` - Get event details
@@ -612,6 +667,7 @@ A transfer student or dual-enrollment student verifies their email for multiple 
 - `GET /api/v1/events/{event_id}/participants` - List participants
 
 ### Chats
+
 - `GET /api/v1/chats` - List my chats
 - `POST /api/v1/chats` - Create chat (direct or group)
 - `GET /api/v1/chats/{chat_id}` - Get chat details
@@ -623,9 +679,11 @@ A transfer student or dual-enrollment student verifies their email for multiple 
 - `GET /api/v1/chats/{chat_id}/search?q={query}` - Search messages
 
 ### WebSocket
+
 - `WS /api/v1/ws?token={jwt_token}` - WebSocket connection for real-time updates
 
 ### Moderation
+
 - `POST /api/v1/reports` - Submit report
 - `GET /api/v1/reports` - List reports (moderator)
 - `PATCH /api/v1/reports/{report_id}` - Update report status
@@ -633,9 +691,11 @@ A transfer student or dual-enrollment student verifies their email for multiple 
 - `GET /api/v1/moderation/logs` - View moderation logs (admin)
 
 ### Search
+
 - `GET /api/v1/search?q={query}&type={type}&filters={filters}` - Global search
 
 ### Notifications
+
 - `GET /api/v1/notifications` - List notifications
 - `PATCH /api/v1/notifications/{notification_id}/read` - Mark as read
 - `PATCH /api/v1/notifications/read-all` - Mark all as read
@@ -643,6 +703,7 @@ A transfer student or dual-enrollment student verifies their email for multiple 
 - `PATCH /api/v1/notifications/preferences` - Update preferences
 
 ### Analytics (Premium)
+
 - `GET /api/v1/analytics/users?period={period}` - User metrics (DAU, WAU, MAU)
 - `GET /api/v1/analytics/content?period={period}` - Content metrics
 - `GET /api/v1/analytics/events?period={period}` - Event metrics
@@ -650,6 +711,7 @@ A transfer student or dual-enrollment student verifies their email for multiple 
 - `POST /api/v1/analytics/export?format={csv|pdf}` - Export analytics
 
 ### Health & Monitoring
+
 - `GET /health` - Liveness check
 - `GET /health/ready` - Readiness check (DB, Redis, external services)
 - `GET /health/metrics` - Prometheus metrics
@@ -657,12 +719,14 @@ A transfer student or dual-enrollment student verifies their email for multiple 
 ## Testing Strategy
 
 ### Unit Tests
+
 - All service layer functions (business logic)
 - All utility functions (validation, formatting, etc.)
 - Pydantic model validation
 - Target: 80%+ code coverage
 
 ### Integration Tests
+
 - All API endpoints with database interactions
 - Authentication flows (OAuth, JWT refresh)
 - WebSocket connections and message delivery
@@ -670,6 +734,7 @@ A transfer student or dual-enrollment student verifies their email for multiple 
 - Target: 100% endpoint coverage
 
 ### End-to-End Tests
+
 - Critical user journeys:
   - Registration → Verification → Join community → Post content
   - Create event → Register → Receive reminder
@@ -677,12 +742,14 @@ A transfer student or dual-enrollment student verifies their email for multiple 
 - Target: Cover all P1 and P2 user stories
 
 ### Performance Tests
+
 - Load testing: 1,000 concurrent users, 10,000 requests/min
 - Stress testing: Find breaking point
 - WebSocket scalability: 10,000 concurrent connections
 - Database query performance: All queries <50ms
 
 ### Security Tests
+
 - OWASP Top 10 vulnerability scanning
 - SQL injection attempts
 - XSS attempts
@@ -693,11 +760,13 @@ A transfer student or dual-enrollment student verifies their email for multiple 
 ## Deployment Strategy
 
 ### Environments
+
 - **Development**: Local Docker Compose setup
 - **Staging**: Kubernetes cluster (mirrors production)
 - **Production**: Kubernetes cluster with auto-scaling
 
 ### CI/CD Pipeline
+
 1. **Linting**: black, isort, flake8, mypy
 2. **Unit Tests**: pytest with coverage report
 3. **Integration Tests**: pytest with test database
@@ -708,6 +777,7 @@ A transfer student or dual-enrollment student verifies their email for multiple 
 8. **Deploy to Production**: Manual approval required
 
 ### Infrastructure Components
+
 - **Application**: 3+ replicas (auto-scale based on CPU)
 - **Database**: PostgreSQL with read replicas
 - **Cache**: Redis cluster (3 nodes)
@@ -717,6 +787,7 @@ A transfer student or dual-enrollment student verifies their email for multiple 
 - **CDN**: CloudFront or similar
 
 ### Monitoring & Alerting
+
 - **Application Metrics**: Prometheus + Grafana dashboards
 - **Error Tracking**: Sentry with Slack notifications
 - **Logs**: Centralized logging (ELK stack or CloudWatch)
@@ -731,6 +802,7 @@ A transfer student or dual-enrollment student verifies their email for multiple 
 ## Success Metrics
 
 ### Technical Metrics
+
 - API response time: p95 <200ms (read), <500ms (write)
 - Uptime: 99.9%
 - Test coverage: >80%
@@ -738,6 +810,7 @@ A transfer student or dual-enrollment student verifies their email for multiple 
 - WebSocket latency: <100ms
 
 ### Business Metrics
+
 - User registration conversion: >60% (OAuth initiated → account created)
 - Verification completion: >70% (email sent → verified)
 - Daily active users (DAU): Track growth
@@ -746,6 +819,7 @@ A transfer student or dual-enrollment student verifies their email for multiple 
 - Prospective → Verified conversion: >30% within 6 months
 
 ### User Experience Metrics
+
 - Time to first post: <5 minutes after registration
 - Search result relevance: >80% click-through on first page
 - Notification delivery time: <500ms
@@ -767,12 +841,14 @@ A transfer student or dual-enrollment student verifies their email for multiple 
 ## Dependencies & Integrations
 
 ### Required Third-Party Services
+
 - **Google OAuth**: OAuth 2.0 client credentials
 - **Email Service**: SendGrid/AWS SES/Mailgun for transactional emails
 - **Object Storage**: AWS S3 or MinIO for file uploads
 - **Monitoring**: Sentry account for error tracking
 
 ### Optional Integrations (Future)
+
 - **Payment Gateway**: Stripe for premium subscriptions
 - **Analytics**: Mixpanel or Amplitude for product analytics
 - **Calendar**: Google Calendar/Outlook for event sync
@@ -782,6 +858,7 @@ A transfer student or dual-enrollment student verifies their email for multiple 
 ## Timeline Estimate
 
 ### Phase 1: MVP (8-10 weeks)
+
 - **Week 1-2**: Project setup, database schema, core models
 - **Week 3-4**: Authentication (Google OAuth, JWT), user management
 - **Week 5-6**: Communities, memberships, student verification
@@ -789,16 +866,19 @@ A transfer student or dual-enrollment student verifies their email for multiple 
 - **Week 9-10**: Testing, bug fixes, documentation
 
 ### Phase 2: Events & Chat (6-8 weeks)
+
 - **Week 11-12**: Event creation, registration, management
 - **Week 13-15**: Real-time chat (WebSocket, direct messages, group chats)
 - **Week 16-18**: Testing, performance optimization
 
 ### Phase 3: Moderation & Search (4-6 weeks)
+
 - **Week 19-20**: Reporting system, moderation queue, actions
 - **Week 21-22**: Global search, filtering, autocomplete
 - **Week 23-24**: Testing, security audit
 
 ### Phase 4: Analytics & Polish (4-6 weeks)
+
 - **Week 25-26**: Analytics dashboard, metrics tracking
 - **Week 27-28**: Notifications system, preferences
 - **Week 29-30**: Performance optimization, final testing, deployment
@@ -816,6 +896,7 @@ All requirements align with the constitution's principles of code quality, testi
 ---
 
 **Next Steps:**
+
 1. Review and approve this specification
 2. Create detailed task breakdown for Phase 1 (MVP)
 3. Set up development environment and CI/CD pipeline

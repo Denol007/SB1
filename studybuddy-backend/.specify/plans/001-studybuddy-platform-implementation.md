@@ -9,6 +9,7 @@
 StudyBuddy is a social networking platform for university students and prospective students featuring verified communities, real-time chat, event management, and moderation capabilities. The backend implements a scalable, production-ready REST API with WebSocket support, built on FastAPI, PostgreSQL, Redis, and Celery for background processing.
 
 **Primary Requirements:**
+
 - User authentication via Google OAuth 2.0 with JWT tokens
 - Student verification system via university email domains
 - Hierarchical community structure with role-based access
@@ -20,6 +21,7 @@ StudyBuddy is a social networking platform for university students and prospecti
 - Global search across communities, users, posts, and events
 
 **Technical Approach:**
+
 - **Hexagonal Architecture** with clear separation of concerns (Domain, Application, Infrastructure)
 - **Repository Pattern** for data access abstraction
 - **Service Layer** for business logic encapsulation
@@ -30,8 +32,9 @@ StudyBuddy is a social networking platform for university students and prospecti
 
 ## Technical Context
 
-**Language/Version**: Python 3.11+ (async/await, type hints, performance improvements)  
-**Primary Dependencies**: 
+**Language/Version**: Python 3.11+ (async/await, type hints, performance improvements)
+**Primary Dependencies**:
+
 - FastAPI 0.104+ (web framework)
 - SQLAlchemy 2.0+ (async ORM)
 - Alembic (migrations)
@@ -39,12 +42,14 @@ StudyBuddy is a social networking platform for university students and prospecti
 - Celery 5+ (background tasks)
 - Pydantic V2 (validation, serialization)
 
-**Storage**: 
+**Storage**:
+
 - PostgreSQL 15+ (primary database with JSONB, full-text search)
 - Redis 7+ (caching, sessions, rate limiting, WebSocket state)
 - S3-compatible storage (file uploads: MinIO for dev, AWS S3 for prod)
 
-**Testing**: 
+**Testing**:
+
 - pytest + pytest-asyncio (async test support)
 - pytest-cov (coverage reporting, target: 80%+)
 - httpx (async HTTP client for API testing)
@@ -55,20 +60,23 @@ StudyBuddy is a social networking platform for university students and prospecti
 
 **Project Type**: Web API (backend-only, consumed by separate frontend)
 
-**Performance Goals**: 
+**Performance Goals**:
+
 - 95th percentile response time: <200ms (reads), <500ms (writes)
 - Support 10,000 concurrent WebSocket connections per instance
 - Handle 100,000+ daily active users
 - Process 1,000+ background jobs per minute
 
-**Constraints**: 
+**Constraints**:
+
 - GDPR compliance (data export, deletion, anonymization)
 - 99.9% uptime SLA
 - Maximum cyclomatic complexity: 10 per function
 - 80%+ test coverage (mandatory)
 - All API endpoints must have OpenAPI documentation
 
-**Scale/Scope**: 
+**Scale/Scope**:
+
 - Support 100+ universities with 1,000+ communities
 - 500,000+ registered users
 - 1M+ posts, 10M+ messages
@@ -80,6 +88,7 @@ StudyBuddy is a social networking platform for university students and prospecti
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
 ✅ **CODE QUALITY**
+
 - Black + Ruff for formatting and linting (enforced via pre-commit)
 - MyPy for type checking with strict mode
 - Type hints on all functions and methods
@@ -87,6 +96,7 @@ StudyBuddy is a social networking platform for university students and prospecti
 - Maximum cyclomatic complexity ≤ 10 (monitored via Ruff)
 
 ✅ **TESTING STANDARDS**
+
 - pytest + pytest-asyncio framework
 - Target: 80%+ code coverage (enforced in CI/CD)
 - Unit tests for all business logic (services, utilities)
@@ -95,6 +105,7 @@ StudyBuddy is a social networking platform for university students and prospecti
 - Faker for realistic test data
 
 ✅ **API DESIGN**
+
 - RESTful resource-based URLs: `/api/v1/communities/{id}/posts`
 - Versioning: `/api/v1/`, `/api/v2/`
 - Pydantic models for request/response validation
@@ -102,12 +113,14 @@ StudyBuddy is a social networking platform for university students and prospecti
 - Rate limiting: 100 req/min per authenticated user
 
 ✅ **DATABASE**
+
 - SQLAlchemy ORM (no raw SQL except analytics)
 - Alembic migrations (never modify existing migrations)
 - Indexes on all foreign keys and frequently queried columns
 - Soft deletes for user data (deleted_at timestamp)
 
 ✅ **SECURITY**
+
 - JWT with access (15min) + refresh tokens (30 days)
 - Bcrypt password hashing (if email/password added)
 - Input sanitization via Pydantic validators
@@ -116,24 +129,28 @@ StudyBuddy is a social networking platform for university students and prospecti
 - Rate limiting enforced
 
 ✅ **PERFORMANCE**
+
 - Redis caching (5-15min TTL)
 - Async/await for all I/O operations
 - Pagination: default 20, max 100 items
 - WebSocket connection pooling
 
 ✅ **SCALABILITY**
+
 - Stateless API design (no local state)
 - Horizontal scaling ready
 - Celery for background tasks
 - Database connection pooling (5-20 per instance)
 
 ✅ **MONITORING & OBSERVABILITY**
+
 - Structlog for structured JSON logging
 - Prometheus metrics via prometheus-fastapi-instrumentator
 - Sentry error tracking
 - Health check endpoints: `/health`, `/health/ready`, `/health/metrics`
 
 ✅ **DOCUMENTATION**
+
 - README.md with setup instructions
 - OpenAPI docs at `/docs` and `/redoc`
 - Database ER diagrams
@@ -377,7 +394,7 @@ studybuddy-backend/
 └── LICENSE
 ```
 
-**Structure Decision**: 
+**Structure Decision**:
 
 We've chosen a **Hexagonal Architecture (Ports and Adapters)** with the following layers:
 
@@ -387,6 +404,7 @@ We've chosen a **Hexagonal Architecture (Ports and Adapters)** with the followin
 4. **API Layer** (`app/api/`): HTTP endpoints, WebSocket handlers, middleware
 
 **Benefits for Scalability:**
+
 - ✅ **Loose Coupling**: Business logic independent of frameworks and databases
 - ✅ **Testability**: Easy to mock dependencies and test in isolation
 - ✅ **Replaceability**: Can swap implementations (e.g., PostgreSQL → MongoDB) without changing business logic
@@ -408,6 +426,7 @@ We've chosen a **Hexagonal Architecture (Ports and Adapters)** with the followin
 **Objective**: Set up a reproducible development environment that matches production as closely as possible.
 
 **Tasks:**
+
 1. Install Python 3.11+ via pyenv or system package manager
 2. Install uv package manager: `curl -LsSf https://astral.sh/uv/install.sh | sh`
 3. Install Docker and Docker Compose
@@ -421,6 +440,7 @@ We've chosen a **Hexagonal Architecture (Ports and Adapters)** with the followin
    - Thunder Client (API testing)
 
 **Deliverables:**
+
 - [ ] Python 3.11+ installed and verified (`python --version`)
 - [ ] uv installed and verified (`uv --version`)
 - [ ] Docker installed and verified (`docker --version`)
@@ -434,12 +454,14 @@ We've chosen a **Hexagonal Architecture (Ports and Adapters)** with the followin
 **Tasks:**
 
 1. **Initialize Python project with uv:**
+
 ```bash
 cd studybuddy-backend
 uv init --name studybuddy --python 3.11
 ```
 
 2. **Create `pyproject.toml` with dependencies:**
+
 ```toml
 [project]
 name = "studybuddy"
@@ -543,12 +565,14 @@ exclude_lines = [
 ```
 
 3. **Install dependencies:**
+
 ```bash
 uv sync
 uv sync --extra dev
 ```
 
 4. **Create `.env.example`:**
+
 ```env
 # Application
 APP_NAME=StudyBuddy
@@ -615,6 +639,7 @@ CORS_ORIGINS=["http://localhost:3000","http://localhost:5173"]
 ```
 
 5. **Create basic directory structure:**
+
 ```bash
 mkdir -p app/{core,domain/{entities,value_objects,enums},application/{services,schemas,interfaces},infrastructure/{database/models,repositories,cache,storage,email,external},api/{v1/endpoints,v1/middleware,v1/dependencies,websocket},tasks}
 mkdir -p tests/{unit/{services,repositories},integration/{api,websocket,tasks},e2e,factories}
@@ -624,6 +649,7 @@ touch app/{core,domain,application,infrastructure,api,tasks}/__init__.py
 ```
 
 **Deliverables:**
+
 - [ ] `pyproject.toml` created with all dependencies
 - [ ] Dependencies installed via uv
 - [ ] `.env.example` created
@@ -637,6 +663,7 @@ touch app/{core,domain,application,infrastructure,api,tasks}/__init__.py
 **Tasks:**
 
 1. **Create `docker/Dockerfile.dev`:**
+
 ```dockerfile
 FROM python:3.11-slim
 
@@ -671,6 +698,7 @@ CMD ["uv", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "800
 ```
 
 2. **Create `docker/Dockerfile` (production):**
+
 ```dockerfile
 # Stage 1: Builder
 FROM python:3.11-slim AS builder
@@ -719,6 +747,7 @@ CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
 ```
 
 3. **Create `docker/docker-compose.yml`:**
+
 ```yaml
 version: '3.8'
 
@@ -813,6 +842,7 @@ volumes:
 ```
 
 4. **Create startup script `scripts/dev.sh`:**
+
 ```bash
 #!/bin/bash
 set -e
@@ -850,6 +880,7 @@ chmod +x scripts/dev.sh
 ```
 
 **Deliverables:**
+
 - [ ] `docker/Dockerfile.dev` created
 - [ ] `docker/Dockerfile` created (production)
 - [ ] `docker/docker-compose.yml` created
@@ -865,6 +896,7 @@ chmod +x scripts/dev.sh
 **Tasks:**
 
 1. **Create `.pre-commit-config.yaml`:**
+
 ```yaml
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -900,12 +932,14 @@ repos:
 ```
 
 2. **Install pre-commit hooks:**
+
 ```bash
 uv run pre-commit install
 uv run pre-commit run --all-files  # Test on existing files
 ```
 
 **Deliverables:**
+
 - [ ] `.pre-commit-config.yaml` created
 - [ ] Pre-commit hooks installed
 - [ ] All hooks pass on initial run
@@ -917,6 +951,7 @@ uv run pre-commit run --all-files  # Test on existing files
 **Tasks:**
 
 1. **Create `.github/workflows/ci.yml`:**
+
 ```yaml
 name: CI
 
@@ -931,31 +966,31 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      
+
       - name: Install uv
         run: curl -LsSf https://astral.sh/uv/install.sh | sh
-      
+
       - name: Install dependencies
         run: |
           uv sync --extra dev
-      
+
       - name: Run Ruff
         run: uv run ruff check app tests
-      
+
       - name: Run Black
         run: uv run black --check app tests
-      
+
       - name: Run MyPy
         run: uv run mypy app
 
   test:
     runs-on: ubuntu-latest
-    
+
     services:
       postgres:
         image: postgres:15-alpine
@@ -970,7 +1005,7 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-      
+
       redis:
         image: redis:7-alpine
         ports:
@@ -980,21 +1015,21 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-    
+
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      
+
       - name: Install uv
         run: curl -LsSf https://astral.sh/uv/install.sh | sh
-      
+
       - name: Install dependencies
         run: uv sync --extra dev
-      
+
       - name: Run tests
         env:
           DATABASE_URL: postgresql+asyncpg://studybuddy:studybuddy@localhost:5432/studybuddy_test
@@ -1002,7 +1037,7 @@ jobs:
           SECRET_KEY: test-secret-key
         run: |
           uv run pytest --cov=app --cov-report=xml --cov-report=term
-      
+
       - name: Upload coverage
         uses: codecov/codecov-action@v3
         with:
@@ -1012,13 +1047,13 @@ jobs:
   build:
     runs-on: ubuntu-latest
     needs: [lint, test]
-    
+
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-      
+
       - name: Build Docker image
         uses: docker/build-push-action@v5
         with:
@@ -1031,6 +1066,7 @@ jobs:
 ```
 
 2. **Create `.github/workflows/cd-staging.yml`:**
+
 ```yaml
 name: Deploy to Staging
 
@@ -1042,25 +1078,25 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     environment: staging
-    
+
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Configure kubectl
         uses: azure/k8s-set-context@v3
         with:
           kubeconfig: ${{ secrets.KUBE_CONFIG_STAGING }}
-      
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-      
+
       - name: Login to Container Registry
         uses: docker/login-action@v3
         with:
           registry: ${{ secrets.REGISTRY_URL }}
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
-      
+
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
@@ -1068,7 +1104,7 @@ jobs:
           file: docker/Dockerfile
           push: true
           tags: ${{ secrets.REGISTRY_URL }}/studybuddy:staging-${{ github.sha }}
-      
+
       - name: Deploy to Kubernetes
         run: |
           kubectl set image deployment/studybuddy-api \
@@ -1078,6 +1114,7 @@ jobs:
 ```
 
 3. **Create `.github/workflows/cd-production.yml`:**
+
 ```yaml
 name: Deploy to Production
 
@@ -1090,25 +1127,25 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     environment: production
-    
+
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Configure kubectl
         uses: azure/k8s-set-context@v3
         with:
           kubeconfig: ${{ secrets.KUBE_CONFIG_PRODUCTION }}
-      
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-      
+
       - name: Login to Container Registry
         uses: docker/login-action@v3
         with:
           registry: ${{ secrets.REGISTRY_URL }}
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
-      
+
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
@@ -1118,14 +1155,14 @@ jobs:
           tags: |
             ${{ secrets.REGISTRY_URL }}/studybuddy:production-${{ github.sha }}
             ${{ secrets.REGISTRY_URL }}/studybuddy:latest
-      
+
       - name: Deploy to Kubernetes
         run: |
           kubectl set image deployment/studybuddy-api \
             api=${{ secrets.REGISTRY_URL }}/studybuddy:production-${{ github.sha }} \
             -n studybuddy-production
           kubectl rollout status deployment/studybuddy-api -n studybuddy-production
-      
+
       - name: Create GitHub Release
         uses: actions/create-release@v1
         env:
@@ -1140,6 +1177,7 @@ jobs:
 ```
 
 **Deliverables:**
+
 - [ ] CI workflow created (lint, test, build)
 - [ ] CD staging workflow created
 - [ ] CD production workflow created
@@ -1152,6 +1190,7 @@ jobs:
 **Tasks:**
 
 1. **Create `kubernetes/namespace.yaml`:**
+
 ```yaml
 apiVersion: v1
 kind: Namespace
@@ -1165,6 +1204,7 @@ metadata:
 ```
 
 2. **Create `kubernetes/configmap.yaml`:**
+
 ```yaml
 apiVersion: v1
 kind: ConfigMap
@@ -1192,6 +1232,7 @@ data:
 ```
 
 3. **Create `kubernetes/secrets.yaml.template`:**
+
 ```yaml
 # DO NOT COMMIT THIS FILE WITH REAL VALUES
 # Use Kubernetes secrets management or external vault
@@ -1215,6 +1256,7 @@ stringData:
 ```
 
 4. **Create `kubernetes/api-deployment.yaml`:**
+
 ```yaml
 apiVersion: apps/v1
 kind: Deployment
@@ -1277,6 +1319,7 @@ spec:
 ```
 
 5. **Create `kubernetes/celery-deployment.yaml`:**
+
 ```yaml
 apiVersion: apps/v1
 kind: Deployment
@@ -1344,6 +1387,7 @@ spec:
 ```
 
 6. **Create `kubernetes/ingress.yaml`:**
+
 ```yaml
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -1374,6 +1418,7 @@ spec:
 ```
 
 7. **Create `kubernetes/hpa.yaml` (Horizontal Pod Autoscaler):**
+
 ```yaml
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
@@ -1403,6 +1448,7 @@ spec:
 ```
 
 **Deliverables:**
+
 - [ ] Kubernetes namespace configuration created
 - [ ] ConfigMap for application settings created
 - [ ] Secrets template created (documented process for real secrets)
@@ -1415,29 +1461,35 @@ spec:
 ## Phase 0 Deliverables Summary
 
 ✅ **Development Environment**
+
 - Python 3.11+, uv, Docker, Docker Compose installed
 - IDE configured with extensions
 
 ✅ **Project Foundation**
+
 - `pyproject.toml` with all dependencies
 - Directory structure following hexagonal architecture
 - `.env.example` with all configuration options
 
 ✅ **Local Development**
+
 - Docker Compose with PostgreSQL, Redis, API, Celery
 - Hot-reload enabled for development
 - Startup script for easy local setup
 
 ✅ **Code Quality**
+
 - Pre-commit hooks (Black, Ruff, MyPy)
 - Enforced before every commit
 
 ✅ **CI/CD**
+
 - GitHub Actions for testing and linting
 - Automated deployment to staging
 - Manual approval for production deployment
 
 ✅ **Production Infrastructure**
+
 - Kubernetes manifests for all services
 - Horizontal pod autoscaling
 - Health checks and monitoring
@@ -1477,6 +1529,7 @@ After completing Phase 0, proceed with:
 **Constitution Compliance**: This plan adheres to all principles defined in the StudyBuddy Constitution, ensuring code quality, testing standards, security, performance, and scalability from day one.
 
 **Easy Local to Production Path:**
+
 ```bash
 # Local development
 ./scripts/dev.sh

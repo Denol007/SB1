@@ -1,7 +1,6 @@
 """Pytest configuration and fixtures for StudyBuddy tests."""
 
 import pytest
-from typing import AsyncGenerator, Generator
 
 # Placeholder for future fixtures
 # Examples:

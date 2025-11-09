@@ -13,23 +13,27 @@ This guide will help you set up the StudyBuddy backend development environment i
 ## Quick Setup (5 minutes)
 
 ### 1. Install uv (Python package manager)
+
 ```bash
 curl -LsSf https://astral.sh/uv/install.sh | sh
 source ~/.bashrc  # or ~/.zshrc
 ```
 
 ### 2. Clone and setup
+
 ```bash
 cd studybuddy-backend
 cp .env.example .env  # Edit with your configuration
 ```
 
 ### 3. Start development environment
+
 ```bash
 ./scripts/dev.sh
 ```
 
 This will:
+
 - Start PostgreSQL on port 5432
 - Start Redis on port 6379
 - Start API on port 8000 with hot-reload
@@ -37,19 +41,22 @@ This will:
 - Run database migrations
 
 ### 4. Access the application
-- **API Documentation (Swagger)**: http://localhost:8000/docs
-- **ReDoc**: http://localhost:8000/redoc
-- **Health Check**: http://localhost:8000/health
+
+- **API Documentation (Swagger)**: <http://localhost:8000/docs>
+- **ReDoc**: <http://localhost:8000/redoc>
+- **Health Check**: <http://localhost:8000/health>
 
 ## Development Workflow
 
 ### Install dependencies
+
 ```bash
 uv sync              # Install production dependencies
 uv sync --extra dev  # Install dev dependencies too
 ```
 
 ### Run tests
+
 ```bash
 # All tests with coverage
 uv run pytest
@@ -63,6 +70,7 @@ open htmlcov/index.html  # View coverage report
 ```
 
 ### Code quality checks
+
 ```bash
 # Format code
 uv run black app tests
@@ -78,6 +86,7 @@ uv run pre-commit run --all-files
 ```
 
 ### Database migrations
+
 ```bash
 # Create a new migration
 uv run alembic revision --autogenerate -m "Add users table"
@@ -93,6 +102,7 @@ uv run alembic history
 ```
 
 ### Run locally without Docker
+
 ```bash
 # Make sure PostgreSQL and Redis are running
 uv run uvicorn app.main:app --reload
@@ -107,6 +117,7 @@ uv run celery -A app.tasks.celery_app beat --loglevel=info
 ## Deployment
 
 ### Deploy to Staging (Automatic)
+
 ```bash
 git checkout develop
 git commit -m "Your changes"
@@ -115,6 +126,7 @@ git push origin develop
 ```
 
 ### Deploy to Production (Manual approval)
+
 ```bash
 # Merge to main after PR approval
 git checkout main
@@ -124,6 +136,7 @@ git push origin main
 ```
 
 ### Manual Kubernetes Deployment
+
 ```bash
 # Apply all manifests
 kubectl apply -f kubernetes/namespace.yaml
@@ -142,6 +155,7 @@ kubectl logs -f deployment/studybuddy-api -n studybuddy-production
 ## Useful Commands
 
 ### Docker Compose
+
 ```bash
 # Start all services
 cd docker && docker compose up -d
@@ -160,6 +174,7 @@ docker compose up -d --build
 ```
 
 ### Database
+
 ```bash
 # Connect to PostgreSQL
 docker exec -it studybuddy-postgres psql -U studybuddy -d studybuddy
@@ -172,6 +187,7 @@ docker exec -i studybuddy-postgres psql -U studybuddy studybuddy < backup.sql
 ```
 
 ### Redis
+
 ```bash
 # Connect to Redis CLI
 docker exec -it studybuddy-redis redis-cli
@@ -229,6 +245,7 @@ SMTP_PASSWORD=your-app-password
 ## Troubleshooting
 
 ### Port already in use
+
 ```bash
 # Find process using port 8000
 lsof -i :8000
@@ -237,6 +254,7 @@ kill -9 <PID>
 ```
 
 ### Database connection error
+
 ```bash
 # Check if PostgreSQL is running
 docker compose ps postgres
@@ -246,6 +264,7 @@ docker compose restart postgres
 ```
 
 ### Redis connection error
+
 ```bash
 # Check if Redis is running
 docker compose ps redis
@@ -255,6 +274,7 @@ docker compose restart redis
 ```
 
 ### Migrations out of sync
+
 ```bash
 # Reset database (CAUTION: deletes all data)
 docker compose down -v
@@ -267,9 +287,9 @@ uv run alembic upgrade head
 - **Specification**: `.specify/specs/001-studybuddy-platform.md`
 - **Constitution**: `.specify/memory/constitution.md`
 - **Implementation Plan**: `.specify/plans/001-studybuddy-platform-implementation.md`
-- **FastAPI Docs**: https://fastapi.tiangolo.com
-- **SQLAlchemy Docs**: https://docs.sqlalchemy.org
-- **Celery Docs**: https://docs.celeryproject.org
+- **FastAPI Docs**: <https://fastapi.tiangolo.com>
+- **SQLAlchemy Docs**: <https://docs.sqlalchemy.org>
+- **Celery Docs**: <https://docs.celeryproject.org>
 
 ## Need Help?
 

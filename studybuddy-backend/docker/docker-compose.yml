@@ -51,35 +51,35 @@ services:
       APP_ENV: development
       DEBUG: "true"
       LOG_LEVEL: DEBUG
-      
+
       # Database
       DATABASE_URL: postgresql+asyncpg://studybuddy:studybuddy_dev@postgres:5432/studybuddy
-      
+
       # Redis
       REDIS_URL: redis://redis:6379/0
-      
+
       # Celery
       CELERY_BROKER_URL: redis://redis:6379/1
       CELERY_RESULT_BACKEND: redis://redis:6379/2
-      
+
       # JWT (dev secrets - DO NOT USE IN PRODUCTION)
       JWT_SECRET_KEY: dev-secret-key-change-in-production
       SECRET_KEY: dev-secret-key-change-in-production
-      
+
       # Google OAuth (configure in .env)
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-your-google-client-id}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-your-google-client-secret}
-      
+
       # Email (configure in .env)
       SMTP_HOST: ${SMTP_HOST:-smtp.gmail.com}
       SMTP_PORT: ${SMTP_PORT:-587}
       SMTP_USER: ${SMTP_USER:-your-email@gmail.com}
       SMTP_PASSWORD: ${SMTP_PASSWORD:-your-password}
-      
+
       # Storage
       STORAGE_BACKEND: local
       LOCAL_STORAGE_PATH: /app/storage
-      
+
       # Features
       DOCS_ENABLED: "true"
       RELOAD: "true"
@@ -107,17 +107,17 @@ services:
       # Application
       APP_ENV: development
       LOG_LEVEL: INFO
-      
+
       # Database
       DATABASE_URL: postgresql+asyncpg://studybuddy:studybuddy_dev@postgres:5432/studybuddy
-      
+
       # Redis
       REDIS_URL: redis://redis:6379/0
-      
+
       # Celery
       CELERY_BROKER_URL: redis://redis:6379/1
       CELERY_RESULT_BACKEND: redis://redis:6379/2
-      
+
       # Email
       SMTP_HOST: ${SMTP_HOST:-smtp.gmail.com}
       SMTP_PORT: ${SMTP_PORT:-587}
@@ -144,13 +144,13 @@ services:
       # Application
       APP_ENV: development
       LOG_LEVEL: INFO
-      
+
       # Database
       DATABASE_URL: postgresql+asyncpg://studybuddy:studybuddy_dev@postgres:5432/studybuddy
-      
+
       # Redis
       REDIS_URL: redis://redis:6379/0
-      
+
       # Celery
       CELERY_BROKER_URL: redis://redis:6379/1
       CELERY_RESULT_BACKEND: redis://redis:6379/2
