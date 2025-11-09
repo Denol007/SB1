@@ -43,7 +43,7 @@ class S3Storage(StorageBackend):
         # Create S3 client with explicit parameters for better type checking
         if endpoint_url:
             self.s3_client = boto3.client(
-                "s3",
+                service_name="s3",
                 aws_access_key_id=aws_access_key_id,
                 aws_secret_access_key=aws_secret_access_key,
                 region_name=aws_region,
@@ -51,7 +51,7 @@ class S3Storage(StorageBackend):
             )
         else:
             self.s3_client = boto3.client(
-                "s3",
+                service_name="s3",
                 aws_access_key_id=aws_access_key_id,
                 aws_secret_access_key=aws_secret_access_key,
                 region_name=aws_region,
