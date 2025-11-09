@@ -53,6 +53,41 @@ class RedisClient:
         """
         return await self.client.set(key, value, ex=ttl)
 
+    async def setex(self, key: str, seconds: int, value: str | int) -> bool | None:
+        """Set value with expiration time.
+
+        Args:
+            key: The cache key.
+            seconds: Expiration time in seconds.
+            value: The value to cache.
+
+        Returns:
+            True if successful, None otherwise.
+        """
+        return await self.client.setex(key, seconds, str(value))
+
+    async def incr(self, key: str) -> int:
+        """Increment value by 1.
+
+        Args:
+            key: The cache key.
+
+        Returns:
+            The new value after incrementing.
+        """
+        return await self.client.incr(key)
+
+    async def ttl(self, key: str) -> int:
+        """Get time to live for key.
+
+        Args:
+            key: The cache key.
+
+        Returns:
+            TTL in seconds, -1 if no expiry, -2 if key doesn't exist.
+        """
+        return await self.client.ttl(key)
+
     async def delete(self, key: str) -> int:
         """Delete key from Redis.
 

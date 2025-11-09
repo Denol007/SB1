@@ -10,8 +10,9 @@ Uses Redis for distributed rate limiting across multiple API instances.
 
 import time
 from collections.abc import Callable
+from typing import Any
 
-from fastapi import HTTPException, Request, Response, status
+from fastapi import HTTPException, Request, status
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.core.logging import setup_logger
@@ -35,7 +36,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
     # Auth endpoint patterns
     AUTH_ENDPOINTS = ["/api/v1/auth/", "/api/v1/verifications/"]
 
-    async def dispatch(self, request: Request, call_next: Callable) -> Response:
+    async def dispatch(self, request: Request, call_next: Callable) -> Any:
         """Check rate limits before processing request.
 
         Args:
@@ -79,14 +80,15 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
             redis = await get_redis_client()
 
             # Get current request count
-            current_count = await redis.get(identifier)
+            current_count_str = await redis.get(identifier)
 
-            if current_count is None:
+            current_count: int
+            if current_count_str is None:
                 # First request in this minute
                 await redis.setex(identifier, 60, 1)  # 60 seconds TTL
                 current_count = 1
             else:
-                current_count = int(current_count)
+                current_count = int(current_count_str)
 
                 if current_count >= limit:
                     # Rate limit exceeded
@@ -107,14 +109,17 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
                     )
 
                 # Increment counter
-                await redis.incr(identifier)
-                current_count += 1
+                current_count = await redis.incr(identifier)
 
             # Add rate limit headers to response
             response = await call_next(request)
             response.headers["X-RateLimit-Limit"] = str(limit)
             response.headers["X-RateLimit-Remaining"] = str(max(0, limit - current_count))
-            response.headers["X-RateLimit-Reset"] = str(int(time.time()) + 60)
+
+            # Get TTL for reset time
+            ttl = await redis.ttl(identifier)
+            reset_time = int(time.time()) + (ttl if ttl > 0 else 60)
+            response.headers["X-RateLimit-Reset"] = str(reset_time)
 
             return response
 

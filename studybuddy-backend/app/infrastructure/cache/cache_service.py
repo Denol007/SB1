@@ -93,7 +93,7 @@ class CacheService:
         key: str,
         value: Any,
         ttl: int | None = None,
-    ) -> bool:
+    ) -> bool | None:
         """Set value in cache with optional TTL.
 
         Automatically serializes dict and list values to JSON.
@@ -105,7 +105,7 @@ class CacheService:
             ttl: Time to live in seconds (optional).
 
         Returns:
-            True if successful, False otherwise.
+            True if successful, None otherwise.
 
         Example:
             >>> await cache.set("counter", 42, ttl=60)

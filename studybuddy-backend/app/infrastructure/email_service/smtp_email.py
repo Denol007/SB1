@@ -41,7 +41,7 @@ class SMTPEmail(EmailBackend):
         )
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize SMTP email backend with settings."""
         self.smtp_host = settings.SMTP_HOST
         self.smtp_port = settings.SMTP_PORT

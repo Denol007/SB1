@@ -7,6 +7,8 @@ This module provides dependency injection functions for:
 - Handling optional authentication
 """
 
+from typing import Any
+
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import JWTError, jwt
@@ -20,7 +22,7 @@ logger = setup_logger(__name__)
 security = HTTPBearer(auto_error=False)
 
 
-def get_user_repository():
+def get_user_repository() -> Any:
     """Get user repository instance.
 
     This is a placeholder that will be implemented when the repository layer is created.
@@ -38,7 +40,7 @@ def get_user_repository():
     raise NotImplementedError("User repository not yet implemented")
 
 
-def get_verification_repository():
+def get_verification_repository() -> Any:
     """Get verification repository instance.
 
     This is a placeholder that will be implemented when the repository layer is created.
@@ -57,7 +59,7 @@ def get_verification_repository():
 
 async def get_current_user(
     credentials: HTTPAuthorizationCredentials | None = Depends(security),
-):
+) -> Any:
     """Extract and validate JWT token, return current user.
 
     This dependency validates the JWT token from the Authorization header,
@@ -114,8 +116,8 @@ async def get_current_user(
 
 
 async def get_current_active_user(
-    current_user=Depends(get_current_user),
-):
+    current_user: Any = Depends(get_current_user),
+) -> Any:
     """Ensure the current user is active (not deleted).
 
     This dependency wraps get_current_user and adds an additional check
@@ -144,8 +146,8 @@ async def get_current_active_user(
 
 
 async def require_verified_student(
-    current_user=Depends(get_current_active_user),
-):
+    current_user: Any = Depends(get_current_active_user),
+) -> Any:
     """Require user to have verified student status.
 
     This dependency ensures the user has at least one verified university
@@ -193,7 +195,7 @@ async def require_verified_student(
 
 async def get_optional_current_user(
     credentials: HTTPAuthorizationCredentials | None = Depends(security),
-) -> object | None:
+) -> Any:
     """Get current user if token provided, otherwise return None.
 
     This dependency is useful for endpoints that work differently for
