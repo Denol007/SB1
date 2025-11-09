@@ -67,12 +67,13 @@ class TestGetDBDependency:
         """Test that get_db yields an async session."""
         # Arrange
         mock_session = AsyncMock(spec=AsyncSession)
-        mock_factory = MagicMock()
-        mock_factory.return_value.__aenter__.return_value = mock_session
+        mock_context_manager = AsyncMock()
+        mock_context_manager.__aenter__.return_value = mock_session
+        mock_context_manager.__aexit__.return_value = None
 
         with patch(
-            "app.infrastructure.database.session.get_async_session_factory",
-            return_value=mock_factory,
+            "app.infrastructure.database.session.SessionFactory",
+            return_value=mock_context_manager,
         ):
             # Act
             generator = get_db()
@@ -86,14 +87,13 @@ class TestGetDBDependency:
         """Test that get_db properly closes session after use."""
         # Arrange
         mock_session = AsyncMock(spec=AsyncSession)
-        mock_factory = MagicMock()
         mock_context_manager = AsyncMock()
         mock_context_manager.__aenter__.return_value = mock_session
-        mock_factory.return_value = mock_context_manager
+        mock_context_manager.__aexit__.return_value = None
 
         with patch(
-            "app.infrastructure.database.session.get_async_session_factory",
-            return_value=mock_factory,
+            "app.infrastructure.database.session.SessionFactory",
+            return_value=mock_context_manager,
         ):
             # Act
             generator = get_db()
@@ -112,14 +112,13 @@ class TestGetDBDependency:
         """Test that get_db closes session even if exception occurs."""
         # Arrange
         mock_session = AsyncMock(spec=AsyncSession)
-        mock_factory = MagicMock()
         mock_context_manager = AsyncMock()
         mock_context_manager.__aenter__.return_value = mock_session
-        mock_factory.return_value = mock_context_manager
+        mock_context_manager.__aexit__.return_value = None
 
         with patch(
-            "app.infrastructure.database.session.get_async_session_factory",
-            return_value=mock_factory,
+            "app.infrastructure.database.session.SessionFactory",
+            return_value=mock_context_manager,
         ):
             # Act
             generator = get_db()

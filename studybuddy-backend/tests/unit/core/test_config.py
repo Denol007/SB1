@@ -42,7 +42,7 @@ class TestSettings:
 
         # Act & Assert
         with pytest.raises(ValidationError) as exc_info:
-            Settings()
+            Settings(_env_file=None)  # Don't load from .env file
 
         assert "DATABASE_URL" in str(exc_info.value)
 
@@ -56,7 +56,7 @@ class TestSettings:
 
         # Act & Assert
         with pytest.raises(ValidationError) as exc_info:
-            Settings()
+            Settings(_env_file=None)  # Don't load from .env file
 
         assert "REDIS_URL" in str(exc_info.value)
 
@@ -147,10 +147,10 @@ class TestSettings:
         monkeypatch.setenv("REDIS_URL", "redis://localhost:6379/0")
         monkeypatch.setenv("SECRET_KEY", "test-secret-key-min-32-chars-long")
         monkeypatch.setenv("JWT_SECRET_KEY", "jwt-secret-key-min-32-chars-long")
-        monkeypatch.setenv("CORS_ORIGINS", "http://localhost:3000,http://localhost:5173")
+        monkeypatch.setenv("CORS_ORIGINS", '["http://localhost:3000","http://localhost:5173"]')
 
         # Act
-        settings = Settings()
+        settings = Settings(_env_file=None)
 
         # Assert
         assert isinstance(settings.CORS_ORIGINS, list)
@@ -167,7 +167,7 @@ class TestSettings:
         monkeypatch.setenv("JWT_SECRET_KEY", "jwt-secret-key-min-32-chars-long")
 
         # Act
-        settings = Settings()
+        settings = Settings(_env_file=None)
 
         # Assert
         assert settings.APP_NAME == "StudyBuddy API"

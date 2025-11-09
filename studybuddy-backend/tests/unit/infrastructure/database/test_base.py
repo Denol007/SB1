@@ -73,9 +73,11 @@ class TestBase:
         """Test that models inheriting from Base get __tablename__."""
 
         # Arrange
+        from sqlalchemy.orm import Mapped, mapped_column
+
         class TestModel(Base):
             __tablename__ = "test_models"
-            id: int
+            id: Mapped[int] = mapped_column(primary_key=True)
 
         # Assert
         assert TestModel.__tablename__ == "test_models"
@@ -86,10 +88,12 @@ class TestTimestampMixin:
 
     def test_timestamp_mixin_has_created_at(self) -> None:
         """Test that TimestampMixin provides created_at column."""
+        from sqlalchemy.orm import Mapped, mapped_column
 
         # Arrange
         class TestModel(Base, TimestampMixin):
-            __tablename__ = "test_timestamps"
+            __tablename__ = "test_timestamps_1"
+            id: Mapped[int] = mapped_column(primary_key=True)
 
         # Act
         mapper = inspect(TestModel)
@@ -100,10 +104,12 @@ class TestTimestampMixin:
 
     def test_timestamp_mixin_has_updated_at(self) -> None:
         """Test that TimestampMixin provides updated_at column."""
+        from sqlalchemy.orm import Mapped, mapped_column
 
         # Arrange
         class TestModel(Base, TimestampMixin):
-            __tablename__ = "test_timestamps"
+            __tablename__ = "test_timestamps_2"
+            id: Mapped[int] = mapped_column(primary_key=True)
 
         # Act
         mapper = inspect(TestModel)
@@ -114,10 +120,12 @@ class TestTimestampMixin:
 
     def test_created_at_has_default(self) -> None:
         """Test that created_at has a default value."""
+        from sqlalchemy.orm import Mapped, mapped_column
 
         # Arrange
         class TestModel(Base, TimestampMixin):
-            __tablename__ = "test_timestamps"
+            __tablename__ = "test_timestamps_3"
+            id: Mapped[int] = mapped_column(primary_key=True)
 
         # Act
         mapper = inspect(TestModel)
@@ -129,10 +137,12 @@ class TestTimestampMixin:
 
     def test_updated_at_has_default_and_onupdate(self) -> None:
         """Test that updated_at has default and onupdate values."""
+        from sqlalchemy.orm import Mapped, mapped_column
 
         # Arrange
         class TestModel(Base, TimestampMixin):
-            __tablename__ = "test_timestamps"
+            __tablename__ = "test_timestamps_4"
+            id: Mapped[int] = mapped_column(primary_key=True)
 
         # Act
         mapper = inspect(TestModel)
@@ -145,10 +155,12 @@ class TestTimestampMixin:
 
     def test_timestamp_values_are_timezone_aware(self) -> None:
         """Test that timestamp columns use timezone-aware datetime."""
+        from sqlalchemy.orm import Mapped, mapped_column
 
         # Arrange
         class TestModel(Base, TimestampMixin):
-            __tablename__ = "test_timestamps"
+            __tablename__ = "test_timestamps_5"
+            id: Mapped[int] = mapped_column(primary_key=True)
 
         # Act
         mapper = inspect(TestModel)

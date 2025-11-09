@@ -46,7 +46,7 @@ class Settings(BaseSettings):
     # Database
     DATABASE_URL: str = Field(..., description="PostgreSQL connection URL")
     DATABASE_POOL_SIZE: int = 5
-    DATABASE_MAX_OVERFLOW: int = 10
+    DATABASE_MAX_OVERFLOW: int = 20
     DATABASE_POOL_TIMEOUT: int = 30
     DATABASE_POOL_RECYCLE: int = 3600
     DATABASE_ECHO: bool = False  # Set to True to log all SQL statements
