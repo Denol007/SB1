@@ -65,10 +65,10 @@ description: "Task list for StudyBuddy platform implementation"
 
 ### Docker Configuration
 
-- [ ] T015 [P] Create `docker/Dockerfile.dev` with hot-reload
-- [ ] T016 [P] Create `docker/Dockerfile` (multi-stage production build)
-- [ ] T017 Create `docker/docker-compose.yml` (PostgreSQL, Redis, API, Celery)
-- [ ] T018 Create `scripts/dev.sh` startup script with executable permissions
+- [x] T015 [P] Create `docker/Dockerfile.dev` with hot-reload ✅
+- [x] T016 [P] Create `docker/Dockerfile` (multi-stage production build) ✅
+- [x] T017 Create `docker/docker-compose.yml` (PostgreSQL, Redis, API, Celery) ✅
+- [x] T018 Create `scripts/dev.sh` startup script with executable permissions ✅
 
 ### Code Quality Setup
 

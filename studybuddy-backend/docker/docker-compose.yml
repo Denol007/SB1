@@ -1,0 +1,197 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: studybuddy-postgres
+    environment:
+      POSTGRES_USER: studybuddy
+      POSTGRES_PASSWORD: studybuddy_dev
+      POSTGRES_DB: studybuddy
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=en_US.UTF-8 --lc-ctype=en_US.UTF-8"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres-init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U studybuddy"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - studybuddy-network
+
+  # Redis Cache & Message Broker
+  redis:
+    image: redis:7-alpine
+    container_name: studybuddy-redis
+    command: redis-server --appendonly yes --maxmemory 512mb --maxmemory-policy allkeys-lru
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    networks:
+      - studybuddy-network
+
+  # FastAPI Application
+  api:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.dev
+    container_name: studybuddy-api
+    environment:
+      # Application
+      APP_ENV: development
+      DEBUG: "true"
+      LOG_LEVEL: DEBUG
+      
+      # Database
+      DATABASE_URL: postgresql+asyncpg://studybuddy:studybuddy_dev@postgres:5432/studybuddy
+      
+      # Redis
+      REDIS_URL: redis://redis:6379/0
+      
+      # Celery
+      CELERY_BROKER_URL: redis://redis:6379/1
+      CELERY_RESULT_BACKEND: redis://redis:6379/2
+      
+      # JWT (dev secrets - DO NOT USE IN PRODUCTION)
+      JWT_SECRET_KEY: dev-secret-key-change-in-production
+      SECRET_KEY: dev-secret-key-change-in-production
+      
+      # Google OAuth (configure in .env)
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-your-google-client-id}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-your-google-client-secret}
+      
+      # Email (configure in .env)
+      SMTP_HOST: ${SMTP_HOST:-smtp.gmail.com}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-your-email@gmail.com}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-your-password}
+      
+      # Storage
+      STORAGE_BACKEND: local
+      LOCAL_STORAGE_PATH: /app/storage
+      
+      # Features
+      DOCS_ENABLED: "true"
+      RELOAD: "true"
+    ports:
+      - "8000:8000"
+    volumes:
+      - ..:/app
+      - storage_data:/app/storage
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - studybuddy-network
+    command: ["uv", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+
+  # Celery Worker
+  celery-worker:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.dev
+    container_name: studybuddy-celery-worker
+    environment:
+      # Application
+      APP_ENV: development
+      LOG_LEVEL: INFO
+      
+      # Database
+      DATABASE_URL: postgresql+asyncpg://studybuddy:studybuddy_dev@postgres:5432/studybuddy
+      
+      # Redis
+      REDIS_URL: redis://redis:6379/0
+      
+      # Celery
+      CELERY_BROKER_URL: redis://redis:6379/1
+      CELERY_RESULT_BACKEND: redis://redis:6379/2
+      
+      # Email
+      SMTP_HOST: ${SMTP_HOST:-smtp.gmail.com}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-your-email@gmail.com}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-your-password}
+    volumes:
+      - ..:/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - studybuddy-network
+    command: ["uv", "run", "celery", "-A", "app.tasks.celery_app", "worker", "--loglevel=info"]
+
+  # Celery Beat (Scheduled Tasks)
+  celery-beat:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.dev
+    container_name: studybuddy-celery-beat
+    environment:
+      # Application
+      APP_ENV: development
+      LOG_LEVEL: INFO
+      
+      # Database
+      DATABASE_URL: postgresql+asyncpg://studybuddy:studybuddy_dev@postgres:5432/studybuddy
+      
+      # Redis
+      REDIS_URL: redis://redis:6379/0
+      
+      # Celery
+      CELERY_BROKER_URL: redis://redis:6379/1
+      CELERY_RESULT_BACKEND: redis://redis:6379/2
+    volumes:
+      - ..:/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - studybuddy-network
+    command: ["uv", "run", "celery", "-A", "app.tasks.celery_app", "beat", "--loglevel=info"]
+
+  # Flower - Celery Monitoring (Optional)
+  flower:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.dev
+    container_name: studybuddy-flower
+    environment:
+      CELERY_BROKER_URL: redis://redis:6379/1
+      CELERY_RESULT_BACKEND: redis://redis:6379/2
+      FLOWER_PORT: 5555
+    ports:
+      - "5555:5555"
+    depends_on:
+      - redis
+      - celery-worker
+    networks:
+      - studybuddy-network
+    command: ["uv", "run", "celery", "-A", "app.tasks.celery_app", "flower", "--port=5555"]
+
+networks:
+  studybuddy-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  storage_data:
+    driver: local
