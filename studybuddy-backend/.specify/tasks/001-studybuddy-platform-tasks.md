@@ -113,18 +113,18 @@ description: "Task list for StudyBuddy platform implementation"
 
 ### Core Configuration
 
-- [ ] T035 Create `app/core/config.py` - Settings class using Pydantic BaseSettings
+- [x] T035 Create `app/core/config.py` - Settings class using Pydantic BaseSettings ✅
   - Database URL, Redis URL
   - JWT secret, OAuth credentials
   - Email settings, file storage config
   - Environment-specific settings
 
-- [ ] T036 Create `app/core/exceptions.py` - Custom exception classes
+- [x] T036 Create `app/core/exceptions.py` - Custom exception classes ✅
   - `BadRequestException`, `UnauthorizedException`
   - `NotFoundException`, `ForbiddenException`
   - `ConflictException`, `ValidationException`
 
-- [ ] T037 Create `app/core/logging.py` - Structlog configuration
+- [x] T037 Create `app/core/logging.py` - Structlog configuration ✅
   - JSON logging for production
   - Request ID tracking
   - PII redaction (passwords, tokens)
