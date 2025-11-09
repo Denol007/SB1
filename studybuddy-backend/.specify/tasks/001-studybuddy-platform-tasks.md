@@ -219,7 +219,7 @@ description: "Task list for StudyBuddy platform implementation"
 
 ### Health Checks & Monitoring
 
-- [ ] T058 Create `app/api/v1/endpoints/health.py` - Health check endpoints
+- [x] T058 Create `app/api/v1/endpoints/health.py` - Health check endpoints ✅
   - `GET /health` - Liveness check (returns 200)
   - `GET /health/ready` - Readiness check (DB, Redis connectivity)
   - `GET /health/metrics` - Prometheus metrics
