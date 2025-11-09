@@ -261,7 +261,7 @@ description: "Task list for StudyBuddy platform implementation"
   - Test `generate_tokens()`
   - Test `refresh_access_token()`
 
-- [ ] T065 [P] [US1] Unit test: `tests/unit/services/test_verification_service.py`
+- [x] T065 [P] [US1] Unit test: `tests/unit/services/test_verification_service.py` ✅
   - Test `request_verification()`
   - Test `confirm_verification()`
   - Test `is_verified_for_university()`
