@@ -5,6 +5,7 @@ exception handlers, startup/shutdown events, and routers.
 """
 
 import logging
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request, status
@@ -40,7 +41,7 @@ init_sentry(
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     """Lifespan context manager for startup and shutdown events.
 
     Args:

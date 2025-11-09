@@ -7,11 +7,13 @@ This module will contain Celery tasks for:
 - Event participation metrics
 """
 
+from typing import Any
+
 from app.tasks.celery_app import celery_app
 
 
 @celery_app.task(bind=True, name="app.tasks.analytics_tasks.aggregate_metrics")
-def aggregate_metrics(self, period: str = "daily") -> dict[str, str]:
+def aggregate_metrics(self: Any, period: str = "daily") -> dict[str, str]:
     """Aggregate analytics metrics (placeholder task).
 
     Args:

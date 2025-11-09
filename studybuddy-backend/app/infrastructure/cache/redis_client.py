@@ -40,7 +40,7 @@ class RedisClient:
         """
         return await self.client.get(key)
 
-    async def set(self, key: str, value: str, ttl: int | None = None) -> bool:
+    async def set(self, key: str, value: str, ttl: int | None = None) -> bool | None:
         """Set value in Redis with optional TTL.
 
         Args:
@@ -49,7 +49,7 @@ class RedisClient:
             ttl: Time to live in seconds (optional).
 
         Returns:
-            True if successful, False otherwise.
+            True if successful, None otherwise.
         """
         return await self.client.set(key, value, ex=ttl)
 

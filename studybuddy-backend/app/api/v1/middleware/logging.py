@@ -11,8 +11,9 @@ This middleware logs all incoming requests and outgoing responses with:
 import time
 import uuid
 from collections.abc import Callable
+from typing import Any
 
-from fastapi import Request, Response
+from fastapi import Request
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.core.logging import request_id_var, setup_logger
@@ -27,7 +28,7 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
     and logs comprehensive information for monitoring and debugging.
     """
 
-    async def dispatch(self, request: Request, call_next: Callable) -> Response:
+    async def dispatch(self, request: Request, call_next: Callable) -> Any:
         """Process the request and log details.
 
         Args:

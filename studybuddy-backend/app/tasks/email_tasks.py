@@ -7,11 +7,13 @@ This module will contain Celery tasks for:
 - Sending password reset emails
 """
 
+from typing import Any
+
 from app.tasks.celery_app import celery_app
 
 
 @celery_app.task(bind=True, name="app.tasks.email_tasks.send_email")
-def send_email(self, to: str, subject: str, body: str) -> dict[str, str]:
+def send_email(self: Any, to: str, subject: str, body: str) -> dict[str, str]:
     """Send an email (placeholder task).
 
     Args:

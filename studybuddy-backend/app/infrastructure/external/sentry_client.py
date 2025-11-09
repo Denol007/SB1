@@ -5,9 +5,10 @@ performance monitoring, and release tracking in the StudyBuddy application.
 """
 
 import logging
-from typing import Any
+from typing import Any, Literal
 
 import sentry_sdk
+from sentry_sdk._types import Event
 from sentry_sdk.integrations.fastapi import FastApiIntegration
 from sentry_sdk.integrations.logging import LoggingIntegration
 from sentry_sdk.integrations.redis import RedisIntegration
@@ -66,7 +67,7 @@ def init_sentry(
         logger.error(f"Failed to initialize Sentry: {e}")
 
 
-def _before_send(event: dict, hint: dict) -> dict | None:
+def _before_send(event: Event, hint: dict[str, Any]) -> Event | None:
     """Filter and modify events before sending to Sentry.
 
     Args:
@@ -94,7 +95,11 @@ def capture_exception(exception: Exception, **kwargs: Any) -> None:
     sentry_sdk.capture_exception(exception, **kwargs)
 
 
-def capture_message(message: str, level: str = "info", **kwargs: Any) -> None:
+def capture_message(
+    message: str,
+    level: Literal["fatal", "critical", "error", "warning", "info", "debug"] = "info",
+    **kwargs: Any,
+) -> None:
     """Capture a message and send it to Sentry.
 
     Args:

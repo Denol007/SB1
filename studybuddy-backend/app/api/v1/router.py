@@ -26,7 +26,7 @@ router.include_router(health.router)
 
 
 @router.get("/")
-async def api_v1_root():
+async def api_v1_root() -> dict[str, str]:
     """API v1 root endpoint.
 
     Returns basic information about the API version.

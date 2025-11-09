@@ -6,11 +6,13 @@ This module will contain Celery tasks for:
 - Sending event update notifications
 """
 
+from typing import Any
+
 from app.tasks.celery_app import celery_app
 
 
 @celery_app.task(bind=True, name="app.tasks.event_tasks.send_event_reminder")
-def send_event_reminder(self, event_id: str) -> dict[str, str]:
+def send_event_reminder(self: Any, event_id: str) -> dict[str, str]:
     """Send event reminder to registered participants (placeholder task).
 
     Args:
