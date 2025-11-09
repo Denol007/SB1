@@ -19,6 +19,9 @@ jobs:
     name: Lint Code
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: studybuddy-backend
 
     steps:
       - name: Checkout code
@@ -32,15 +35,15 @@ jobs:
       - name: Install uv
         run: |
           curl -LsSf https://astral.sh/uv/install.sh | sh
-          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - name: Cache uv dependencies
         uses: actions/cache@v4
         with:
           path: |
             ~/.cache/uv
-            .venv
-          key: ${{ runner.os }}-uv-${{ hashFiles('**/pyproject.toml') }}
+            studybuddy-backend/.venv
+          key: ${{ runner.os }}-uv-${{ hashFiles('studybuddy-backend/pyproject.toml') }}
           restore-keys: |
             ${{ runner.os }}-uv-
 
@@ -65,6 +68,9 @@ jobs:
     name: Run Tests
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: studybuddy-backend
 
     services:
       postgres:
@@ -115,15 +121,15 @@ jobs:
       - name: Install uv
         run: |
           curl -LsSf https://astral.sh/uv/install.sh | sh
-          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - name: Cache uv dependencies
         uses: actions/cache@v4
         with:
           path: |
             ~/.cache/uv
-            .venv
-          key: ${{ runner.os }}-uv-${{ hashFiles('**/pyproject.toml') }}
+            studybuddy-backend/.venv
+          key: ${{ runner.os }}-uv-${{ hashFiles('studybuddy-backend/pyproject.toml') }}
           restore-keys: |
             ${{ runner.os }}-uv-
 
@@ -139,7 +145,7 @@ jobs:
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
-          files: ./coverage.xml
+          files: ./studybuddy-backend/coverage.xml
           flags: unittests
           name: codecov-umbrella
           fail_ci_if_error: false
@@ -149,7 +155,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
-          path: htmlcov/
+          path: studybuddy-backend/htmlcov/
           retention-days: 7
         if: always()
 
@@ -177,8 +183,8 @@ jobs:
       - name: Build development image
         uses: docker/build-push-action@v5
         with:
-          context: .
-          file: ./docker/Dockerfile.dev
+          context: ./studybuddy-backend
+          file: ./studybuddy-backend/docker/Dockerfile.dev
           push: false
           tags: studybuddy-backend:dev-${{ github.sha }}
           cache-from: type=local,src=/tmp/.buildx-cache
@@ -187,8 +193,8 @@ jobs:
       - name: Build production image
         uses: docker/build-push-action@v5
         with:
-          context: .
-          file: ./docker/Dockerfile
+          context: ./studybuddy-backend
+          file: ./studybuddy-backend/docker/Dockerfile
           push: false
           tags: studybuddy-backend:${{ github.sha }}
           cache-from: type=local,src=/tmp/.buildx-cache
@@ -203,6 +209,9 @@ jobs:
     name: Security Scan
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: studybuddy-backend
 
     steps:
       - name: Checkout code
@@ -216,7 +225,7 @@ jobs:
       - name: Install uv
         run: |
           curl -LsSf https://astral.sh/uv/install.sh | sh
-          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - name: Install dependencies
         run: |
@@ -231,7 +240,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: bandit-security-report
-          path: bandit-report.json
+          path: studybuddy-backend/bandit-report.json
           retention-days: 30
         if: always()
 
@@ -239,7 +248,7 @@ jobs:
         uses: aquasecurity/trivy-action@master
         with:
           scan-type: 'fs'
-          scan-ref: '.'
+          scan-ref: './studybuddy-backend'
           format: 'sarif'
           output: 'trivy-results.sarif'
         continue-on-error: true
@@ -247,7 +256,7 @@ jobs:
       - name: Upload Trivy results to GitHub Security
         uses: github/codeql-action/upload-sarif@v3
         with:
-          sarif_file: 'trivy-results.sarif'
+          sarif_file: 'studybuddy-backend/trivy-results.sarif'
         if: always()
 
   summary:

@@ -51,8 +51,8 @@ jobs:
         id: build
         uses: docker/build-push-action@v5
         with:
-          context: .
-          file: ./docker/Dockerfile
+          context: ./studybuddy-backend
+          file: ./studybuddy-backend/docker/Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -68,6 +68,9 @@ jobs:
     environment:
       name: staging
       url: https://staging-api.studybuddy.example.com
+    defaults:
+      run:
+        working-directory: studybuddy-backend
 
     steps:
       - name: Checkout code
@@ -192,23 +195,3 @@ jobs:
         run: |
           echo "❌ Staging deployment failed!"
           exit 1
-
-      # Optional: Add Slack/Discord notification here
-      # - name: Send Slack notification
-      #   uses: slackapi/slack-github-action@v1
-      #   with:
-      #     payload: |
-      #       {
-      #         "text": "Staging Deployment: ${{ job.status }}",
-      #         "blocks": [
-      #           {
-      #             "type": "section",
-      #             "text": {
-      #               "type": "mrkdwn",
-      #               "text": "Staging deployment *${{ job.status }}*\nCommit: ${{ github.sha }}\nActor: ${{ github.actor }}"
-      #             }
-      #           }
-      #         ]
-      #       }
-      #   env:
-      #     SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
