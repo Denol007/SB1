@@ -25,9 +25,18 @@ from app.core.exceptions import (
     UnauthorizedException,
     ValidationException,
 )
+from app.infrastructure.external.sentry_client import init_sentry
 
 # Configure logger
 logger = logging.getLogger(__name__)
+
+# Initialize Sentry for error tracking and performance monitoring
+init_sentry(
+    dsn=settings.SENTRY_DSN,
+    environment=settings.SENTRY_ENVIRONMENT,
+    traces_sample_rate=settings.SENTRY_TRACES_SAMPLE_RATE,
+    release=f"studybuddy@{settings.APP_ENV}",
+)
 
 
 @asynccontextmanager
