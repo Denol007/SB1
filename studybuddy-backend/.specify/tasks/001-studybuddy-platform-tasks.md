@@ -230,7 +230,7 @@ description: "Task list for StudyBuddy platform implementation"
 
 ### Common Schemas
 
-- [ ] T061 Create `app/application/schemas/common.py` - Shared Pydantic models
+- [x] T061 Create `app/application/schemas/common.py` - Shared Pydantic models ✅
   - `PaginationParams` - page, page_size
   - `PaginatedResponse` - data, pagination metadata
   - `ErrorResponse` - error code, message, details
