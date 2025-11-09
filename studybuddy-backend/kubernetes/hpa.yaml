@@ -1,0 +1,171 @@
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: studybuddy-api-hpa
+  labels:
+    app: studybuddy
+    component: api
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: studybuddy-api
+
+  minReplicas: 3
+  maxReplicas: 10
+
+  metrics:
+    # CPU-based scaling
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+
+    # Memory-based scaling
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
+
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+        - type: Percent
+          value: 50
+          periodSeconds: 60
+        - type: Pods
+          value: 1
+          periodSeconds: 60
+      selectPolicy: Min
+
+    scaleUp:
+      stabilizationWindowSeconds: 0
+      policies:
+        - type: Percent
+          value: 100
+          periodSeconds: 30
+        - type: Pods
+          value: 2
+          periodSeconds: 30
+      selectPolicy: Max
+
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: studybuddy-celery-worker-hpa
+  labels:
+    app: studybuddy
+    component: celery-worker
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: studybuddy-celery-worker
+
+  minReplicas: 2
+  maxReplicas: 8
+
+  metrics:
+    # CPU-based scaling
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 75
+
+    # Memory-based scaling
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 85
+
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+        - type: Percent
+          value: 50
+          periodSeconds: 60
+        - type: Pods
+          value: 1
+          periodSeconds: 60
+      selectPolicy: Min
+
+    scaleUp:
+      stabilizationWindowSeconds: 60
+      policies:
+        - type: Percent
+          value: 100
+          periodSeconds: 30
+        - type: Pods
+          value: 2
+          periodSeconds: 30
+      selectPolicy: Max
+
+---
+# Pod Disruption Budget for API
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: studybuddy-api-pdb
+  labels:
+    app: studybuddy
+    component: api
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: studybuddy
+      component: api
+
+---
+# Pod Disruption Budget for Celery Worker
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: studybuddy-celery-worker-pdb
+  labels:
+    app: studybuddy
+    component: celery-worker
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: studybuddy
+      component: celery-worker
+
+---
+# Vertical Pod Autoscaler (VPA) - Optional
+# Requires VPA controller to be installed in the cluster
+# apiVersion: autoscaling.k8s.io/v1
+# kind: VerticalPodAutoscaler
+# metadata:
+#   name: studybuddy-api-vpa
+#   labels:
+#     app: studybuddy
+#     component: api
+# spec:
+#   targetRef:
+#     apiVersion: apps/v1
+#     kind: Deployment
+#     name: studybuddy-api
+#   updatePolicy:
+#     updateMode: "Auto"
+#   resourcePolicy:
+#     containerPolicies:
+#       - containerName: api
+#         minAllowed:
+#           cpu: 250m
+#           memory: 256Mi
+#         maxAllowed:
+#           cpu: 2000m
+#           memory: 2Gi

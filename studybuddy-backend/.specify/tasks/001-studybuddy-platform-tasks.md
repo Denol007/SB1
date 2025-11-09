@@ -85,13 +85,13 @@ description: "Task list for StudyBuddy platform implementation"
 
 ### Kubernetes Manifests
 
-- [ ] T025 [P] Create `kubernetes/namespace.yaml`
-- [ ] T026 [P] Create `kubernetes/configmap.yaml`
-- [ ] T027 [P] Create `kubernetes/secrets.yaml.template`
-- [ ] T028 [P] Create `kubernetes/api-deployment.yaml`
-- [ ] T029 [P] Create `kubernetes/celery-deployment.yaml`
-- [ ] T030 [P] Create `kubernetes/ingress.yaml`
-- [ ] T031 [P] Create `kubernetes/hpa.yaml` (Horizontal Pod Autoscaler)
+- [x] T025 [P] Create `kubernetes/namespace.yaml` ✅
+- [x] T026 [P] Create `kubernetes/configmap.yaml` ✅
+- [x] T027 [P] Create `kubernetes/secrets.yaml.template` ✅
+- [x] T028 [P] Create `kubernetes/api-deployment.yaml` ✅
+- [x] T029 [P] Create `kubernetes/celery-deployment.yaml` ✅
+- [x] T030 [P] Create `kubernetes/ingress.yaml` ✅
+- [x] T031 [P] Create `kubernetes/hpa.yaml` (Horizontal Pod Autoscaler) ✅
 
 ### Documentation
 

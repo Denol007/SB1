@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: studybuddy-staging
+  labels:
+    app: studybuddy
+    environment: staging
+    managed-by: github-actions
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: studybuddy-prod
+  labels:
+    app: studybuddy
+    environment: production
+    managed-by: github-actions

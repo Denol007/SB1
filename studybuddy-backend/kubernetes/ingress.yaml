@@ -1,0 +1,143 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: studybuddy-ingress
+  labels:
+    app: studybuddy
+  annotations:
+    # Nginx Ingress Controller annotations
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+
+    # CORS settings
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "https://studybuddy.example.com"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, PUT, PATCH, DELETE, OPTIONS"
+    nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+
+    # Rate limiting
+    nginx.ingress.kubernetes.io/limit-rps: "100"
+    nginx.ingress.kubernetes.io/limit-connections: "10"
+
+    # WebSocket support
+    nginx.ingress.kubernetes.io/websocket-services: "studybuddy-api"
+    nginx.ingress.kubernetes.io/proxy-http-version: "1.1"
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      proxy_set_header Upgrade $http_upgrade;
+      proxy_set_header Connection "upgrade";
+
+    # SSL/TLS configuration (use cert-manager for automatic certificates)
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+
+    # Security headers
+    nginx.ingress.kubernetes.io/custom-http-errors: "404,503"
+    nginx.ingress.kubernetes.io/server-snippet: |
+      add_header X-Frame-Options "SAMEORIGIN" always;
+      add_header X-Content-Type-Options "nosniff" always;
+      add_header X-XSS-Protection "1; mode=block" always;
+      add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+      add_header Permissions-Policy "geolocation=(), microphone=(), camera=()" always;
+
+spec:
+  ingressClassName: nginx
+
+  tls:
+    - hosts:
+        - api.studybuddy.example.com
+      secretName: studybuddy-tls-cert
+
+  rules:
+    - host: api.studybuddy.example.com
+      http:
+        paths:
+          # API endpoints
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: studybuddy-api
+                port:
+                  number: 8000
+
+          # Health checks
+          - path: /health
+            pathType: Prefix
+            backend:
+              service:
+                name: studybuddy-api
+                port:
+                  number: 8000
+
+          # API documentation
+          - path: /docs
+            pathType: Prefix
+            backend:
+              service:
+                name: studybuddy-api
+                port:
+                  number: 8000
+
+          - path: /redoc
+            pathType: Prefix
+            backend:
+              service:
+                name: studybuddy-api
+                port:
+                  number: 8000
+
+          # OpenAPI schema
+          - path: /openapi.json
+            pathType: Exact
+            backend:
+              service:
+                name: studybuddy-api
+                port:
+                  number: 8000
+
+          # WebSocket endpoint
+          - path: /ws
+            pathType: Prefix
+            backend:
+              service:
+                name: studybuddy-api
+                port:
+                  number: 8000
+
+---
+# Staging Ingress (optional)
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: studybuddy-staging-ingress
+  namespace: studybuddy-staging
+  labels:
+    app: studybuddy
+    environment: staging
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "https://staging.studybuddy.example.com"
+    cert-manager.io/cluster-issuer: "letsencrypt-staging"
+spec:
+  ingressClassName: nginx
+
+  tls:
+    - hosts:
+        - staging-api.studybuddy.example.com
+      secretName: studybuddy-staging-tls-cert
+
+  rules:
+    - host: staging-api.studybuddy.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: studybuddy-api
+                port:
+                  number: 8000
