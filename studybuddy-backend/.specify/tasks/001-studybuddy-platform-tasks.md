@@ -250,10 +250,10 @@ description: "Task list for StudyBuddy platform implementation"
 
 ### Tests for User Story 1 (Write FIRST, ensure they FAIL)
 
-- [ ] T062 [P] [US1] Create test factories in `tests/factories/user_factory.py`
+- [x] T062 [P] [US1] Create test factories in `tests/factories/user_factory.py` ✅
   - `UserFactory` using Factory Boy + Faker
 
-- [ ] T063 [P] [US1] Create test factories in `tests/factories/verification_factory.py`
+- [x] T063 [P] [US1] Create test factories in `tests/factories/verification_factory.py` ✅
   - `VerificationFactory`, `UniversityFactory`
 
 - [ ] T064 [P] [US1] Unit test: `tests/unit/services/test_auth_service.py`
