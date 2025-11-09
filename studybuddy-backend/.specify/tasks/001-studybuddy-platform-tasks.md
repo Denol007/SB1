@@ -194,7 +194,7 @@ description: "Task list for StudyBuddy platform implementation"
 
 ### API Foundation
 
-- [ ] T053 Create `app/main.py` - FastAPI application setup
+- [x] T053 Create `app/main.py` - FastAPI application setup ✅
   - App initialization
   - CORS middleware configuration
   - Global exception handler
