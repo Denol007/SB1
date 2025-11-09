@@ -226,7 +226,7 @@ description: "Task list for StudyBuddy platform implementation"
 
 - [x] T059 Configure `prometheus-fastapi-instrumentator` in `app/main.py` ✅
 
-- [ ] T060 Create `app/infrastructure/external/sentry_client.py` - Sentry integration
+- [x] T060 Create `app/infrastructure/external/sentry_client.py` - Sentry integration ✅
 
 ### Common Schemas
 
