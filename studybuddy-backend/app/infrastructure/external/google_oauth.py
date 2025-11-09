@@ -15,7 +15,7 @@ Example:
     >>> user_info = await client.get_user_info(tokens["access_token"])
 """
 
-from typing import Any
+from typing import Any, cast
 from urllib.parse import urlencode
 
 import httpx
@@ -130,7 +130,7 @@ class GoogleOAuthClient:
                     f"Failed to exchange code for token: {response.status_code} - {error_detail}"
                 )
 
-            return response.json()
+            return cast(dict[str, Any], response.json())
 
     async def get_user_info(self, access_token: str) -> dict[str, Any]:
         """Retrieve user information from Google using access token.
@@ -168,4 +168,4 @@ class GoogleOAuthClient:
                 error_detail = response.json() if response.text else response.text
                 raise Exception(f"Failed to get user info: {response.status_code} - {error_detail}")
 
-            return response.json()
+            return cast(dict[str, Any], response.json())

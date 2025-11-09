@@ -37,7 +37,7 @@ class PaginationParams(BaseModel):
         default=20, ge=1, le=100, description="Number of items per page (max 100)"
     )
 
-    @computed_field  # type: ignore[misc]
+    @computed_field  # type: ignore[prop-decorator]
     @property
     def offset(self) -> int:
         """Calculate the offset for database queries.
@@ -53,7 +53,7 @@ class PaginationParams(BaseModel):
         """
         return (self.page - 1) * self.page_size
 
-    @computed_field  # type: ignore[misc]
+    @computed_field  # type: ignore[prop-decorator]
     @property
     def limit(self) -> int:
         """Get the limit for database queries.
@@ -100,7 +100,7 @@ class PaginatedResponse(BaseModel, Generic[T]):
     page_size: int = Field(description="Number of items per page")
     has_next: bool = Field(description="Whether there are more pages available")
 
-    @computed_field  # type: ignore[misc]
+    @computed_field  # type: ignore[prop-decorator]
     @property
     def total_pages(self) -> int:
         """Calculate the total number of pages.

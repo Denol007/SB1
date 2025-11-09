@@ -66,7 +66,7 @@ celery_app.conf.update(
 
 
 # Task base class with custom defaults
-class BaseTask(celery_app.Task):
+class BaseTask(celery_app.Task):  # type: ignore[name-defined]
     """Base task with custom configuration.
 
     All tasks inherit from this base class to get consistent behavior.
@@ -81,7 +81,9 @@ class BaseTask(celery_app.Task):
     # Track started state
     track_started = True
 
-    def on_failure(self, exc, task_id, args, kwargs, einfo):
+    def on_failure(
+        self, exc: Exception, task_id: str, args: tuple, kwargs: dict, einfo: object
+    ) -> None:
         """Handle task failure.
 
         Args:
@@ -95,7 +97,9 @@ class BaseTask(celery_app.Task):
         print(f"Task {self.name}[{task_id}] failed: {exc}")
         super().on_failure(exc, task_id, args, kwargs, einfo)
 
-    def on_retry(self, exc, task_id, args, kwargs, einfo):
+    def on_retry(
+        self, exc: Exception, task_id: str, args: tuple, kwargs: dict, einfo: object
+    ) -> None:
         """Handle task retry.
 
         Args:
@@ -109,7 +113,7 @@ class BaseTask(celery_app.Task):
         print(f"Task {self.name}[{task_id}] retrying: {exc}")
         super().on_retry(exc, task_id, args, kwargs, einfo)
 
-    def on_success(self, retval, task_id, args, kwargs):
+    def on_success(self, retval: object, task_id: str, args: tuple, kwargs: dict) -> None:
         """Handle task success.
 
         Args:
