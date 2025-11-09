@@ -10,7 +10,7 @@ This module manages all application configuration including:
 - Environment-specific settings
 """
 
-from pydantic import Field, field_validator
+from pydantic import Field, ValidationInfo, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -147,7 +147,7 @@ class Settings(BaseSettings):
 
     @field_validator("CELERY_BROKER_URL", mode="after")
     @classmethod
-    def set_celery_broker_url(cls, v: str, info) -> str:
+    def set_celery_broker_url(cls, v: str, info: ValidationInfo) -> str:
         """Set Celery broker URL to Redis URL if not provided.
 
         Args:
@@ -158,12 +158,12 @@ class Settings(BaseSettings):
             Celery broker URL
         """
         if not v and "REDIS_URL" in info.data:
-            return info.data["REDIS_URL"]
+            return str(info.data["REDIS_URL"])
         return v
 
     @field_validator("CELERY_RESULT_BACKEND", mode="after")
     @classmethod
-    def set_celery_result_backend(cls, v: str, info) -> str:
+    def set_celery_result_backend(cls, v: str, info: ValidationInfo) -> str:
         """Set Celery result backend to Redis URL if not provided.
 
         Args:
@@ -174,12 +174,12 @@ class Settings(BaseSettings):
             Celery result backend URL
         """
         if not v and "REDIS_URL" in info.data:
-            return info.data["REDIS_URL"]
+            return str(info.data["REDIS_URL"])
         return v
 
     @field_validator("SENTRY_ENVIRONMENT", mode="after")
     @classmethod
-    def set_sentry_environment(cls, v: str, info) -> str:
+    def set_sentry_environment(cls, v: str, info: ValidationInfo) -> str:
         """Set Sentry environment from APP_ENV if not provided.
 
         Args:
@@ -190,7 +190,7 @@ class Settings(BaseSettings):
             Sentry environment name
         """
         if not v and "APP_ENV" in info.data:
-            return info.data["APP_ENV"]
+            return str(info.data["APP_ENV"])
         return v
 
     def is_production(self) -> bool:

@@ -86,7 +86,8 @@ jobs:
       - name: Sign the image with cosign
         run: |
           echo "Image signing would go here (cosign)"
-          # cosign sign --key cosign.key ${{ steps.meta.outputs.tags }}
+          echo "Tags: ${{ steps.meta.outputs.tags }}"
+          # cosign sign --key cosign.key ${IMAGE_TAG}
 
   approval:
     name: Manual Approval Required

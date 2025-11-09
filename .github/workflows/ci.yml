@@ -139,17 +139,20 @@ jobs:
 
       - name: Run tests with coverage
         run: |
-          uv run pytest --cov=app --cov-report=xml --cov-report=term --cov-report=html -v
-        continue-on-error: true  # Don't fail CI yet (no tests written)
+          cd studybuddy-backend
+          uv run pytest --cov=app --cov-report=xml:coverage.xml --cov-report=term --cov-report=html -v
+        continue-on-error: true  # Don't fail CI yet (some tests may not exist)
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
-          files: ./studybuddy-backend/coverage.xml
+          files: studybuddy-backend/coverage.xml
           flags: unittests
           name: codecov-umbrella
-          fail_ci_if_error: false
-        continue-on-error: true
+          fail_ci_if_error: false  # Don't fail if codecov upload fails
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        if: always()
 
       - name: Upload coverage reports as artifact
         uses: actions/upload-artifact@v4

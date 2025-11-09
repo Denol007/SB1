@@ -11,18 +11,21 @@ This module configures structlog for the application, providing:
 import logging
 import sys
 import uuid
+from collections.abc import Callable, MutableMapping
 from contextvars import ContextVar
 from typing import Any
 
 import structlog
 
+# Type aliases for structlog
+EventDict = MutableMapping[str, Any]
+Processor = Callable[[Any, str, EventDict], EventDict]
+
 # Context variable for request ID tracking across async boundaries
 request_id_var: ContextVar[str] = ContextVar("request_id", default="")
 
 
-def add_request_id(
-    logger: logging.Logger, method_name: str, event_dict: dict[str, Any]
-) -> dict[str, Any]:
+def add_request_id(logger: Any, method_name: str, event_dict: EventDict) -> EventDict:
     """Add request ID to log event dictionary.
 
     This processor adds a unique request ID to every log entry. If a request ID
@@ -50,9 +53,7 @@ def add_request_id(
     return event_dict
 
 
-def redact_pii(
-    logger: logging.Logger, method_name: str, event_dict: dict[str, Any]
-) -> dict[str, Any]:
+def redact_pii(logger: Any, method_name: str, event_dict: EventDict) -> EventDict:
     """Redact personally identifiable information from logs.
 
     This processor replaces sensitive field values with '***REDACTED***' to prevent
@@ -94,7 +95,9 @@ def redact_pii(
         else:
             return data
 
-    return _redact_dict(event_dict)
+    # Type cast the result to EventDict for mypy
+    result: EventDict = _redact_dict(event_dict)
+    return result
 
 
 def configure_logging(json_logs: bool = True) -> None:
@@ -141,7 +144,7 @@ def configure_logging(json_logs: bool = True) -> None:
 
     # Configure structlog
     structlog.configure(
-        processors=processors,
+        processors=processors,  # type: ignore[arg-type]
         wrapper_class=structlog.stdlib.BoundLogger,
         context_class=dict,
         logger_factory=structlog.stdlib.LoggerFactory(),
@@ -156,7 +159,7 @@ def configure_logging(json_logs: bool = True) -> None:
     )
 
 
-def setup_logger(name: str) -> structlog.stdlib.BoundLogger:
+def setup_logger(name: str) -> Any:
     """Create a configured logger instance.
 
     This is the primary way to get a logger in the application. It returns
