@@ -402,7 +402,7 @@ description: "Task list for StudyBuddy platform implementation"
 
 ### Seed Data for User Story 1
 
-- [x] T095 [US1] Create `scripts/seed_data.py`
+- [x] T095 [US1] Create `scripts/seed_data.py` ✅
   - Seed universities (Stanford, MIT, Harvard, etc.)
   - Create test users (verified, unverified, admin)
 
