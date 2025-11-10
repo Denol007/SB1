@@ -9,7 +9,7 @@ they should be imported and included here.
 
 from fastapi import APIRouter
 
-from app.api.v1.endpoints import auth, health, users
+from app.api.v1.endpoints import auth, health, users, verifications
 
 # Create main v1 router
 router = APIRouter(prefix="/api/v1", tags=["v1"])
@@ -22,6 +22,9 @@ router.include_router(auth.router)
 
 # Include user profile endpoints
 router.include_router(users.router)
+
+# Include verification endpoints
+router.include_router(verifications.router)
 
 # TODO: Import and include endpoint routers as they are created
 # Example:

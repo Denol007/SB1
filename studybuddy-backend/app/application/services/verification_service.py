@@ -267,3 +267,20 @@ class VerificationService:
             return False
 
         return verification.status.value == "verified"
+
+    async def get_user_verifications(self, user_id: UUID) -> list[Verification]:
+        """Get all verification records for a user.
+
+        Args:
+            user_id: User's unique identifier.
+
+        Returns:
+            list[Verification]: List of all verifications for the user,
+                ordered by most recent first.
+
+        Example:
+            >>> verifications = await verification_service.get_user_verifications(user_id)
+            >>> len(verifications)
+            2
+        """
+        return await self.verification_repository.get_all_by_user(user_id)

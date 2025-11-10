@@ -392,13 +392,13 @@ description: "Task list for StudyBuddy platform implementation"
   - `DELETE /api/v1/users/me` - Delete account (GDPR)
   - `GET /api/v1/users/{user_id}` - Get user by ID
 
-- [ ] T093 [US1] Create `app/api/v1/endpoints/verifications.py`
+- [x] T093 [US1] Create `app/api/v1/endpoints/verifications.py`
   - `POST /api/v1/verifications` - Request student verification
   - `POST /api/v1/verifications/confirm/{token}` - Confirm verification
   - `GET /api/v1/verifications/me` - List my verifications
   - `POST /api/v1/verifications/{verification_id}/resend` - Resend email
 
-- [ ] T094 [US1] Update `app/api/v1/router.py` to include auth, users, verifications routers
+- [x] T094 [US1] Update `app/api/v1/router.py` to include auth, users, verifications routers
 
 ### Seed Data for User Story 1
 

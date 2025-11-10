@@ -98,3 +98,16 @@ class VerificationRepository(ABC):
             updating verified_at timestamp, or marking as expired.
         """
         pass
+
+    @abstractmethod
+    async def get_all_by_user(self, user_id: UUID) -> list[Verification]:
+        """Retrieve all verification records for a specific user.
+
+        Args:
+            user_id: UUID of the user.
+
+        Returns:
+            list[Verification]: List of all verification records for the user,
+                ordered by created_at descending (most recent first).
+        """
+        pass

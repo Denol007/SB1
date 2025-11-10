@@ -133,3 +133,21 @@ class SQLAlchemyVerificationRepository(VerificationRepository):
         await self._session.flush()
         await self._session.refresh(verification)
         return verification
+
+    async def get_all_by_user(self, user_id: UUID) -> list[Verification]:
+        """Retrieve all verification records for a specific user.
+
+        Args:
+            user_id: UUID of the user.
+
+        Returns:
+            list[Verification]: List of all verification records for the user,
+                ordered by created_at descending (most recent first).
+        """
+        stmt = (
+            select(Verification)
+            .where(Verification.user_id == user_id)
+            .order_by(Verification.created_at.desc())
+        )
+        result = await self._session.execute(stmt)
+        return list(result.scalars().all())

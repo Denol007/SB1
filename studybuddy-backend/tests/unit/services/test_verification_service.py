@@ -581,3 +581,73 @@ class TestIsVerifiedForUniversity(TestVerificationService):
 
         # Assert
         assert is_verified is False
+
+
+class TestGetUserVerifications(TestVerificationService):
+    """Tests for get_user_verifications() method."""
+
+    @pytest.mark.asyncio
+    async def test_returns_all_user_verifications(
+        self,
+        verification_service,
+        mock_verification_repository,
+        user_id,
+        verified_verification,
+        pending_verification,
+    ):
+        """Should return all verifications for a user."""
+        # Arrange
+        verifications = [verified_verification, pending_verification]
+        mock_verification_repository.get_user_verifications.return_value = verifications
+
+        # Act
+        result = await verification_service.get_user_verifications(user_id)
+
+        # Assert
+        assert len(result) == 2
+        assert result[0] == verified_verification
+        assert result[1] == pending_verification
+        mock_verification_repository.get_user_verifications.assert_called_once_with(user_id)
+
+    @pytest.mark.asyncio
+    async def test_returns_empty_list_when_no_verifications(
+        self,
+        verification_service,
+        mock_verification_repository,
+        user_id,
+    ):
+        """Should return empty list when user has no verifications."""
+        # Arrange
+        mock_verification_repository.get_user_verifications.return_value = []
+
+        # Act
+        result = await verification_service.get_user_verifications(user_id)
+
+        # Assert
+        assert result == []
+
+    @pytest.mark.asyncio
+    async def test_includes_all_verification_details(
+        self,
+        verification_service,
+        mock_verification_repository,
+        user_id,
+        verified_verification,
+    ):
+        """Should include all verification fields in response."""
+        # Arrange
+        mock_verification_repository.get_user_verifications.return_value = [verified_verification]
+
+        # Act
+        result = await verification_service.get_user_verifications(user_id)
+
+        # Assert
+        verification = result[0]
+        assert "id" in verification
+        assert "user_id" in verification
+        assert "university_id" in verification
+        assert "email" in verification
+        assert "status" in verification
+        assert "verified_at" in verification
+        assert "expires_at" in verification
+        assert "created_at" in verification
