@@ -295,7 +295,7 @@ description: "Task list for StudyBuddy platform implementation"
 
 ### Database Models for User Story 1
 
-- [ ] T073 [P] [US1] Create `app/infrastructure/database/models/user.py`
+- [x] T073 [P] [US1] Create `app/infrastructure/database/models/user.py` ✅
   - Fields: id (UUID), google_id, email, name, bio, avatar_url, role
   - Timestamps: created_at, updated_at, deleted_at
 
