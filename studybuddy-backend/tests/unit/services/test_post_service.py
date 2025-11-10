@@ -470,7 +470,7 @@ class TestGetCommunityFeed:
         mock_post_repository,
         community_id,
     ):
-        """Test that get_community_feed returns paginated posts."""
+        """Test that get_community_feed returns paginated posts with total count."""
         # Arrange
         posts = [
             MagicMock(
@@ -483,14 +483,16 @@ class TestGetCommunityFeed:
         ]
 
         mock_post_repository.list_by_community.return_value = posts
+        mock_post_repository.count_by_community.return_value = 100  # Total count
 
         # Act
-        result = await post_service.get_community_feed(
+        result_posts, total = await post_service.get_community_feed(
             community_id=community_id, page=1, page_size=20
         )
 
         # Assert
-        assert len(result) == 20
+        assert len(result_posts) == 20
+        assert total == 100
         mock_post_repository.list_by_community.assert_called_once_with(
             community_id=community_id,
             page=1,
@@ -498,6 +500,7 @@ class TestGetCommunityFeed:
             sort_by="created_at",
             descending=True,
         )
+        mock_post_repository.count_by_community.assert_called_once_with(community_id)
 
     @pytest.mark.asyncio
     async def test_gets_feed_sorted_by_created_at_desc(

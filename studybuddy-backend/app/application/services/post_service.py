@@ -226,36 +226,43 @@ class PostService:
         community_id: UUID,
         page: int = 1,
         page_size: int = 20,
-    ) -> list[Post]:
-        """Get paginated community feed.
+        sort_by: str = "created_at",
+        sort_order: str = "desc",
+    ) -> tuple[list[Post], int]:
+        """Get paginated community feed with total count.
 
-        Posts are sorted by created_at descending (newest first).
+        Posts are sorted by specified field.
         Pinned posts appear first.
 
         Args:
             community_id: UUID of the community.
             page: Page number (1-indexed).
             page_size: Number of posts per page.
+            sort_by: Field to sort by (created_at, updated_at).
+            sort_order: Sort order (asc, desc).
 
         Returns:
-            List of Post instances for the requested page.
+            Tuple of (list of Post instances, total count).
 
         Example:
-            >>> posts = await service.get_community_feed(
+            >>> posts, total = await service.get_community_feed(
             ...     community_id=community_uuid,
             ...     page=1,
             ...     page_size=20
             ... )
         """
+        descending = sort_order == "desc"
         posts = await self.post_repository.list_by_community(
             community_id=community_id,
             page=page,
             page_size=page_size,
-            sort_by="created_at",
-            descending=True,
+            sort_by=sort_by,
+            descending=descending,
         )
 
-        return posts
+        total = await self.post_repository.count_by_community(community_id)
+
+        return posts, total
 
     async def pin_post(
         self,

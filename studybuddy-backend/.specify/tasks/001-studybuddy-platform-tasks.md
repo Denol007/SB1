@@ -660,15 +660,20 @@ description: "Task list for StudyBuddy platform implementation"
 
 ### API Endpoints for User Story 3
 
-- [ ] T133 [US3] Create `app/api/v1/endpoints/posts.py`
+- [x] T133 [US3] Create `app/api/v1/endpoints/posts.py` ✅
   - `GET /api/v1/communities/{community_id}/posts` - Feed with pagination
   - `POST /api/v1/communities/{community_id}/posts` - Create
   - `GET /api/v1/posts/{post_id}` - Get details
   - `PATCH /api/v1/posts/{post_id}` - Update
   - `DELETE /api/v1/posts/{post_id}` - Delete
   - `POST /api/v1/posts/{post_id}/pin` - Pin (moderator)
-  - `POST /api/v1/posts/{post_id}/reactions` - Add reaction
+  - `POST /api/v1/posts/{post_id}/unpin` - Unpin (moderator)
+  - `POST /api/v1/posts/{post_id}/reactions` - Add/update reaction
   - `DELETE /api/v1/posts/{post_id}/reactions` - Remove reaction
+  - Created 3 new repository implementations (post, reaction, comment)
+  - Fixed database schema bug (is_pinned column type)
+  - All 5 integration tests passing
+  - All 63 post-related tests passing (unit + schema + integration)
 
 - [ ] T134 [US3] Create `app/api/v1/endpoints/comments.py`
   - `GET /api/v1/posts/{post_id}/comments` - List

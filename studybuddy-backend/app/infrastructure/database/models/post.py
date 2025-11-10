@@ -7,7 +7,7 @@ pinning support, and soft delete.
 from datetime import datetime
 from uuid import UUID, uuid4
 
-from sqlalchemy import DateTime, ForeignKey, Index, String, Text
+from sqlalchemy import Boolean, DateTime, ForeignKey, Index, Text
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from sqlalchemy.orm import Mapped, mapped_column
@@ -86,7 +86,7 @@ class Post(Base, TimestampMixin):
 
     # Pinning support (pinned posts appear first in feed)
     is_pinned: Mapped[bool] = mapped_column(
-        String,
+        Boolean,
         nullable=False,
         default=False,
         index=True,  # Index for sorting feed with pinned posts first

@@ -50,7 +50,7 @@ except Exception:  # pragma: no cover - skip when models not present
 class TestPostCreationFlow:
     """End-to-end test for complete post creation and interaction flow."""
 
-    async def test_complete_post_creation_flow(self, db_session):
+    async def test_complete_post_creation_flow(self, db_session, auth_headers):
         """Test complete flow: Create post → React → Comment → Edit → Delete.
 
         This E2E test validates the entire post interaction journey:
@@ -64,6 +64,7 @@ class TestPostCreationFlow:
 
         Args:
             db_session: Database session fixture.
+            auth_headers: Auth headers fixture for creating JWT tokens.
 
         Expected behavior:
             - Post is created successfully and visible to community members
@@ -151,10 +152,6 @@ class TestPostCreationFlow:
         # Create async client for API testing
         transport = ASGITransport(app=app)  # type: ignore
         async with AsyncClient(transport=transport, base_url="http://test") as client:
-            # Helper function to create auth headers
-            def auth_headers(user_id):
-                return {"Authorization": f"Bearer mock-token-{user_id}"}
-
             # ===== STEP 1: Create a post =====
             print("\n[E2E] Step 1: Create a post...")
 
@@ -232,7 +229,7 @@ class TestPostCreationFlow:
                 json={"reaction_type": "love"},
                 headers=auth_headers(commenter.id),
             )
-            assert love_response.status_code == 200  # Update existing reaction
+            assert love_response.status_code == 201  # API returns 201 for both create and update
             love_data = love_response.json()
             assert love_data["reaction_type"] == "love"
             print(f"✓ User '{commenter.name}' changed reaction to 'love'")
