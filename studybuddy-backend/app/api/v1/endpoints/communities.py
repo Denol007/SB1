@@ -331,6 +331,7 @@ async def update_community(
             community_id=community_id,
             data=update_dict,
         )
+
         return CommunityDetailResponse.model_validate(community)
 
     except ForbiddenException as e:

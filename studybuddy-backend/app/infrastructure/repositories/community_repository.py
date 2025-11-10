@@ -259,15 +259,21 @@ class SQLAlchemyCommunityRepository(CommunityRepository):
         # Perform update using UPDATE statement
         from sqlalchemy import update as sql_update
 
-        stmt = sql_update(Community).where(Community.id == community_id).values(**data)
+        stmt = (
+            sql_update(Community)
+            .where(Community.id == community_id)
+            .values(**data)
+            .execution_options(synchronize_session=False)
+        )
         await self._session.execute(stmt)
         await self._session.flush()
 
-        # Completely clear the session to avoid any caching
-        self._session.expunge_all()
-
-        # Fetch the updated community with completely fresh query
-        stmt = select(Community).where(Community.id == community_id, Community.deleted_at.is_(None))
+        # Fetch the updated community with fresh query
+        stmt = (
+            select(Community)
+            .where(Community.id == community_id, Community.deleted_at.is_(None))
+            .execution_options(populate_existing=True)
+        )
         result = await self._session.execute(stmt)
         return result.scalar_one_or_none()
 

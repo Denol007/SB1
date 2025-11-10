@@ -97,9 +97,9 @@ class CommunityUpdate(BaseModel):
     """Schema for updating an existing community.
 
     All fields are optional. Only provided fields will be updated.
-    Name and type cannot be changed after creation for data integrity.
 
     Attributes:
+        name: Updated community name.
         description: Updated community description.
         visibility: Updated visibility level.
         requires_verification: Updated verification requirement.
@@ -108,11 +108,18 @@ class CommunityUpdate(BaseModel):
 
     Example:
         >>> update = CommunityUpdate(
+        ...     name="Updated Name",
         ...     description="Updated community description",
         ...     visibility=CommunityVisibility.PRIVATE
         ... )
     """
 
+    name: str | None = Field(
+        default=None,
+        min_length=1,
+        max_length=255,
+        description="Updated community name",
+    )
     description: str | None = Field(
         default=None,
         min_length=1,
