@@ -643,8 +643,9 @@ description: "Task list for StudyBuddy platform implementation"
   - `ReactionCreate`, `ReactionResponse`, `ReactionDetailResponse`
   - 20 unit tests - all passing
 
-- [ ] T131 [P] [US3] Create `app/application/schemas/comment.py`
-  - `CommentCreate`, `CommentUpdate`, `CommentResponse`
+- [x] T131 [P] [US3] Create `app/application/schemas/comment.py` ✅
+  - `CommentCreate`, `CommentUpdate`, `CommentResponse`, `CommentDetailResponse`
+  - 28 unit tests - all passing
 
 ### Services for User Story 3
 
