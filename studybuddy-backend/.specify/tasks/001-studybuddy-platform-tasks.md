@@ -568,7 +568,13 @@ description: "Task list for StudyBuddy platform implementation"
   - 9 tests skip (awaiting endpoints), 3 tests pass (error cases)
   - Ready to execute once endpoints implemented (T134)
 
-- [ ] T120 [US3] E2E test: `tests/e2e/test_post_creation_flow.py`
+- [x] T120 [US3] E2E test: `tests/e2e/test_post_creation_flow.py` ✅
+  - Complete end-to-end test for post interaction flow
+  - 14 comprehensive steps: create → react → comment → edit → delete
+  - Tests post/reaction/comment CRUD operations with permissions
+  - Validates threaded comments, reaction changes, soft deletes
+  - Verifies community feed excludes deleted content
+  - Currently skips (awaiting T133/T134 endpoint implementation)
 
 ### Domain Models for User Story 3
 
