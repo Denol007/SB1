@@ -460,7 +460,7 @@ description: "Task list for StudyBuddy platform implementation"
   - Timestamp: joined_at
   - Unique constraint: (user_id, community_id)
 
-- [ ] T105 [US2] Create Alembic migration: `alembic revision --autogenerate -m "Add communities and memberships tables"`
+- [x] T105 [US2] Create Alembic migration: `alembic revision --autogenerate -m "Add communities and memberships tables"` ✅
 
 ### Repository Layer for User Story 2
 
