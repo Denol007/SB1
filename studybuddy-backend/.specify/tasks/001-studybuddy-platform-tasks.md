@@ -356,18 +356,18 @@ description: "Task list for StudyBuddy platform implementation"
 
 ### Services for User Story 1
 
-- [ ] T087 [US1] Create `app/application/services/auth_service.py`
+- [x] T087 [US1] Create `app/application/services/auth_service.py`
   - `create_user_from_google(google_user_info)` → User
   - `generate_tokens(user_id)` → access_token, refresh_token
   - `refresh_access_token(refresh_token)` → new access_token
   - `logout(refresh_token)` → invalidate token
 
-- [ ] T088 [US1] Create `app/application/services/user_service.py`
+- [x] T088 [US1] Create `app/application/services/user_service.py`
   - `get_user_profile(user_id)` → User
   - `update_user_profile(user_id, data)` → User
   - `delete_user(user_id)` → soft delete
 
-- [ ] T089 [US1] Create `app/application/services/verification_service.py`
+- [x] T089 [US1] Create `app/application/services/verification_service.py`
   - `request_verification(user_id, university_id, email)` → Verification
   - `confirm_verification(token)` → Verification
   - `is_verified_for_university(user_id, university_id)` → bool
