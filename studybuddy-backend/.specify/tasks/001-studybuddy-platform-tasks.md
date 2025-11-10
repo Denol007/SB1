@@ -455,7 +455,7 @@ description: "Task list for StudyBuddy platform implementation"
   - Fields: requires_verification, avatar_url, cover_url, member_count
   - Timestamps: created_at, updated_at, deleted_at
 
-- [ ] T104 [P] [US2] Create `app/infrastructure/database/models/membership.py`
+- [x] T104 [P] [US2] Create `app/infrastructure/database/models/membership.py` ✅
   - Fields: id, user_id (FK), community_id (FK), role
   - Timestamp: joined_at
   - Unique constraint: (user_id, community_id)
