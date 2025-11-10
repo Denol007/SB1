@@ -312,13 +312,13 @@ description: "Task list for StudyBuddy platform implementation"
 
 ### Repository Interfaces for User Story 1
 
-- [ ] T078 [P] [US1] Create `app/application/interfaces/user_repository.py`
+- [x] T078 [P] [US1] Create `app/application/interfaces/user_repository.py` ✅
   - Abstract methods: `create()`, `get_by_id()`, `get_by_email()`, `get_by_google_id()`, `update()`, `delete()`
 
-- [ ] T079 [P] [US1] Create `app/application/interfaces/verification_repository.py`
+- [x] T079 [P] [US1] Create `app/application/interfaces/verification_repository.py` ✅
   - Abstract methods: `create()`, `get_by_token()`, `get_by_user_and_university()`, `update()`
 
-- [ ] T080 [P] [US1] Create `app/application/interfaces/university_repository.py`
+- [x] T080 [P] [US1] Create `app/application/interfaces/university_repository.py` ✅
   - Abstract methods: `get_by_domain()`, `list_all()`
 
 ### Repository Implementations for User Story 1
