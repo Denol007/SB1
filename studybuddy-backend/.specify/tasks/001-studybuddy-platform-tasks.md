@@ -429,12 +429,12 @@ description: "Task list for StudyBuddy platform implementation"
   - Test `add_member()`, `remove_member()`, `update_member_role()`
   - Test hierarchical permissions
 
-- [ ] T098 [P] [US2] Integration test: `tests/integration/api/test_community_endpoints.py`
+- [x] T098 [P] [US2] Integration test: `tests/integration/api/test_community_endpoints.py` ✅
   - Test all CRUD operations
   - Test membership management
   - Test permission enforcement
 
-- [ ] T099 [US2] E2E test: `tests/e2e/test_community_creation_flow.py`
+- [x] T099 [US2] E2E test: `tests/e2e/test_community_creation_flow.py` ✅
   - Create community → Configure → Add members → Sub-community
 
 ### Domain Models for User Story 2
