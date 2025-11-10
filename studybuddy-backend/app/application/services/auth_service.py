@@ -8,7 +8,6 @@ This service handles:
 """
 
 from typing import Any
-from uuid import UUID
 
 from jose import ExpiredSignatureError
 
@@ -17,6 +16,7 @@ from app.core.config import settings
 from app.core.exceptions import ConflictException, UnauthorizedException
 from app.core.security import create_access_token, create_refresh_token, verify_token
 from app.infrastructure.cache.cache_service import CacheService
+from app.infrastructure.database.models.user import User
 
 
 class AuthService:
@@ -44,7 +44,7 @@ class AuthService:
         self.user_repository = user_repository
         self.cache_service = cache_service
 
-    async def create_user_from_google(self, google_user_info: dict[str, Any]) -> dict[str, Any]:
+    async def create_user_from_google(self, google_user_info: dict[str, Any]) -> User:
         """Create or retrieve user from Google OAuth information.
 
         This method handles three scenarios:
@@ -61,7 +61,7 @@ class AuthService:
                 - email_verified: Whether email is verified
 
         Returns:
-            User dictionary with id, google_id, email, name, avatar_url, role, etc.
+            User: User object with id, google_id, email, name, avatar_url, role, etc.
 
         Raises:
             ConflictException: If email is already taken by a different Google account.
@@ -90,14 +90,10 @@ class AuthService:
 
         if user_by_email:
             # If user exists with same email but no Google ID, link the account
-            if not user_by_email.get("google_id"):
-                updated_user = await self.user_repository.update(
-                    UUID(user_by_email["id"]),
-                    {
-                        "google_id": google_id,
-                        "avatar_url": google_user_info.get("picture"),
-                    },
-                )
+            if not user_by_email.google_id:
+                user_by_email.google_id = google_id
+                user_by_email.avatar_url = google_user_info.get("picture")
+                updated_user = await self.user_repository.update(user_by_email)
                 return updated_user
 
             # If user exists with different Google ID, raise conflict
@@ -106,15 +102,15 @@ class AuthService:
             )
 
         # Create new user
-        user_data = {
-            "google_id": google_id,
-            "email": email,
-            "name": google_user_info["name"],
-            "avatar_url": google_user_info.get("picture"),
-        }
+        new_user = User(
+            google_id=google_id,
+            email=email,
+            name=google_user_info["name"],
+            avatar_url=google_user_info.get("picture"),
+        )
 
-        new_user = await self.user_repository.create(user_data)
-        return new_user
+        created_user = await self.user_repository.create(new_user)
+        return created_user
 
     async def generate_tokens(self, user_id: str) -> dict[str, str]:
         """Generate access and refresh tokens for a user.

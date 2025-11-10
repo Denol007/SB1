@@ -10,7 +10,7 @@ This service handles:
 import secrets
 from datetime import UTC, datetime, timedelta
 from hashlib import sha256
-from typing import Any, Protocol
+from typing import Protocol
 from uuid import UUID
 
 from app.application.interfaces.university_repository import UniversityRepository
@@ -21,6 +21,8 @@ from app.core.exceptions import (
     NotFoundException,
     UnauthorizedException,
 )
+from app.domain.enums.verification_status import VerificationStatus
+from app.infrastructure.database.models.verification import Verification
 
 
 class EmailService(Protocol):
@@ -80,7 +82,7 @@ class VerificationService:
         user_id: UUID,
         university_id: UUID,
         email: str,
-    ) -> dict[str, Any]:
+    ) -> Verification:
         """Request email verification for a university.
 
         Creates a new verification request or updates an existing pending one.
@@ -93,7 +95,7 @@ class VerificationService:
             email: Student email address to verify.
 
         Returns:
-            Verification dictionary containing:
+            Verification: Verification object containing:
                 - id: Verification UUID
                 - user_id: User's UUID
                 - university_id: University's UUID
@@ -126,13 +128,13 @@ class VerificationService:
 
         # Verify the university ID from email domain matches the requested university
         # This ensures the email domain belongs to the university the user selected
-        if str(university["id"]) != str(university_id):
+        if str(university.id) != str(university_id):
             raise BadRequestException(
                 message=f"Email domain {email_domain} does not match the selected university"
             )
 
         # Alternative check: verify the domain matches
-        if university.get("domain") != email_domain:
+        if university.domain != email_domain:
             raise BadRequestException(message="Email domain does not match university domain")
 
         # Check if user already has a verification for this university
@@ -143,7 +145,7 @@ class VerificationService:
 
         if existing:
             # If already verified, raise conflict
-            if existing.get("status") == "verified":
+            if existing.status.value == "verified":
                 raise ConflictException(message="User is already verified for this university")
 
             # If pending, update with new token
@@ -151,16 +153,14 @@ class VerificationService:
             token_hash = sha256(token.encode()).hexdigest()
             expires_at = datetime.now(UTC) + timedelta(hours=24)
 
-            updated = await self.verification_repository.update(
-                UUID(existing["id"]),
-                token_hash=token_hash,
-                expires_at=expires_at,
-            )
+            existing.token_hash = token_hash
+            existing.expires_at = expires_at
+            updated = await self.verification_repository.update(existing)
 
             # Send verification email
             await self.email_service.send_verification_email(
                 to=email,
-                university_name=university["name"],
+                university_name=university.name,
                 token=token,
             )
 
@@ -171,7 +171,7 @@ class VerificationService:
         token_hash = sha256(token.encode()).hexdigest()
         expires_at = datetime.now(UTC) + timedelta(hours=24)
 
-        verification = await self.verification_repository.create(
+        new_verification = Verification(
             user_id=user_id,
             university_id=university_id,
             email=email,
@@ -179,16 +179,18 @@ class VerificationService:
             expires_at=expires_at,
         )
 
+        verification = await self.verification_repository.create(new_verification)
+
         # Send verification email
         await self.email_service.send_verification_email(
             to=email,
-            university_name=university["name"],
+            university_name=university.name,
             token=token,
         )
 
         return verification
 
-    async def confirm_verification(self, token: str) -> dict[str, Any]:
+    async def confirm_verification(self, token: str) -> Verification:
         """Confirm email verification using the token from email.
 
         Validates the token, checks expiration, and updates the verification
@@ -198,7 +200,7 @@ class VerificationService:
             token: Verification token from email link.
 
         Returns:
-            Verified verification dictionary with status updated to "verified"
+            Verification: Verified verification object with status updated to "verified"
             and verified_at timestamp set.
 
         Raises:
@@ -208,32 +210,29 @@ class VerificationService:
 
         Example:
             >>> verification = await verification_service.confirm_verification(token)
-            >>> verification["status"]
-            'verified'
+            >>> verification.status
+            VerificationStatus.VERIFIED
         """
         # Hash token to find verification
         token_hash = sha256(token.encode()).hexdigest()
-        verification = await self.verification_repository.get_by_token_hash(token_hash)
+        verification = await self.verification_repository.get_by_token(token_hash)
 
         if not verification:
             raise NotFoundException(message="Verification not found")
 
         # Check if already verified
-        if verification.get("status") == "verified":
+        if verification.status.value == "verified":
             raise ConflictException(message="Verification is already verified")
 
         # Check if token expired
-        expires_at = verification.get("expires_at")
-        if expires_at and datetime.now(UTC) > expires_at:
+        if verification.expires_at and datetime.now(UTC) > verification.expires_at:
             raise UnauthorizedException(message="Verification token has expired")
 
         # Update verification status
         verified_at = datetime.now(UTC)
-        updated = await self.verification_repository.update(
-            UUID(verification["id"]),
-            status="verified",
-            verified_at=verified_at,
-        )
+        verification.status = VerificationStatus.VERIFIED
+        verification.verified_at = verified_at
+        updated = await self.verification_repository.update(verification)
 
         return updated
 
@@ -267,32 +266,4 @@ class VerificationService:
         if not verification:
             return False
 
-        return verification.get("status") == "verified"
-
-    async def get_user_verifications(self, user_id: UUID) -> list[dict[str, Any]]:
-        """Retrieve all verification records for a user.
-
-        Returns all verifications regardless of status (pending, verified, expired).
-
-        Args:
-            user_id: User's unique identifier.
-
-        Returns:
-            List of verification dictionaries, each containing:
-                - id: Verification UUID
-                - user_id: User's UUID
-                - university_id: University's UUID
-                - email: Student email address
-                - status: Verification status
-                - verified_at: Verification timestamp (if verified)
-                - expires_at: Token expiration time
-                - created_at: Creation timestamp
-                - updated_at: Last update timestamp
-
-        Example:
-            >>> verifications = await verification_service.get_user_verifications(user_id)
-            >>> len(verifications)
-            2
-        """
-        verifications = await self.verification_repository.get_user_verifications(user_id)
-        return verifications
+        return verification.status.value == "verified"
