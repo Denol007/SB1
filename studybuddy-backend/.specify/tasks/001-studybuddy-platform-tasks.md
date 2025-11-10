@@ -560,7 +560,14 @@ description: "Task list for StudyBuddy platform implementation"
   - Tests currently skip (awaiting Post model/endpoints - T122, T133)
   - Ready to execute once endpoints implemented
 
-- [ ] T119 [P] [US3] Integration test: `tests/integration/api/test_comment_endpoints.py`
+- [x] T119 [P] [US3] Integration test: `tests/integration/api/test_comment_endpoints.py` ✅
+  - 12 integration tests for comment endpoints
+  - Tests: create/get flow, threaded replies, pagination, update/delete as author
+  - Tests: permission checks (non-author fails), empty content validation
+  - Tests: non-existent post/comment error handling
+  - 9 tests skip (awaiting endpoints), 3 tests pass (error cases)
+  - Ready to execute once endpoints implemented (T134)
+
 - [ ] T120 [US3] E2E test: `tests/e2e/test_post_creation_flow.py`
 
 ### Domain Models for User Story 3
