@@ -18,7 +18,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.v1.dependencies.auth import get_current_user
+from app.api.v1.dependencies.auth import get_current_user, get_optional_current_user
 from app.application.schemas.community import (
     CommunityCreate,
     CommunityDetailResponse,
@@ -131,7 +131,7 @@ async def list_communities(
     type: CommunityType | None = Query(None, description="Filter by community type"),
     visibility: CommunityVisibility | None = Query(None, description="Filter by visibility"),
     role: MembershipRole | None = Query(None, description="Filter by user's role in communities"),
-    current_user: User = Depends(get_current_user),
+    current_user: User | None = Depends(get_optional_current_user),
     community_service: CommunityService = Depends(get_community_service),
     membership_repo: SQLAlchemyMembershipRepository = Depends(get_membership_repository),
 ) -> list[CommunityResponse]:
@@ -145,15 +145,20 @@ async def list_communities(
         type: Optional filter by community type
         visibility: Optional filter by visibility
         role: Optional filter by user's role in the community
-        current_user: Authenticated user
+        current_user: Authenticated user (optional)
         community_service: Community service instance
         membership_repo: Membership repository for filtering by role
 
     Returns:
         list[CommunityResponse]: List of communities matching filters
     """
-    # If filtering by role, get user's memberships first
+    # If filtering by role, authentication is required
     if role is not None:
+        if current_user is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Authentication required to filter by role",
+            )
         memberships = await membership_repo.get_by_user(current_user.id)
         # Filter memberships by role
         filtered_memberships = [m for m in memberships if m.role == role]
@@ -183,7 +188,7 @@ async def list_communities(
     community_repo = SQLAlchemyCommunityRepository(membership_repo._session)
 
     # Get all communities (we'll filter by visibility access below)
-    all_communities = await community_repo.get_all()
+    all_communities = await community_repo.list_all()
 
     # Apply filters
     communities = []
@@ -199,10 +204,11 @@ async def list_communities(
         if community.visibility == CommunityVisibility.PUBLIC:
             communities.append(community)
         else:
-            # Check if user is a member
-            membership = await membership_repo.get_membership(current_user.id, community.id)
-            if membership:
-                communities.append(community)
+            # Private community - only show if user is authenticated and a member
+            if current_user is not None:
+                membership = await membership_repo.get_membership(current_user.id, community.id)
+                if membership:
+                    communities.append(community)
 
     return [CommunityResponse.model_validate(c) for c in communities]
 
@@ -216,7 +222,7 @@ async def list_communities(
 )
 async def get_community(
     community_id: UUID,
-    current_user: User = Depends(get_current_user),
+    current_user: User | None = Depends(get_optional_current_user),
     community_service: CommunityService = Depends(get_community_service),
     membership_repo: SQLAlchemyMembershipRepository = Depends(get_membership_repository),
 ) -> CommunityDetailResponse:
@@ -228,7 +234,7 @@ async def get_community(
 
     Args:
         community_id: Community ID
-        current_user: Authenticated user
+        current_user: Authenticated user (optional)
         community_service: Community service instance
         membership_repo: Membership repository
 
@@ -249,10 +255,12 @@ async def get_community(
         community = await community_repo.get_by_id(community_id)
 
         if not community:
-            raise NotFoundException("Community", str(community_id))
+            raise NotFoundException(f"Community {community_id} not found")
 
         # Check access for private communities
         if community.visibility == CommunityVisibility.PRIVATE:
+            if current_user is None:
+                raise ForbiddenException("Authentication required to access private communities")
             membership = await membership_repo.get_membership(current_user.id, community_id)
             if not membership:
                 raise ForbiddenException("You do not have access to this private community")
@@ -391,7 +399,7 @@ async def join_community(
         community = await community_repo.get_by_id(community_id)
 
         if not community:
-            raise NotFoundException("Community", str(community_id))
+            raise NotFoundException(f"Community {community_id} not found")
 
         if community.visibility == CommunityVisibility.PRIVATE:
             raise ForbiddenException("Cannot join private communities. Contact an admin.")
@@ -489,7 +497,7 @@ async def list_members(
         community = await community_repo.get_by_id(community_id)
 
         if not community:
-            raise NotFoundException("Community", str(community_id))
+            raise NotFoundException(f"Community {community_id} not found")
 
         # Check access for private communities
         if community.visibility == CommunityVisibility.PRIVATE:
@@ -498,15 +506,7 @@ async def list_members(
                 raise ForbiddenException("You do not have access to this private community")
 
         # Get all members
-        # Note: This is a temporary workaround. TODO: Add get_by_community method to repository
-        from sqlalchemy import select
-
-        from app.infrastructure.database.models.membership import Membership
-
-        result = await membership_repo._session.execute(
-            select(Membership).where(Membership.community_id == community_id)
-        )
-        memberships = result.scalars().all()
+        memberships = await membership_repo.get_by_community(community_id)
         return [MembershipResponse.model_validate(m) for m in memberships]
 
     except ForbiddenException as e:

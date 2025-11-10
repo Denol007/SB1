@@ -283,3 +283,53 @@ class MembershipRepository(ABC):
             Number of members with admin role.
         """
         return await self.get_admin_count(community_id)
+
+    @abstractmethod
+    async def get_by_community(
+        self,
+        community_id: UUID,
+        skip: int = 0,
+        limit: int = 100,
+    ) -> list[Membership]:
+        """Get all memberships for a community with pagination.
+
+        Args:
+            community_id: UUID of the community.
+            skip: Number of records to skip (default: 0).
+            limit: Maximum number of records to return (default: 100).
+
+        Returns:
+            List of Membership instances for the community, ordered by joined_at ASC.
+
+        Example:
+            >>> memberships = await repository.get_by_community(community_uuid)
+            >>> for membership in memberships:
+            ...     print(f"User: {membership.user_id}, Role: {membership.role}")
+        """
+        pass
+
+    @abstractmethod
+    async def get_by_user(
+        self,
+        user_id: UUID,
+        skip: int = 0,
+        limit: int = 100,
+    ) -> list[Membership]:
+        """Get all memberships for a user with pagination.
+
+        Alias for get_user_memberships for consistency.
+
+        Args:
+            user_id: UUID of the user.
+            skip: Number of records to skip (default: 0).
+            limit: Maximum number of records to return (default: 100).
+
+        Returns:
+            List of Membership instances for the user, ordered by joined_at DESC.
+
+        Example:
+            >>> memberships = await repository.get_by_user(user_uuid)
+            >>> for membership in memberships:
+            ...     print(f"Community: {membership.community_id}, Role: {membership.role}")
+        """
+        pass
