@@ -540,8 +540,11 @@ description: "Task list for StudyBuddy platform implementation"
 
 ### Tests for User Story 3 (Write FIRST)
 
-- [ ] T116 [P] [US3] Create factories: `tests/factories/post_factory.py`
+- [x] T116 [P] [US3] Create factories: `tests/factories/post_factory.py` ✅
   - `PostFactory`, `ReactionFactory`, `CommentFactory`
+  - Created ReactionType enum (T121) with 4 types: like, love, celebrate, support
+  - 29 unit tests - all passing (100%)
+  - Helper methods for common scenarios (pinned, edited, with_attachments, etc.)
 
 - [ ] T117 [P] [US3] Unit test: `tests/unit/services/test_post_service.py`
 - [ ] T118 [P] [US3] Integration test: `tests/integration/api/test_post_endpoints.py`
@@ -550,8 +553,10 @@ description: "Task list for StudyBuddy platform implementation"
 
 ### Domain Models for User Story 3
 
-- [ ] T121 [P] [US3] Create `app/domain/enums/reaction_type.py`
+- [x] T121 [P] [US3] Create `app/domain/enums/reaction_type.py` ✅
   - Enum: `like`, `love`, `celebrate`, `support`
+  - String enum with from_string() validation method
+  - Completed as part of T116 (needed for factories)
 
 ### Database Models for User Story 3
 
