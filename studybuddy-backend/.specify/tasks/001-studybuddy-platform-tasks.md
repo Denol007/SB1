@@ -546,7 +546,14 @@ description: "Task list for StudyBuddy platform implementation"
   - 29 unit tests - all passing (100%)
   - Helper methods for common scenarios (pinned, edited, with_attachments, etc.)
 
-- [ ] T117 [P] [US3] Unit test: `tests/unit/services/test_post_service.py`
+- [x] T117 [P] [US3] Unit test: `tests/unit/services/test_post_service.py` ✅
+  - 25 unit tests for PostService (TDD - tests first, service not yet implemented)
+  - Post creation (4 tests), updates (4 tests), deletion (3 tests)
+  - Community feed with pagination/sorting (4 tests)
+  - Post pinning/unpinning (3 tests)
+  - Reaction management (5 tests), reaction counts (2 tests)
+  - All tests currently skipping (awaiting PostService implementation - T132)
+
 - [ ] T118 [P] [US3] Integration test: `tests/integration/api/test_post_endpoints.py`
 - [ ] T119 [P] [US3] Integration test: `tests/integration/api/test_comment_endpoints.py`
 - [ ] T120 [US3] E2E test: `tests/e2e/test_post_creation_flow.py`
