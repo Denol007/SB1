@@ -606,7 +606,13 @@ description: "Task list for StudyBuddy platform implementation"
   - Indexes: post_created_at, parent_id, author_id
   - Completed as part of T132 (PostService implementation)
 
-- [ ] T125 [US3] Create migration: `alembic revision --autogenerate -m "Add posts, reactions, comments"`
+- [x] T125 [US3] Create migration: `alembic revision --autogenerate -m "Add posts, reactions, comments"` ✅
+  - Migration file: 6ff0160ab230_add_posts_reactions_comments.py
+  - Creates posts table (10 columns, 7 indexes, 2 FKs)
+  - Creates reactions table (6 columns, 5 indexes, 2 FKs, unique constraint)
+  - Creates comments table (9 columns, 8 indexes, 3 FKs including self-reference)
+  - Tested: upgrade and downgrade both work correctly
+  - Applied to studybuddy database
 
 ### Repository Layer for User Story 3
 
