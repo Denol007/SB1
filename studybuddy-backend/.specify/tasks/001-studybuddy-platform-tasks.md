@@ -450,7 +450,7 @@ description: "Task list for StudyBuddy platform implementation"
 
 ### Database Models for User Story 2
 
-- [ ] T103 [P] [US2] Create `app/infrastructure/database/models/community.py`
+- [x] T103 [P] [US2] Create `app/infrastructure/database/models/community.py` ✅
   - Fields: id, name, description, type, visibility, parent_id (self-referential FK)
   - Fields: requires_verification, avatar_url, cover_url, member_count
   - Timestamps: created_at, updated_at, deleted_at
