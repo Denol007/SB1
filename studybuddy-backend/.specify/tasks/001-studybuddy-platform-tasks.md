@@ -306,9 +306,9 @@ description: "Task list for StudyBuddy platform implementation"
   - Fields: id (UUID), user_id (FK), university_id (FK), email, token_hash, status
   - Timestamps: verified_at, expires_at
 
-- [ ] T076 [US1] Create Alembic migration: `alembic revision --autogenerate -m "Add users, universities, verifications tables"`
+- [x] T076 [US1] Create Alembic migration: `alembic revision --autogenerate -m "Add users, universities, verifications tables"` ✅
 
-- [ ] T077 [US1] Review and test migration: `alembic upgrade head`
+- [x] T077 [US1] Review and test migration: `alembic upgrade head` ✅
 
 ### Repository Interfaces for User Story 1
 
