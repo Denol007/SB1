@@ -11,8 +11,6 @@ from datetime import UTC, datetime
 from uuid import uuid4
 
 import pytest
-from app.infrastructure.database.models.community import Community
-from app.infrastructure.database.models.membership import Membership
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -20,6 +18,8 @@ from app.domain.enums.community_type import CommunityType
 from app.domain.enums.community_visibility import CommunityVisibility
 from app.domain.enums.membership_role import MembershipRole
 from app.domain.enums.user_role import UserRole
+from app.infrastructure.database.models.community import Community
+from app.infrastructure.database.models.membership import Membership
 from app.infrastructure.database.models.user import User
 
 

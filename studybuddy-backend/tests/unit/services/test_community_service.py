@@ -13,9 +13,9 @@ from unittest.mock import AsyncMock, MagicMock
 from uuid import uuid4
 
 import pytest
-from app.application.services.community_service import CommunityService
 from fastapi import HTTPException
 
+from app.application.services.community_service import CommunityService
 from app.domain.enums.community_type import CommunityType
 from app.domain.enums.community_visibility import CommunityVisibility
 from app.domain.enums.membership_role import MembershipRole
