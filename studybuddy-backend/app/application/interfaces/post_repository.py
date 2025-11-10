@@ -146,3 +146,20 @@ class PostRepository(ABC):
             ... )
         """
         pass
+
+    @abstractmethod
+    async def count_by_community(self, community_id: UUID) -> int:
+        """Count total posts in a community.
+
+        Excludes soft-deleted posts.
+
+        Args:
+            community_id: UUID of the community.
+
+        Returns:
+            Total number of non-deleted posts.
+
+        Example:
+            >>> total = await repository.count_by_community(uuid)
+        """
+        pass

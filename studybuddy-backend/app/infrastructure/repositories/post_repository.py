@@ -168,7 +168,7 @@ class SQLAlchemyPostRepository(PostRepository):
         # Build order by clause: pinned posts first, then sort by specified field
         sort_column = getattr(Post, sort_by, Post.created_at)
         if descending:
-            sort_order = desc(sort_column)
+            sort_order: Any = desc(sort_column)
         else:
             sort_order = sort_column
 

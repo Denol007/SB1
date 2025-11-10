@@ -152,6 +152,6 @@ class SQLAlchemyReactionRepository(ReactionRepository):
 
         counts: dict[ReactionType, int] = {}
         for row in result:
-            counts[row.reaction_type] = row.count
+            counts[row.reaction_type] = int(row.count)
 
         return counts
