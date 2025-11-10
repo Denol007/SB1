@@ -168,9 +168,9 @@ class TestPostCreationFlow:
             if create_response.status_code in (404, 501):
                 pytest.skip("Post creation endpoint not yet implemented (T133)")
 
-            assert create_response.status_code == 201, (
-                f"Expected 201, got {create_response.status_code}: {create_response.text}"
-            )
+            assert (
+                create_response.status_code == 201
+            ), f"Expected 201, got {create_response.status_code}: {create_response.text}"
 
             post_data = create_response.json()
             post_id = post_data["id"]
