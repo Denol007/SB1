@@ -3,6 +3,8 @@
 This is a stub implementation. Full implementation planned for T112.
 """
 
+from typing import Any
+
 
 class CommunityService:
     """Community service for managing communities and memberships.
@@ -11,7 +13,7 @@ class CommunityService:
     will be added in T112.
     """
 
-    def __init__(self, community_repository, membership_repository):
+    def __init__(self, community_repository: Any, membership_repository: Any) -> None:
         """Initialize the community service.
 
         Args:
