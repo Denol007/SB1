@@ -598,7 +598,7 @@ class TestGetUserVerifications(TestVerificationService):
         """Should return all verifications for a user."""
         # Arrange
         verifications = [verified_verification, pending_verification]
-        mock_verification_repository.get_user_verifications.return_value = verifications
+        mock_verification_repository.get_all_by_user.return_value = verifications
 
         # Act
         result = await verification_service.get_user_verifications(user_id)
@@ -607,7 +607,7 @@ class TestGetUserVerifications(TestVerificationService):
         assert len(result) == 2
         assert result[0] == verified_verification
         assert result[1] == pending_verification
-        mock_verification_repository.get_user_verifications.assert_called_once_with(user_id)
+        mock_verification_repository.get_all_by_user.assert_called_once_with(user_id)
 
     @pytest.mark.asyncio
     async def test_returns_empty_list_when_no_verifications(
@@ -618,7 +618,7 @@ class TestGetUserVerifications(TestVerificationService):
     ):
         """Should return empty list when user has no verifications."""
         # Arrange
-        mock_verification_repository.get_user_verifications.return_value = []
+        mock_verification_repository.get_all_by_user.return_value = []
 
         # Act
         result = await verification_service.get_user_verifications(user_id)
@@ -636,7 +636,7 @@ class TestGetUserVerifications(TestVerificationService):
     ):
         """Should include all verification fields in response."""
         # Arrange
-        mock_verification_repository.get_user_verifications.return_value = [verified_verification]
+        mock_verification_repository.get_all_by_user.return_value = [verified_verification]
 
         # Act
         result = await verification_service.get_user_verifications(user_id)
