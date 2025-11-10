@@ -490,15 +490,15 @@ description: "Task list for StudyBuddy platform implementation"
 
 ### Services for User Story 2
 
-- [ ] T112 [US2] Create `app/application/services/community_service.py`
-  - `create_community(user_id, data)` → Community
-  - `update_community(community_id, user_id, data)` → Community
-  - `delete_community(community_id, user_id)` → void
-  - `join_community(user_id, community_id)` → Membership
-  - `leave_community(user_id, community_id)` → void
-  - `add_member(community_id, user_id, target_user_id, role)` → Membership
-  - `update_member_role(community_id, user_id, target_user_id, new_role)` → Membership
-  - `check_permission(user_id, community_id, required_role)` → bool
+- [x] T112 [US2] Create `app/application/services/community_service.py` ✅
+  - `create_community(user_id, data)` → Community ✅
+  - `update_community(community_id, user_id, data)` → Community ✅
+  - `delete_community(community_id, user_id)` → void ✅
+  - `add_member(community_id, user_id, target_user_id, role)` → Membership ✅
+  - `remove_member(community_id, user_id, target_user_id)` → void ✅
+  - `update_member_role(community_id, user_id, target_user_id, new_role)` → Membership ✅
+  - `check_permission(user_id, community_id, required_role)` → bool ✅
+  - 22 unit tests - all passing ✅
 
 ### API Endpoints for User Story 2
 

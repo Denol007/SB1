@@ -101,6 +101,22 @@ class MembershipRepository(ABC):
         """
         pass
 
+    async def get_by_user_and_community(
+        self,
+        user_id: UUID,
+        community_id: UUID,
+    ) -> Membership | None:
+        """Alias for get_membership for backward compatibility.
+
+        Args:
+            user_id: UUID of the user.
+            community_id: UUID of the community.
+
+        Returns:
+            Membership instance if found, None otherwise.
+        """
+        return await self.get_membership(user_id, community_id)
+
     @abstractmethod
     async def update_role(
         self,
@@ -256,3 +272,14 @@ class MembershipRepository(ABC):
             ...     print("Warning: Only one admin left")
         """
         pass
+
+    async def count_admins(self, community_id: UUID) -> int:
+        """Alias for get_admin_count for backward compatibility.
+
+        Args:
+            community_id: UUID of the community.
+
+        Returns:
+            Number of members with admin role.
+        """
+        return await self.get_admin_count(community_id)

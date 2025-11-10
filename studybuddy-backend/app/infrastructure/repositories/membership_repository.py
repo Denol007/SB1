@@ -102,6 +102,22 @@ class SQLAlchemyMembershipRepository(MembershipRepository):
         result = await self._session.execute(stmt)
         return result.scalar_one_or_none()
 
+    async def get_by_user_and_community(
+        self,
+        user_id: UUID,
+        community_id: UUID,
+    ) -> Membership | None:
+        """Alias for get_membership for backward compatibility.
+
+        Args:
+            user_id: UUID of the user.
+            community_id: UUID of the community.
+
+        Returns:
+            Membership instance if found, None otherwise.
+        """
+        return await self.get_membership(user_id, community_id)
+
     async def remove_member(
         self,
         user_id: UUID,
@@ -287,3 +303,14 @@ class SQLAlchemyMembershipRepository(MembershipRepository):
         )
         result = await self._session.execute(stmt)
         return result.scalar_one()
+
+    async def count_admins(self, community_id: UUID) -> int:
+        """Alias for get_admin_count for backward compatibility.
+
+        Args:
+            community_id: UUID of the community.
+
+        Returns:
+            Number of members with admin role.
+        """
+        return await self.get_admin_count(community_id)

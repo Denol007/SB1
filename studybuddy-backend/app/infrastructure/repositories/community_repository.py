@@ -219,13 +219,13 @@ class SQLAlchemyCommunityRepository(CommunityRepository):
     async def update(
         self,
         community_id: UUID,
-        **kwargs: Any,
+        data: dict[str, Any],
     ) -> Community | None:
         """Update community fields.
 
         Args:
             community_id: UUID of the community to update.
-            **kwargs: Fields to update (name, description, visibility, etc.).
+            data: Dictionary of fields to update (name, description, visibility, etc.).
 
         Returns:
             Updated Community instance if found, None otherwise.
@@ -249,7 +249,7 @@ class SQLAlchemyCommunityRepository(CommunityRepository):
         }
 
         # Validate and apply updates
-        for field, value in kwargs.items():
+        for field, value in data.items():
             if field not in allowed_fields:
                 raise ValueError(f"Field '{field}' cannot be updated")
             setattr(community, field, value)
