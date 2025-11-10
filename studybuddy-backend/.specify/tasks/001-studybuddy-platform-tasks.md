@@ -420,7 +420,7 @@ description: "Task list for StudyBuddy platform implementation"
 
 ### Tests for User Story 2 (Write FIRST, ensure they FAIL)
 
-- [ ] T096 [P] [US2] Create test factories in `tests/factories/community_factory.py`
+- [x] T096 [P] [US2] Create test factories in `tests/factories/community_factory.py` ✅
   - `CommunityFactory`, `MembershipFactory`
 
 - [ ] T097 [P] [US2] Unit test: `tests/unit/services/test_community_service.py`
@@ -439,13 +439,13 @@ description: "Task list for StudyBuddy platform implementation"
 
 ### Domain Models for User Story 2
 
-- [ ] T100 [P] [US2] Create `app/domain/enums/community_type.py`
+- [x] T100 [P] [US2] Create `app/domain/enums/community_type.py` ✅
   - Enum: `university`, `business`, `student_council`, `hobby`
 
-- [ ] T101 [P] [US2] Create `app/domain/enums/community_visibility.py`
+- [x] T101 [P] [US2] Create `app/domain/enums/community_visibility.py` ✅
   - Enum: `public`, `private`, `closed`
 
-- [ ] T102 [P] [US2] Create `app/domain/enums/membership_role.py`
+- [x] T102 [P] [US2] Create `app/domain/enums/membership_role.py` ✅
   - Enum: `admin`, `moderator`, `member`
 
 ### Database Models for User Story 2

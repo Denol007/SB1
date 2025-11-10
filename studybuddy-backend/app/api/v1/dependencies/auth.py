@@ -7,14 +7,21 @@ This module provides dependency injection functions for:
 - Handling optional authentication
 """
 
-from typing import Any
+from collections.abc import AsyncGenerator
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import JWTError, jwt
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
 from app.core.logging import setup_logger
+from app.infrastructure.database.models.user import User
+from app.infrastructure.database.session import get_db
+from app.infrastructure.repositories.user_repository import SQLAlchemyUserRepository
+from app.infrastructure.repositories.verification_repository import (
+    SQLAlchemyVerificationRepository,
+)
 
 logger = setup_logger(__name__)
 
@@ -22,44 +29,38 @@ logger = setup_logger(__name__)
 security = HTTPBearer(auto_error=False)
 
 
-def get_user_repository() -> Any:
+async def get_user_repository(
+    db: AsyncSession = Depends(get_db),
+) -> AsyncGenerator[SQLAlchemyUserRepository, None]:
     """Get user repository instance.
 
-    This is a placeholder that will be implemented when the repository layer is created.
-    For now, it's here to support the dependency injection pattern.
+    Args:
+        db: Database session from dependency injection
 
-    Returns:
-        UserRepository: Instance of user repository
-
-    Raises:
-        NotImplementedError: Repository layer not yet implemented
+    Yields:
+        SQLAlchemyUserRepository: Instance of user repository with database session
     """
-    # TODO: Import and return actual repository when available
-    # from app.infrastructure.repositories.user_repository import UserRepository
-    # return UserRepository()
-    raise NotImplementedError("User repository not yet implemented")
+    yield SQLAlchemyUserRepository(db)
 
 
-def get_verification_repository() -> Any:
+async def get_verification_repository(
+    db: AsyncSession = Depends(get_db),
+) -> AsyncGenerator[SQLAlchemyVerificationRepository, None]:
     """Get verification repository instance.
 
-    This is a placeholder that will be implemented when the repository layer is created.
+    Args:
+        db: Database session from dependency injection
 
-    Returns:
-        VerificationRepository: Instance of verification repository
-
-    Raises:
-        NotImplementedError: Repository layer not yet implemented
+    Yields:
+        SQLAlchemyVerificationRepository: Instance of verification repository with database session
     """
-    # TODO: Import and return actual repository when available
-    # from app.infrastructure.repositories.verification_repository import VerificationRepository
-    # return VerificationRepository()
-    raise NotImplementedError("Verification repository not yet implemented")
+    yield SQLAlchemyVerificationRepository(db)
 
 
 async def get_current_user(
     credentials: HTTPAuthorizationCredentials | None = Depends(security),
-) -> Any:
+    user_repo: SQLAlchemyUserRepository = Depends(get_user_repository),
+) -> "User":  # type: ignore
     """Extract and validate JWT token, return current user.
 
     This dependency validates the JWT token from the Authorization header,
@@ -67,6 +68,7 @@ async def get_current_user(
 
     Args:
         credentials: HTTP Bearer token from Authorization header
+        user_repo: User repository instance
 
     Returns:
         User: The authenticated user object
@@ -74,6 +76,7 @@ async def get_current_user(
     Raises:
         HTTPException: 401 if token is invalid, expired, or user not found
     """
+
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -100,7 +103,6 @@ async def get_current_user(
         raise credentials_exception from e
 
     # Retrieve user from database
-    user_repo = get_user_repository()
     user = await user_repo.get_by_id(user_id)
 
     if user is None:
@@ -116,8 +118,8 @@ async def get_current_user(
 
 
 async def get_current_active_user(
-    current_user: Any = Depends(get_current_user),
-) -> Any:
+    current_user: "User" = Depends(get_current_user),  # type: ignore
+) -> "User":  # type: ignore
     """Ensure the current user is active (not deleted).
 
     This dependency wraps get_current_user and adds an additional check
@@ -146,8 +148,8 @@ async def get_current_active_user(
 
 
 async def require_verified_student(
-    current_user: Any = Depends(get_current_active_user),
-) -> Any:
+    current_user: "User" = Depends(get_current_active_user),  # type: ignore
+) -> "User":  # type: ignore
     """Require user to have verified student status.
 
     This dependency ensures the user has at least one verified university
@@ -195,7 +197,8 @@ async def require_verified_student(
 
 async def get_optional_current_user(
     credentials: HTTPAuthorizationCredentials | None = Depends(security),
-) -> Any:
+    user_repo: SQLAlchemyUserRepository = Depends(get_user_repository),
+) -> "User | None":  # type: ignore
     """Get current user if token provided, otherwise return None.
 
     This dependency is useful for endpoints that work differently for
@@ -203,6 +206,7 @@ async def get_optional_current_user(
 
     Args:
         credentials: HTTP Bearer token from Authorization header (optional)
+        user_repo: User repository for database operations
 
     Returns:
         User | None: The authenticated user or None if no valid token
@@ -221,7 +225,6 @@ async def get_optional_current_user(
             return None
 
         # Retrieve user from database
-        user_repo = get_user_repository()
         user = await user_repo.get_by_id(user_id)
 
         return user

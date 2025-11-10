@@ -15,6 +15,9 @@ from app.infrastructure.database.models.university import University
 from app.infrastructure.database.models.user import User
 from app.main import app
 
+# Test database URL
+TEST_DATABASE_URL = "postgresql+asyncpg://studybuddy:studybuddy_dev@localhost:5432/studybuddy_test"
+
 
 @pytest.fixture(scope="session")
 def anyio_backend() -> str:
@@ -33,11 +36,6 @@ async def db_session():
     Yields:
         AsyncSession: Database session for testing.
     """
-    # Use test database URL - assumes Docker container is running
-    TEST_DATABASE_URL = (
-        "postgresql+asyncpg://studybuddy:studybuddy_dev@localhost:5432/studybuddy_test"
-    )
-
     # Create async engine with NullPool to avoid connection issues
     engine = create_async_engine(
         TEST_DATABASE_URL,
@@ -78,8 +76,19 @@ async def async_client(db_session: AsyncSession):
     """
     from httpx import ASGITransport
 
+    from app.infrastructure.database.session import get_db
+
+    # Override the get_db dependency to use our test session
+    async def override_get_db():
+        yield db_session
+
+    app.dependency_overrides[get_db] = override_get_db
+
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
         yield client
+
+    # Clean up the override
+    app.dependency_overrides.clear()
 
 
 @pytest_asyncio.fixture

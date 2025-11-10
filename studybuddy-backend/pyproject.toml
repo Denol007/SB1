@@ -53,6 +53,7 @@ dev = [
     "pytest-asyncio>=0.21.1",
     "pytest-cov>=4.1.0",
     "pytest-mock>=3.12.0",
+    "pytest-env>=1.1.3",
     "httpx>=0.25.2",
     "factory-boy>=3.3.0",
     "faker>=20.1.0",
@@ -177,6 +178,11 @@ minversion = "7.0"
 addopts = "-ra -q --strict-markers --strict-config"
 testpaths = ["tests"]
 pythonpath = ["."]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+env = [
+    "DATABASE_URL=postgresql+asyncpg://studybuddy:studybuddy_dev@localhost:5432/studybuddy_test",
+]
 markers = [
     "asyncio: Mark test as async",
     "unit: Unit tests",
