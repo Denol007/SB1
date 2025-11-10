@@ -375,13 +375,13 @@ description: "Task list for StudyBuddy platform implementation"
 
 ### Background Tasks for User Story 1
 
-- [ ] T090 [US1] Create `app/tasks/email_tasks.py`
+- [x] T090 [US1] Create `app/tasks/email_tasks.py` ✅
   - `send_verification_email(verification_id)` - Celery task
   - Email template with verification link (24h expiry)
 
 ### API Endpoints for User Story 1
 
-- [ ] T091 [US1] Create `app/api/v1/endpoints/auth.py`
+- [x] T091 [US1] Create `app/api/v1/endpoints/auth.py`
   - `POST /api/v1/auth/google` - Initiate OAuth, handle callback
   - `POST /api/v1/auth/refresh` - Refresh access token
   - `POST /api/v1/auth/logout` - Invalidate refresh token
