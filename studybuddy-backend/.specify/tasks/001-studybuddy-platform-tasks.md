@@ -464,7 +464,7 @@ description: "Task list for StudyBuddy platform implementation"
 
 ### Repository Layer for User Story 2
 
-- [ ] T106 [P] [US2] Create `app/application/interfaces/community_repository.py`
+- [x] T106 [P] [US2] Create `app/application/interfaces/community_repository.py` ✅
 - [ ] T107 [US2] Create `app/infrastructure/repositories/community_repository.py`
   - `create()`, `get_by_id()`, `list_by_type()`, `update()`, `delete()`
   - `get_children()` - Get sub-communities
