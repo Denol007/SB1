@@ -386,7 +386,7 @@ description: "Task list for StudyBuddy platform implementation"
   - `POST /api/v1/auth/refresh` - Refresh access token
   - `POST /api/v1/auth/logout` - Invalidate refresh token
 
-- [ ] T092 [US1] Create `app/api/v1/endpoints/users.py`
+- [x] T092 [US1] Create `app/api/v1/endpoints/users.py`
   - `GET /api/v1/users/me` - Get current user profile
   - `PATCH /api/v1/users/me` - Update profile (bio, avatar)
   - `DELETE /api/v1/users/me` - Delete account (GDPR)
