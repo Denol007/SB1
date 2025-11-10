@@ -18,6 +18,12 @@ from alembic import context
 from app.core.config import settings
 from app.infrastructure.database.base import Base
 
+# Import all models so they're registered with Base.metadata
+# This is required for autogenerate to detect schema changes
+from app.infrastructure.database.models.university import University  # noqa: F401
+from app.infrastructure.database.models.user import User  # noqa: F401
+from app.infrastructure.database.models.verification import Verification  # noqa: F401
+
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
