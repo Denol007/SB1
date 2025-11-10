@@ -29,11 +29,6 @@ router.include_router(verifications.router)
 # Include community endpoints
 router.include_router(communities.router)
 
-# TODO: Import and include endpoint routers as they are created
-# Example:
-# from app.api.v1.endpoints import communities
-# router.include_router(communities.router, prefix="/communities", tags=["communities"])
-
 
 @router.get("/")
 async def api_v1_root() -> dict[str, str]:

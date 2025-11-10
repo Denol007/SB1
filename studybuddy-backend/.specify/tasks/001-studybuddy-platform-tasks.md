@@ -520,7 +520,11 @@ description: "Task list for StudyBuddy platform implementation"
   - `get_membership_repository()` dependency helper
   - 9 unit tests - all passing
 
-- [ ] T115 [US2] Update `app/api/v1/router.py` to include communities router
+- [x] T115 [US2] Update `app/api/v1/router.py` to include communities router ✅
+  - Communities router already included and working
+  - 9 community endpoints registered and accessible
+  - Removed outdated TODO comment
+  - Verified with integration tests
 
 **Checkpoint**: US2 complete - Communities functional with role-based access ✅
 
