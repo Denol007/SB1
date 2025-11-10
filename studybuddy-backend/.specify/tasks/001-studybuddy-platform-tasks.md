@@ -472,8 +472,9 @@ description: "Task list for StudyBuddy platform implementation"
   - 26 integration tests - all passing ✅
 
 - [x] T108 [P] [US2] Create `app/application/interfaces/membership_repository.py` ✅
-- [ ] T109 [US2] Create `app/infrastructure/repositories/membership_repository.py`
-  - `add_member()`, `remove_member()`, `update_role()`, `get_user_memberships()`
+- [x] T109 [US2] Create `app/infrastructure/repositories/membership_repository.py` ✅
+  - `add_member()`, `remove_member()`, `update_role()`, `get_user_memberships()` ✅
+  - 22 integration tests - all passing ✅
 
 ### Schemas for User Story 2
 
