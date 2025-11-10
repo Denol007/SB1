@@ -4,6 +4,8 @@ This module provides the concrete implementation of the UniversityRepository int
 using SQLAlchemy async queries for PostgreSQL database operations.
 """
 
+from uuid import UUID
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -28,6 +30,19 @@ class SQLAlchemyUniversityRepository(UniversityRepository):
             session: SQLAlchemy async session for database operations.
         """
         self._session = session
+
+    async def get_by_id(self, university_id: UUID) -> University | None:
+        """Retrieve a university by its ID.
+
+        Args:
+            university_id: UUID of the university.
+
+        Returns:
+            University | None: The university if found, None otherwise.
+        """
+        stmt = select(University).where(University.id == university_id)
+        result = await self._session.execute(stmt)
+        return result.scalar_one_or_none()
 
     async def get_by_domain(self, domain: str) -> University | None:
         """Retrieve a university by its email domain.

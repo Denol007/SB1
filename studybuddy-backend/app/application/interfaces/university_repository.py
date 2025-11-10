@@ -6,6 +6,7 @@ be provided in the infrastructure layer.
 """
 
 from abc import ABC, abstractmethod
+from uuid import UUID
 
 from app.infrastructure.database.models.university import University
 
@@ -16,6 +17,18 @@ class UniversityRepository(ABC):
     Defines the contract for all university-related data operations. Implementations
     must provide async methods for querying university information.
     """
+
+    @abstractmethod
+    async def get_by_id(self, university_id: UUID) -> University | None:
+        """Retrieve a university by its ID.
+
+        Args:
+            university_id: UUID of the university.
+
+        Returns:
+            Optional[University]: The university if found, None otherwise.
+        """
+        pass
 
     @abstractmethod
     async def get_by_domain(self, domain: str) -> University | None:

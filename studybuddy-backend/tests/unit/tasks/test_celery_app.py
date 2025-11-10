@@ -255,7 +255,7 @@ class TestPlaceholderTasks:
         """Test that email_tasks module can be imported."""
         from app.tasks import email_tasks
 
-        assert hasattr(email_tasks, "send_email")
+        assert hasattr(email_tasks, "send_verification_email")
 
     def test_can_import_analytics_tasks(self):
         """Test that analytics_tasks module can be imported."""
@@ -269,13 +269,13 @@ class TestPlaceholderTasks:
 
         assert hasattr(event_tasks, "send_event_reminder")
 
-    def test_send_email_task_callable(self):
-        """Test that send_email task is callable."""
-        from app.tasks.email_tasks import send_email
+    def test_send_verification_email_task_callable(self):
+        """Test that send_verification_email task is callable."""
+        from app.tasks.email_tasks import send_verification_email
 
-        assert callable(send_email)
+        assert callable(send_verification_email)
         # Test with delay() method (async task call)
-        assert hasattr(send_email, "delay")
+        assert hasattr(send_verification_email, "delay")
 
     def test_aggregate_metrics_task_callable(self):
         """Test that aggregate_metrics task is callable."""
@@ -294,14 +294,6 @@ class TestPlaceholderTasks:
 
 class TestTaskExecution:
     """Test cases for task execution and callbacks."""
-
-    def test_email_task_execution(self):
-        """Test that email task executes successfully."""
-        from app.tasks.email_tasks import send_email
-
-        result = send_email("test@example.com", "Test Subject", "Test Body")
-        assert result["status"] == "success"
-        assert "test@example.com" in result["message"]
 
     def test_analytics_task_execution(self):
         """Test that analytics task executes successfully."""

@@ -49,6 +49,19 @@ class SQLAlchemyVerificationRepository(VerificationRepository):
         await self._session.refresh(verification)
         return verification
 
+    async def get_by_id(self, verification_id: UUID) -> Verification | None:
+        """Retrieve a verification record by its ID.
+
+        Args:
+            verification_id: UUID of the verification record.
+
+        Returns:
+            Verification | None: The verification record if found, None otherwise.
+        """
+        stmt = select(Verification).where(Verification.id == verification_id)
+        result = await self._session.execute(stmt)
+        return result.scalar_one_or_none()
+
     async def get_by_token(self, token_hash: str) -> Verification | None:
         """Retrieve a verification record by its hashed token.
 

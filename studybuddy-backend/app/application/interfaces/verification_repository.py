@@ -34,6 +34,18 @@ class VerificationRepository(ABC):
         pass
 
     @abstractmethod
+    async def get_by_id(self, verification_id: UUID) -> Verification | None:
+        """Retrieve a verification record by its ID.
+
+        Args:
+            verification_id: UUID of the verification record.
+
+        Returns:
+            Optional[Verification]: The verification record if found, None otherwise.
+        """
+        pass
+
+    @abstractmethod
     async def get_by_token(self, token_hash: str) -> Verification | None:
         """Retrieve a verification record by its hashed token.
 
