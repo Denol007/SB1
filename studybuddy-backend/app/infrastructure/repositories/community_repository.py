@@ -269,12 +269,12 @@ class SQLAlchemyCommunityRepository(CommunityRepository):
         await self._session.flush()
 
         # Fetch the updated community with fresh query
-        stmt = (
+        select_stmt = (
             select(Community)
             .where(Community.id == community_id, Community.deleted_at.is_(None))
             .execution_options(populate_existing=True)
         )
-        result = await self._session.execute(stmt)
+        result = await self._session.execute(select_stmt)
         return result.scalar_one_or_none()
 
     async def delete(self, community_id: UUID) -> bool:

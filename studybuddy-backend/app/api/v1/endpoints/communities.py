@@ -73,6 +73,20 @@ async def get_membership_repository(
     return SQLAlchemyMembershipRepository(db)
 
 
+async def get_community_repository(
+    db: AsyncSession = Depends(get_db),
+) -> SQLAlchemyCommunityRepository:
+    """Dependency for community repository.
+
+    Args:
+        db: Database session from dependency injection.
+
+    Returns:
+        SQLAlchemyCommunityRepository: Community repository instance.
+    """
+    return SQLAlchemyCommunityRepository(db)
+
+
 @router.post(
     "/",
     response_model=CommunityDetailResponse,
@@ -386,7 +400,7 @@ async def delete_community(
 async def join_community(
     community_id: UUID,
     current_user: User = Depends(get_current_user),
-    community_service: CommunityService = Depends(get_community_service),
+    community_repo: SQLAlchemyCommunityRepository = Depends(get_community_repository),
     membership_repo: SQLAlchemyMembershipRepository = Depends(get_membership_repository),
 ) -> MembershipResponse:
     """Join a community.
@@ -397,7 +411,8 @@ async def join_community(
     Args:
         community_id: Community ID to join
         current_user: Authenticated user
-        community_service: Community service instance
+        community_repo: Community repository instance
+        membership_repo: Membership repository instance
 
     Returns:
         MembershipResponse: Created membership details
@@ -408,14 +423,7 @@ async def join_community(
         HTTPException: 409 if user is already a member
     """
     try:
-        # Check if community is public
-        from app.infrastructure.repositories.community_repository import (
-            SQLAlchemyCommunityRepository,
-        )
-
-        community_repo = SQLAlchemyCommunityRepository(
-            community_service.membership_repository._session
-        )
+        # Check if community exists and is public
         community = await community_repo.get_by_id(community_id)
 
         if not community:
