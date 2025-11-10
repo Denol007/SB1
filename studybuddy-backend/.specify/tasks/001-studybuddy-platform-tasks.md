@@ -502,7 +502,7 @@ description: "Task list for StudyBuddy platform implementation"
 
 ### API Endpoints for User Story 2
 
-- [ ] T113 [US2] Create `app/api/v1/endpoints/communities.py`
+- [x] T113 [US2] Create `app/api/v1/endpoints/communities.py` ✅
   - `GET /api/v1/communities` - List communities (filters: type, visibility)
   - `POST /api/v1/communities` - Create community
   - `GET /api/v1/communities/{community_id}` - Get details
@@ -512,10 +512,13 @@ description: "Task list for StudyBuddy platform implementation"
   - `POST /api/v1/communities/{community_id}/leave` - Leave
   - `GET /api/v1/communities/{community_id}/members` - List members
   - `PATCH /api/v1/communities/{community_id}/members/{user_id}` - Update role
+  - All 27 integration tests passing (100%)
 
-- [ ] T114 [US2] Create `app/api/v1/dependencies/permissions.py`
-  - `require_community_admin(community_id)` dependency
-  - `require_community_moderator(community_id)` dependency
+- [x] T114 [US2] Create `app/api/v1/dependencies/permissions.py` ✅
+  - `require_community_admin(community_id)` dependency - Enforces admin role
+  - `require_community_moderator(community_id)` dependency - Enforces moderator or admin role
+  - `get_membership_repository()` dependency helper
+  - 9 unit tests - all passing
 
 - [ ] T115 [US2] Update `app/api/v1/router.py` to include communities router
 
