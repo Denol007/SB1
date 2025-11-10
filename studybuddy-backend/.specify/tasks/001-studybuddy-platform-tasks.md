@@ -478,9 +478,10 @@ description: "Task list for StudyBuddy platform implementation"
 
 ### Schemas for User Story 2
 
-- [ ] T110 [P] [US2] Create `app/application/schemas/community.py`
-  - `CommunityCreate`, `CommunityUpdate`, `CommunityResponse`
-  - `CommunityDetailResponse` (with member_count, parent info)
+- [x] T110 [P] [US2] Create `app/application/schemas/community.py` ✅
+  - `CommunityCreate`, `CommunityUpdate`, `CommunityResponse` ✅
+  - `CommunityDetailResponse` (with member_count, parent info) ✅
+  - 29 unit tests - all passing ✅
 
 - [ ] T111 [P] [US2] Create `app/application/schemas/membership.py`
   - `MembershipCreate`, `MembershipUpdate`, `MembershipResponse`
