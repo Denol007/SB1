@@ -1,6 +1,7 @@
 """Pytest configuration and fixtures for StudyBuddy tests."""
 
-from uuid import uuid4
+from collections.abc import Callable
+from uuid import UUID, uuid4
 
 import pytest
 import pytest_asyncio
@@ -9,6 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import NullPool
 
+from app.core.security import create_access_token
 from app.domain.enums.user_role import UserRole
 from app.infrastructure.database.base import Base
 from app.infrastructure.database.models.university import University
@@ -84,7 +86,9 @@ async def async_client(db_session: AsyncSession):
 
     app.dependency_overrides[get_db] = override_get_db
 
-    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://test", follow_redirects=True
+    ) as client:
         yield client
 
     # Clean up the override
@@ -162,3 +166,35 @@ async def test_university(db_session: AsyncSession) -> University:
     await db_session.commit()
     await db_session.refresh(university)
     return university
+
+
+@pytest.fixture
+def auth_headers() -> Callable[[UUID | str], dict[str, str]]:
+    """Create authentication headers with JWT token.
+
+    Returns a function that generates authorization headers for a given user ID.
+    This fixture is used in integration tests to authenticate API requests.
+
+    Returns:
+        Callable: Function that takes a user_id and returns auth headers dict
+
+    Example:
+        ```python
+        headers = auth_headers(test_user.id)
+        response = await async_client.post("/api/v1/communities", headers=headers, json=data)
+        ```
+    """
+
+    def _create_headers(user_id: UUID | str) -> dict[str, str]:
+        """Create headers with JWT token for user.
+
+        Args:
+            user_id: User ID to encode in JWT token
+
+        Returns:
+            dict: Headers with Authorization bearer token
+        """
+        token = create_access_token(str(user_id))
+        return {"Authorization": f"Bearer {token}"}
+
+    return _create_headers
