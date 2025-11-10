@@ -337,19 +337,22 @@ description: "Task list for StudyBuddy platform implementation"
 
 ### Schemas (DTOs) for User Story 1
 
-- [ ] T084 [P] [US1] Create `app/application/schemas/auth.py`
+- [x] T084 [P] [US1] Create `app/application/schemas/auth.py` ✅
   - `GoogleAuthRequest`, `GoogleAuthResponse`
   - `TokenResponse` (access_token, refresh_token, token_type)
   - `RefreshTokenRequest`
+  - 15 unit tests
 
-- [ ] T085 [P] [US1] Create `app/application/schemas/user.py`
+- [x] T085 [P] [US1] Create `app/application/schemas/user.py` ✅
   - `UserCreate`, `UserUpdate`, `UserResponse`
   - `UserProfileResponse` (detailed user info)
+  - 18 unit tests
 
-- [ ] T086 [P] [US1] Create `app/application/schemas/verification.py`
+- [x] T086 [P] [US1] Create `app/application/schemas/verification.py` ✅
   - `VerificationRequest` (university_id, email)
   - `VerificationConfirmRequest` (token)
   - `VerificationResponse` (status, university, verified_at)
+  - 15 unit tests
 
 ### Services for User Story 1
 
