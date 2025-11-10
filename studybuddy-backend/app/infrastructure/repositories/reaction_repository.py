@@ -152,6 +152,7 @@ class SQLAlchemyReactionRepository(ReactionRepository):
 
         counts: dict[ReactionType, int] = {}
         for row in result:
-            counts[row.reaction_type] = int(row.count)
+            # row is a tuple: (reaction_type, count)
+            counts[row[0]] = row[1]
 
         return counts
