@@ -17,6 +17,7 @@ class StudyBuddyException(Exception):
     Attributes:
         message: Human-readable error message
         status_code: HTTP status code for API responses
+        detail: Alias for message (for compatibility)
     """
 
     def __init__(self, message: str = "An error occurred", status_code: int = 500) -> None:
@@ -29,6 +30,15 @@ class StudyBuddyException(Exception):
         self.message = message
         self.status_code = status_code
         super().__init__(self.message)
+
+    @property
+    def detail(self) -> str:
+        """Alias for message attribute for compatibility.
+
+        Returns:
+            The error message.
+        """
+        return self.message
 
 
 class BadRequestException(StudyBuddyException):
