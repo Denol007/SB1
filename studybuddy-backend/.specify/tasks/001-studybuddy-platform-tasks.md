@@ -483,8 +483,10 @@ description: "Task list for StudyBuddy platform implementation"
   - `CommunityDetailResponse` (with member_count, parent info) ✅
   - 29 unit tests - all passing ✅
 
-- [ ] T111 [P] [US2] Create `app/application/schemas/membership.py`
-  - `MembershipCreate`, `MembershipUpdate`, `MembershipResponse`
+- [x] T111 [P] [US2] Create `app/application/schemas/membership.py` ✅
+  - `MembershipCreate`, `MembershipUpdate`, `MembershipResponse` ✅
+  - `MembershipDetailResponse` (with user and community details) ✅
+  - 25 unit tests - all passing ✅
 
 ### Services for User Story 2
 
