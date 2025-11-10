@@ -8,6 +8,7 @@ This module provides dependency injection functions for:
 """
 
 from collections.abc import AsyncGenerator
+from uuid import UUID
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
@@ -60,7 +61,7 @@ async def get_verification_repository(
 async def get_current_user(
     credentials: HTTPAuthorizationCredentials | None = Depends(security),
     user_repo: SQLAlchemyUserRepository = Depends(get_user_repository),
-) -> "User":  # type: ignore
+) -> User:
     """Extract and validate JWT token, return current user.
 
     This dependency validates the JWT token from the Authorization header,
@@ -103,7 +104,7 @@ async def get_current_user(
         raise credentials_exception from e
 
     # Retrieve user from database
-    user = await user_repo.get_by_id(user_id)
+    user = await user_repo.get_by_id(UUID(user_id))
 
     if user is None:
         logger.warning(f"User not found for ID: {user_id}")
@@ -118,8 +119,8 @@ async def get_current_user(
 
 
 async def get_current_active_user(
-    current_user: "User" = Depends(get_current_user),  # type: ignore
-) -> "User":  # type: ignore
+    current_user: User = Depends(get_current_user),
+) -> User:
     """Ensure the current user is active (not deleted).
 
     This dependency wraps get_current_user and adds an additional check
@@ -148,8 +149,9 @@ async def get_current_active_user(
 
 
 async def require_verified_student(
-    current_user: "User" = Depends(get_current_active_user),  # type: ignore
-) -> "User":  # type: ignore
+    current_user: User = Depends(get_current_active_user),
+    verification_repo: SQLAlchemyVerificationRepository = Depends(get_verification_repository),
+) -> User:
     """Require user to have verified student status.
 
     This dependency ensures the user has at least one verified university
@@ -157,6 +159,7 @@ async def require_verified_student(
 
     Args:
         current_user: The current active user
+        verification_repo: Verification repository instance
 
     Returns:
         User: The verified user object
@@ -173,8 +176,7 @@ async def require_verified_student(
         return current_user
 
     # Check if user has any verified verifications
-    verification_repo = get_verification_repository()
-    verifications = await verification_repo.get_user_verifications(current_user.id)
+    verifications = await verification_repo.get_all_by_user(current_user.id)
 
     has_verified = any(v.status == "verified" for v in verifications)
 
@@ -198,7 +200,7 @@ async def require_verified_student(
 async def get_optional_current_user(
     credentials: HTTPAuthorizationCredentials | None = Depends(security),
     user_repo: SQLAlchemyUserRepository = Depends(get_user_repository),
-) -> "User | None":  # type: ignore
+) -> User | None:
     """Get current user if token provided, otherwise return None.
 
     This dependency is useful for endpoints that work differently for
@@ -225,7 +227,7 @@ async def get_optional_current_user(
             return None
 
         # Retrieve user from database
-        user = await user_repo.get_by_id(user_id)
+        user = await user_repo.get_by_id(UUID(user_id))
 
         return user
 
