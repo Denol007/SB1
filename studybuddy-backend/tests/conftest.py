@@ -17,8 +17,16 @@ os.environ["RATE_LIMIT_ENABLED"] = "false"
 from app.core.security import create_access_token
 from app.domain.enums.user_role import UserRole
 from app.infrastructure.database.base import Base
+
+# Import all models to ensure they're registered with Base.metadata
+from app.infrastructure.database.models.comment import Comment  # noqa: F401
+from app.infrastructure.database.models.community import Community  # noqa: F401
+from app.infrastructure.database.models.membership import Membership  # noqa: F401
+from app.infrastructure.database.models.post import Post  # noqa: F401
+from app.infrastructure.database.models.reaction import Reaction  # noqa: F401
 from app.infrastructure.database.models.university import University
 from app.infrastructure.database.models.user import User
+from app.infrastructure.database.models.verification import Verification  # noqa: F401
 from app.main import app
 
 # Test database URL

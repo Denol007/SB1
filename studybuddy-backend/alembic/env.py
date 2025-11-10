@@ -20,6 +20,11 @@ from app.infrastructure.database.base import Base
 
 # Import all models so they're registered with Base.metadata
 # This is required for autogenerate to detect schema changes
+from app.infrastructure.database.models.comment import Comment  # noqa: F401
+from app.infrastructure.database.models.community import Community  # noqa: F401
+from app.infrastructure.database.models.membership import Membership  # noqa: F401
+from app.infrastructure.database.models.post import Post  # noqa: F401
+from app.infrastructure.database.models.reaction import Reaction  # noqa: F401
 from app.infrastructure.database.models.university import University  # noqa: F401
 from app.infrastructure.database.models.user import User  # noqa: F401
 from app.infrastructure.database.models.verification import Verification  # noqa: F401
