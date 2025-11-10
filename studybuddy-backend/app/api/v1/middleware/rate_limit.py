@@ -15,6 +15,7 @@ from typing import Any
 from fastapi import HTTPException, Request, status
 from starlette.middleware.base import BaseHTTPMiddleware
 
+from app.core.config import settings
 from app.core.logging import setup_logger
 from app.infrastructure.cache.redis_client import get_redis_client
 
@@ -49,6 +50,10 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         Raises:
             HTTPException: 429 if rate limit exceeded
         """
+        # Skip rate limiting if disabled
+        if not settings.RATE_LIMIT_ENABLED:
+            return await call_next(request)
+
         # Skip rate limiting for health checks
         if request.url.path.startswith("/health"):
             return await call_next(request)

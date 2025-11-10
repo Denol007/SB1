@@ -97,7 +97,11 @@ class SQLAlchemyCommunityRepository(CommunityRepository):
         Returns:
             Community instance if found and not deleted, None otherwise.
         """
-        stmt = select(Community).where(Community.id == community_id, Community.deleted_at.is_(None))
+        stmt = (
+            select(Community)
+            .where(Community.id == community_id, Community.deleted_at.is_(None))
+            .execution_options(populate_existing=True)
+        )
         result = await self._session.execute(stmt)
         return result.scalar_one_or_none()
 
@@ -233,10 +237,6 @@ class SQLAlchemyCommunityRepository(CommunityRepository):
         Raises:
             ValueError: If attempting to update invalid or protected fields.
         """
-        community = await self.get_by_id(community_id)
-        if not community:
-            return None
-
         # Define allowed fields for update
         allowed_fields = {
             "name",
@@ -248,18 +248,28 @@ class SQLAlchemyCommunityRepository(CommunityRepository):
             "cover_url",
         }
 
-        # Validate and apply updates
-        for field, value in data.items():
+        # Validate fields
+        for field in data.keys():
             if field not in allowed_fields:
                 raise ValueError(f"Field '{field}' cannot be updated")
-            setattr(community, field, value)
 
-        # Update the updated_at timestamp
-        community.updated_at = datetime.now(UTC)
+        # Add updated_at timestamp
+        data["updated_at"] = datetime.now(UTC)
 
+        # Perform update using UPDATE statement
+        from sqlalchemy import update as sql_update
+
+        stmt = sql_update(Community).where(Community.id == community_id).values(**data)
+        await self._session.execute(stmt)
         await self._session.flush()
-        await self._session.refresh(community)
-        return community
+
+        # Completely clear the session to avoid any caching
+        self._session.expunge_all()
+
+        # Fetch the updated community with completely fresh query
+        stmt = select(Community).where(Community.id == community_id, Community.deleted_at.is_(None))
+        result = await self._session.execute(stmt)
+        return result.scalar_one_or_none()
 
     async def delete(self, community_id: UUID) -> bool:
         """Soft delete a community.

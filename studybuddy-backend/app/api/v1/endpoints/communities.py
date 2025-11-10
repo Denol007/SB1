@@ -19,6 +19,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.v1.dependencies.auth import get_current_user, get_optional_current_user
+from app.application.schemas.common import PaginatedResponse
 from app.application.schemas.community import (
     CommunityCreate,
     CommunityDetailResponse,
@@ -122,7 +123,7 @@ async def create_community(
 
 @router.get(
     "/",
-    response_model=list[CommunityResponse],
+    response_model=PaginatedResponse[CommunityResponse],
     status_code=status.HTTP_200_OK,
     summary="List communities",
     description="Get list of communities with optional filters (type, visibility, role)",
@@ -134,7 +135,7 @@ async def list_communities(
     current_user: User | None = Depends(get_optional_current_user),
     community_service: CommunityService = Depends(get_community_service),
     membership_repo: SQLAlchemyMembershipRepository = Depends(get_membership_repository),
-) -> list[CommunityResponse]:
+) -> PaginatedResponse[CommunityResponse]:
     """List communities with optional filters.
 
     Returns communities the user has access to:
@@ -180,7 +181,16 @@ async def list_communities(
                 if visibility and community.visibility != visibility:
                     continue
                 communities.append(community)
-        return [CommunityResponse.model_validate(c) for c in communities]
+
+        # Wrap in paginated response
+        community_responses = [CommunityResponse.model_validate(c) for c in communities]
+        return PaginatedResponse(
+            data=community_responses,
+            total=len(community_responses),
+            page=1,
+            page_size=len(community_responses),
+            has_next=False,
+        )
 
     # Otherwise, get all communities with filters
     from app.infrastructure.repositories.community_repository import SQLAlchemyCommunityRepository
@@ -210,7 +220,15 @@ async def list_communities(
                 if membership:
                     communities.append(community)
 
-    return [CommunityResponse.model_validate(c) for c in communities]
+    # Wrap in paginated response
+    community_responses = [CommunityResponse.model_validate(c) for c in communities]
+    return PaginatedResponse(
+        data=community_responses,
+        total=len(community_responses),
+        page=1,
+        page_size=len(community_responses),
+        has_next=False,
+    )
 
 
 @router.get(
@@ -360,7 +378,7 @@ async def delete_community(
 @router.post(
     "/{community_id}/join",
     response_model=MembershipResponse,
-    status_code=status.HTTP_201_CREATED,
+    status_code=status.HTTP_200_OK,
     summary="Join a community",
     description="Join a public community as a member",
 )
@@ -368,6 +386,7 @@ async def join_community(
     community_id: UUID,
     current_user: User = Depends(get_current_user),
     community_service: CommunityService = Depends(get_community_service),
+    membership_repo: SQLAlchemyMembershipRepository = Depends(get_membership_repository),
 ) -> MembershipResponse:
     """Join a community.
 
@@ -404,13 +423,18 @@ async def join_community(
         if community.visibility == CommunityVisibility.PRIVATE:
             raise ForbiddenException("Cannot join private communities. Contact an admin.")
 
-        # Join as member
-        membership = await community_service.add_member(
+        # Check if already a member
+        existing_membership = await membership_repo.get_membership(current_user.id, community_id)
+        if existing_membership:
+            raise ConflictException("You are already a member of this community")
+
+        # Join as member (self-join - bypass admin check)
+        membership = await membership_repo.add_member(
+            user_id=current_user.id,
             community_id=community_id,
-            user_id=current_user.id,  # Self-join - user is the admin
-            target_user_id=current_user.id,  # And the target
             role=MembershipRole.MEMBER,
         )
+
         return MembershipResponse.model_validate(membership)
 
     except ConflictException as e:
@@ -460,30 +484,34 @@ async def leave_community(
 
 @router.get(
     "/{community_id}/members",
-    response_model=list[MembershipResponse],
+    response_model=PaginatedResponse[MembershipResponse],
     status_code=status.HTTP_200_OK,
     summary="List community members",
     description="Get list of all members in a community",
 )
 async def list_members(
     community_id: UUID,
-    current_user: User = Depends(get_current_user),
+    role: MembershipRole | None = Query(None, description="Filter by member role"),
+    current_user: User | None = Depends(get_optional_current_user),
     membership_repo: SQLAlchemyMembershipRepository = Depends(get_membership_repository),
-) -> list[MembershipResponse]:
+) -> PaginatedResponse[MembershipResponse]:
     """List all members of a community.
 
-    Only accessible to community members (for private communities).
-    Public communities are accessible to all authenticated users.
+    Accessible to:
+    - Anyone for public communities
+    - Only members for private communities
 
     Args:
         community_id: Community ID
-        current_user: Authenticated user
+        role: Optional filter by member role
+        current_user: Authenticated user (optional)
         membership_repo: Membership repository
 
     Returns:
-        list[MembershipResponse]: List of community members
+        PaginatedResponse[MembershipResponse]: List of community members
 
     Raises:
+        HTTPException: 401 if private community and user is not authenticated
         HTTPException: 403 if private community and user is not a member
         HTTPException: 404 if community not found
     """
@@ -501,13 +529,31 @@ async def list_members(
 
         # Check access for private communities
         if community.visibility == CommunityVisibility.PRIVATE:
+            if current_user is None:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Authentication required to access private community members",
+                )
             user_membership = await membership_repo.get_membership(current_user.id, community_id)
             if not user_membership:
                 raise ForbiddenException("You do not have access to this private community")
 
         # Get all members
         memberships = await membership_repo.get_by_community(community_id)
-        return [MembershipResponse.model_validate(m) for m in memberships]
+
+        # Filter by role if specified
+        if role is not None:
+            memberships = [m for m in memberships if m.role == role]
+
+        # Wrap in paginated response
+        membership_responses = [MembershipResponse.model_validate(m) for m in memberships]
+        return PaginatedResponse(
+            data=membership_responses,
+            total=len(membership_responses),
+            page=1,
+            page_size=len(membership_responses),
+            has_next=False,
+        )
 
     except ForbiddenException as e:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e)) from e

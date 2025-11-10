@@ -94,6 +94,7 @@ class Settings(BaseSettings):
     CORS_ALLOW_HEADERS: list[str] = ["*"]
 
     # Rate Limiting
+    RATE_LIMIT_ENABLED: bool = True
     RATE_LIMIT_PER_MINUTE: int = 100
     RATE_LIMIT_PER_MINUTE_UNAUTH: int = 20
 

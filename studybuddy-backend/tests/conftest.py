@@ -1,5 +1,6 @@
 """Pytest configuration and fixtures for StudyBuddy tests."""
 
+import os
 from collections.abc import Callable
 from uuid import UUID, uuid4
 
@@ -9,6 +10,9 @@ from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import NullPool
+
+# Disable rate limiting for tests BEFORE importing app modules
+os.environ["RATE_LIMIT_ENABLED"] = "false"
 
 from app.core.security import create_access_token
 from app.domain.enums.user_role import UserRole

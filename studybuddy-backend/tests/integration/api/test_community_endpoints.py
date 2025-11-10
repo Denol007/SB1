@@ -627,6 +627,7 @@ class TestPermissionEnforcement:
         private_community = Community(
             id=uuid4(),
             name="Private Community",
+            description="A private community",
             type=CommunityType.HOBBY,
             visibility=CommunityVisibility.PRIVATE,
             member_count=0,
