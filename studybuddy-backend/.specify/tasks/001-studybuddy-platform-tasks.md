@@ -299,10 +299,10 @@ description: "Task list for StudyBuddy platform implementation"
   - Fields: id (UUID), google_id, email, name, bio, avatar_url, role
   - Timestamps: created_at, updated_at, deleted_at
 
-- [ ] T074 [P] [US1] Create `app/infrastructure/database/models/university.py`
+- [x] T074 [P] [US1] Create `app/infrastructure/database/models/university.py` ✅
   - Fields: id (UUID), name, domain, logo_url, country
 
-- [ ] T075 [P] [US1] Create `app/infrastructure/database/models/verification.py`
+- [x] T075 [P] [US1] Create `app/infrastructure/database/models/verification.py` ✅
   - Fields: id (UUID), user_id (FK), university_id (FK), email, token_hash, status
   - Timestamps: verified_at, expires_at
 
