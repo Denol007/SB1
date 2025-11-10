@@ -323,14 +323,17 @@ description: "Task list for StudyBuddy platform implementation"
 
 ### Repository Implementations for User Story 1
 
-- [ ] T081 [US1] Create `app/infrastructure/repositories/user_repository.py`
+- [x] T081 [US1] Create `app/infrastructure/repositories/user_repository.py` ✅
   - Implement all interface methods with SQLAlchemy async queries
+  - 14 integration tests covering all CRUD operations
 
-- [ ] T082 [US1] Create `app/infrastructure/repositories/verification_repository.py`
+- [x] T082 [US1] Create `app/infrastructure/repositories/verification_repository.py` ✅
   - Implement all interface methods
+  - 9 integration tests for verification management
 
-- [ ] T083 [US1] Create `app/infrastructure/repositories/university_repository.py`
+- [x] T083 [US1] Create `app/infrastructure/repositories/university_repository.py` ✅
   - Implement all interface methods
+  - 8 integration tests for university queries
 
 ### Schemas (DTOs) for User Story 1
 
