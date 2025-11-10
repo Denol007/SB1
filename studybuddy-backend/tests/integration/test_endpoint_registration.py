@@ -144,19 +144,19 @@ class TestEndpointRegistration:
             # For paths that might have multiple methods, check if any expected method exists
             if path == "/api/v1/auth/google":
                 # Could be GET or POST depending on implementation
-                assert actual_methods & expected_methods, (
-                    f"{path}: expected one of {expected_methods}, got {actual_methods}"
-                )
+                assert (
+                    actual_methods & expected_methods
+                ), f"{path}: expected one of {expected_methods}, got {actual_methods}"
             else:
                 # Exact match or subset check
                 if len(expected_methods) == 1:
-                    assert expected_methods <= actual_methods, (
-                        f"{path}: expected {expected_methods}, got {actual_methods}"
-                    )
+                    assert (
+                        expected_methods <= actual_methods
+                    ), f"{path}: expected {expected_methods}, got {actual_methods}"
                 else:
-                    assert expected_methods == actual_methods, (
-                        f"{path}: expected {expected_methods}, got {actual_methods}"
-                    )
+                    assert (
+                        expected_methods == actual_methods
+                    ), f"{path}: expected {expected_methods}, got {actual_methods}"
 
         print("✓ All endpoint HTTP methods correct")
 

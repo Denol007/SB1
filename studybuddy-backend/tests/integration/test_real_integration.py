@@ -614,9 +614,9 @@ class TestRealEndToEndScenario:
                                                 f"Step 7: Final profile → Role: {final_profile['role']}"
                                             )
 
-                                            assert final_profile["role"] == "student", (
-                                                "User should now be a student"
-                                            )
+                                            assert (
+                                                final_profile["role"] == "student"
+                                            ), "User should now be a student"
 
                                             print("\n✅ Complete user journey successful!")
                                             print(
