@@ -423,7 +423,7 @@ description: "Task list for StudyBuddy platform implementation"
 - [x] T096 [P] [US2] Create test factories in `tests/factories/community_factory.py` ✅
   - `CommunityFactory`, `MembershipFactory`
 
-- [ ] T097 [P] [US2] Unit test: `tests/unit/services/test_community_service.py`
+- [x] T097 [P] [US2] Unit test: `tests/unit/services/test_community_service.py` ✅
   - Test `create_community()`
   - Test `update_community_settings()`
   - Test `add_member()`, `remove_member()`, `update_member_role()`
