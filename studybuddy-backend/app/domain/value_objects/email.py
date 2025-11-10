@@ -45,6 +45,12 @@ class Email:
         r"\.[a-zA-Z]{2,}$"  # TLD
     )
 
+    # Explicit type annotations for MyPy
+    value: str
+    local_part: str
+    domain: str
+    is_university_email: bool
+
     def __init__(self, email: str) -> None:
         """Create a new Email value object with validation.
 

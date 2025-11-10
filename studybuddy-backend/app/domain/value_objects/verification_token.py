@@ -35,6 +35,9 @@ class VerificationToken:
     # Pattern for valid tokens: alphanumeric, hyphens, underscores
     TOKEN_PATTERN = re.compile(r"^[A-Za-z0-9_-]+$")
 
+    # Explicit type annotation for MyPy
+    value: str
+
     def __init__(self, value: str) -> None:
         """Create a verification token from a string value.
 
