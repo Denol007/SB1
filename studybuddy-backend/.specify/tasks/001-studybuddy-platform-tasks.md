@@ -284,13 +284,13 @@ description: "Task list for StudyBuddy platform implementation"
 - [x] T069 [P] [US1] Create `app/domain/enums/user_role.py` ✅
   - Enum: `student`, `prospective_student`, `admin`
 
-- [ ] T070 [P] [US1] Create `app/domain/enums/verification_status.py`
+- [x] T070 [P] [US1] Create `app/domain/enums/verification_status.py` ✅
   - Enum: `pending`, `verified`, `expired`
 
-- [ ] T071 [P] [US1] Create `app/domain/value_objects/email.py`
+- [x] T071 [P] [US1] Create `app/domain/value_objects/email.py` ✅
   - Email value object with validation
 
-- [ ] T072 [P] [US1] Create `app/domain/value_objects/verification_token.py`
+- [x] T072 [P] [US1] Create `app/domain/value_objects/verification_token.py` ✅
   - Token generation and validation logic
 
 ### Database Models for User Story 1
