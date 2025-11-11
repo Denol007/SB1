@@ -40,6 +40,7 @@ from app.core.exceptions import (
 from app.domain.enums.event_status import EventStatus
 from app.infrastructure.database.models.user import User
 from app.infrastructure.database.session import get_db
+from app.infrastructure.repositories.community_repository import SQLAlchemyCommunityRepository
 from app.infrastructure.repositories.event_registration_repository import (
     SQLAlchemyEventRegistrationRepository,
 )
@@ -64,7 +65,10 @@ async def get_event_service(db: AsyncSession = Depends(get_db)) -> EventService:
     event_repository = SQLAlchemyEventRepository(db)
     registration_repository = SQLAlchemyEventRegistrationRepository(db)
     membership_repository = SQLAlchemyMembershipRepository(db)
-    return EventService(event_repository, registration_repository, membership_repository)
+    community_repository = SQLAlchemyCommunityRepository(db)
+    return EventService(
+        event_repository, registration_repository, membership_repository, community_repository
+    )
 
 
 async def get_event_repository(
