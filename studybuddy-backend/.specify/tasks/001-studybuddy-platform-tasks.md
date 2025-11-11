@@ -811,7 +811,31 @@ description: "Task list for StudyBuddy platform implementation"
 
 ### Repository & Service Layer for User Story 4
 
-- [ ] T146 [US4] Repository interfaces and implementations for events and registrations
+- [x] T146 [US4] Repository interfaces and implementations for events and registrations
+  - Created `app/application/interfaces/event_repository.py`:
+    - EventRepository interface with methods: create, get_by_id, update, delete
+    - list_by_community, list_by_creator, count_registered_participants
+    - get_upcoming_events for future event queries
+  - Created `app/application/interfaces/event_registration_repository.py`:
+    - EventRegistrationRepository interface with methods: create, get_by_id
+    - get_by_event_and_user, update_status, delete
+    - list_by_event, list_by_user, count_by_event_and_status
+    - get_first_waitlisted for waitlist management (FIFO)
+  - Created `app/infrastructure/repositories/event_repository.py`:
+    - SQLAlchemyEventRepository implementation with all CRUD operations
+    - Soft delete support (deleted_at timestamp)
+    - Pagination for list operations
+    - Status filtering for community events
+    - Count registered participants with join to registrations
+  - Created `app/infrastructure/repositories/event_registration_repository.py`:
+    - SQLAlchemyEventRegistrationRepository implementation
+    - Unique constraint handling (ConflictException on duplicate registration)
+    - FIFO waitlist retrieval (oldest first)
+    - Count by status for capacity management
+  - Updated `app/application/interfaces/__init__.py` to export new interfaces
+  - Updated `app/infrastructure/repositories/__init__.py` to export new implementations
+  - All imports verified working, no linting errors
+
 - [ ] T147 [US4] Create `app/application/services/event_service.py`
   - `create_event()`, `update_event()`, `delete_event()`
   - `register_for_event()` - Handle capacity and waitlist
