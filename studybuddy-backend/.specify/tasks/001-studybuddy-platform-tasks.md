@@ -865,13 +865,15 @@ description: "Task list for StudyBuddy platform implementation"
 
 ### Background Tasks for User Story 4
 
-- [ ] T148 [US4] Add to `app/tasks/event_tasks.py`
+- [x] T148 [US4] Add to `app/tasks/event_tasks.py` ✅ Commit: b156318
   - `send_event_reminders()` - Celery beat task (24h before)
   - `send_event_cancellation_notice()`
+  - Added email methods to `EmailBackend` interface and `SMTPEmail` implementation
+  - HTML email templates for event reminders and cancellations
 
 ### API Endpoints for User Story 4
 
-- [ ] T149 [US4] Create `app/api/v1/endpoints/events.py`
+- [x] T149 [US4] Create `app/api/v1/endpoints/events.py` ✅ (current commit)
   - `GET /api/v1/communities/{community_id}/events` - List
   - `POST /api/v1/communities/{community_id}/events` - Create
   - `GET /api/v1/events/{event_id}` - Get details
@@ -880,8 +882,14 @@ description: "Task list for StudyBuddy platform implementation"
   - `POST /api/v1/events/{event_id}/register` - Register
   - `DELETE /api/v1/events/{event_id}/register` - Unregister
   - `GET /api/v1/events/{event_id}/participants` - List participants
+  - Created `app/application/schemas/event.py` with all DTOs:
+    - `EventCreate`, `EventUpdate`
+    - `EventResponse`, `EventDetailResponse`
+    - `EventRegistrationResponse`, `EventParticipantResponse`
+  - All endpoints with proper error handling and permission checks
 
-- [ ] T150 [US4] Update router
+- [x] T150 [US4] Update router ✅ (current commit)
+  - Updated `app/api/v1/router.py` to include events router
 
 **Checkpoint**: US4 complete - Event system functional ✅
 

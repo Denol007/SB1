@@ -9,7 +9,16 @@ they should be imported and included here.
 
 from fastapi import APIRouter
 
-from app.api.v1.endpoints import auth, comments, communities, health, posts, users, verifications
+from app.api.v1.endpoints import (
+    auth,
+    comments,
+    communities,
+    events,
+    health,
+    posts,
+    users,
+    verifications,
+)
 
 # Create main v1 router
 router = APIRouter(prefix="/api/v1", tags=["v1"])
@@ -34,6 +43,9 @@ router.include_router(posts.router)
 
 # Include comment endpoints
 router.include_router(comments.router)
+
+# Include event endpoints
+router.include_router(events.router)
 
 
 @router.get("/")
