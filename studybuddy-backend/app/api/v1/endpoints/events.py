@@ -610,12 +610,11 @@ async def list_event_participants(
                     EventParticipantResponse(
                         user_id=user.id,
                         email=user.email,
-                        full_name=user.full_name,
+                        full_name=user.name,  # User model uses 'name' field
                         status=registration.status,
                         registered_at=registration.registered_at,
                     )
                 )
-
         return participants
 
     except NotFoundException as e:
