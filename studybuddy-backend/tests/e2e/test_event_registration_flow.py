@@ -27,10 +27,9 @@ from app.domain.enums.user_role import UserRole
 from app.main import app
 
 try:
+    from app.infrastructure.database.models.community import Community
     from app.infrastructure.database.models.event import Event
     from app.infrastructure.database.models.event_registration import EventRegistration
-
-    from app.infrastructure.database.models.community import Community
     from app.infrastructure.database.models.membership import Membership
     from app.infrastructure.database.models.user import User
 except Exception:  # pragma: no cover - skip when models not present
@@ -175,9 +174,9 @@ class TestEventRegistrationFlow:
             if create_response.status_code in (404, 501):
                 pytest.skip("Event creation endpoint not yet implemented (T149)")
 
-            assert (
-                create_response.status_code == 201
-            ), f"Expected 201, got {create_response.status_code}: {create_response.text}"
+            assert create_response.status_code == 201, (
+                f"Expected 201, got {create_response.status_code}: {create_response.text}"
+            )
 
             event_data = create_response.json()
             event_id = event_data["id"]
@@ -323,9 +322,9 @@ class TestEventRegistrationFlow:
                 json={"title": "Hacked Title"},
                 headers=auth_headers(users[1].id),  # Regular member
             )
-            assert (
-                unauthorized_update.status_code == 403
-            ), "Regular user should not be able to update event"
+            assert unauthorized_update.status_code == 403, (
+                "Regular user should not be able to update event"
+            )
             print("✓ Permission check passed - regular user blocked from updating")
 
             # ===== STEP 10: Moderator changes event status to cancelled =====
