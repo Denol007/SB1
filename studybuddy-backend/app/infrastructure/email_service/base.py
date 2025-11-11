@@ -91,3 +91,22 @@ class EmailBackend(ABC):
             Exception: If email sending fails.
         """
         pass
+
+    @abstractmethod
+    async def send_event_cancellation(
+        self,
+        to: str,
+        event_title: str,
+        event_time: datetime,
+    ) -> None:
+        """Send event cancellation notice email.
+
+        Args:
+            to: Recipient email address.
+            event_title: Title of the cancelled event.
+            event_time: Original event start time.
+
+        Raises:
+            Exception: If email sending fails.
+        """
+        pass

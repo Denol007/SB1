@@ -209,6 +209,61 @@ The StudyBuddy Team
 
         logger.info(f"Event reminder sent to {to} for '{event_title}'")
 
+    async def send_event_cancellation(
+        self,
+        to: str,
+        event_title: str,
+        event_time: datetime,
+    ) -> None:
+        """Send event cancellation notice email.
+
+        Args:
+            to: Recipient email address.
+            event_title: Title of the cancelled event.
+            event_time: Original event start time.
+
+        Raises:
+            Exception: If email sending fails.
+        """
+        # Format event time
+        formatted_time = event_time.strftime("%A, %B %d, %Y at %I:%M %p")
+
+        subject = f"Event Cancelled: {event_title}"
+
+        # Plain text version
+        body = f"""
+Hello,
+
+We regret to inform you that the following event has been cancelled:
+
+Event: {event_title}
+Originally Scheduled: {formatted_time}
+
+We apologize for any inconvenience this may cause.
+
+If you have any questions, please contact the event organizer or community moderators.
+
+Best regards,
+The StudyBuddy Team
+"""
+
+        # HTML version with template
+        event_url = f"{settings.FRONTEND_URL}/events"
+        html = self._render_event_cancellation_template(
+            event_title=event_title,
+            event_time=event_time,
+            event_url=event_url,
+        )
+
+        await self.send_email(
+            to=to,
+            subject=subject,
+            body=body.strip(),
+            html=html,
+        )
+
+        logger.info(f"Event cancellation notice sent to {to} for '{event_title}'")
+
     def _render_verification_template(
         self,
         verification_url: str,
@@ -417,6 +472,121 @@ The StudyBuddy Team
 
         <div style="text-align: center;">
             <a href="{event_url}" class="button">View Event Details</a>
+        </div>
+
+        <div class="footer">
+            <p>Best regards,<br>The StudyBuddy Team</p>
+        </div>
+    </div>
+</body>
+</html>
+"""
+
+    def _render_event_cancellation_template(
+        self,
+        event_title: str,
+        event_time: datetime,
+        event_url: str,
+    ) -> str:
+        """Render event cancellation email HTML template.
+
+        Args:
+            event_title: Title of the cancelled event.
+            event_time: Original event start time.
+            event_url: URL to view other events.
+
+        Returns:
+            Rendered HTML email template.
+        """
+        formatted_time = event_time.strftime("%A, %B %d, %Y at %I:%M %p")
+
+        return f"""
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Cancelled</title>
+    <style>
+        body {{
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }}
+        .container {{
+            background-color: #ffffff;
+            border-radius: 8px;
+            padding: 40px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }}
+        .header {{
+            text-align: center;
+            margin-bottom: 30px;
+        }}
+        .logo {{
+            font-size: 28px;
+            font-weight: bold;
+            color: #4F46E5;
+        }}
+        h1 {{
+            color: #DC2626;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }}
+        .event-details {{
+            background-color: #FEF2F2;
+            border-left: 4px solid #DC2626;
+            padding: 20px;
+            margin: 20px 0;
+        }}
+        .event-details p {{
+            margin: 8px 0;
+        }}
+        .button {{
+            display: inline-block;
+            background-color: #4F46E5;
+            color: #ffffff;
+            text-decoration: none;
+            padding: 14px 28px;
+            border-radius: 6px;
+            font-weight: 500;
+            margin: 20px 0;
+        }}
+        .footer {{
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #E5E7EB;
+            font-size: 14px;
+            color: #6B7280;
+            text-align: center;
+        }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">StudyBuddy</div>
+        </div>
+
+        <h1>❌ Event Cancelled</h1>
+
+        <p>Hello,</p>
+
+        <p>We regret to inform you that the following event has been cancelled:</p>
+
+        <div class="event-details">
+            <p><strong>📅 Event:</strong> {event_title}</p>
+            <p><strong>🕐 Originally Scheduled:</strong> {formatted_time}</p>
+            <p><strong>Status:</strong> <span style="color: #DC2626;">Cancelled</span></p>
+        </div>
+
+        <p>We apologize for any inconvenience this may cause. If you have any questions, please contact the event organizer or community moderators.</p>
+
+        <div style="text-align: center;">
+            <a href="{event_url}" class="button">Browse Other Events</a>
         </div>
 
         <div class="footer">
