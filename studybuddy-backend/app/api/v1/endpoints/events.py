@@ -162,10 +162,23 @@ async def list_community_events(
         event_responses = []
         for event in events:
             registered_count = await event_repo.count_registered_participants(event.id)
-            # Use from_attributes=True to create response from model
-            event_response = EventResponse.model_validate(event)
-            # Override registered_count
-            event_response.registered_count = registered_count
+            # Create response with all fields including registered_count
+            event_response = EventResponse(
+                id=event.id,
+                community_id=event.community_id,
+                creator_id=event.creator_id,
+                title=event.title,
+                description=event.description,
+                type=event.type,
+                location=event.location,
+                start_time=event.start_time,
+                end_time=event.end_time,
+                participant_limit=event.participant_limit,
+                registered_count=registered_count,
+                status=event.status,
+                created_at=event.created_at,
+                updated_at=event.updated_at,
+            )
             event_responses.append(event_response)
 
         # Calculate total (simplified - in production, use count query)
@@ -173,7 +186,7 @@ async def list_community_events(
         has_next = len(event_responses) == page_size
 
         return PaginatedResponse(
-            items=event_responses,
+            data=event_responses,
             total=total,
             page=page,
             page_size=page_size,

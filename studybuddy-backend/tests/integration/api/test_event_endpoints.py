@@ -298,7 +298,7 @@ class TestEventListing:
 
         if resp.status_code == 200:
             data = resp.json()
-            assert isinstance(data, list) or "items" in data  # Could be list or paginated
+            assert isinstance(data, list) or "data" in data  # Could be list or paginated
 
 
 @pytest.mark.integration
