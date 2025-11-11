@@ -780,10 +780,18 @@ description: "Task list for StudyBuddy platform implementation"
   - Complete SQLAlchemy model with EventType and EventStatus enums
   - Added to models **init**.py for Alembic auto-detection
 
-- [ ] T144 [P] [US4] Create `app/infrastructure/database/models/event_registration.py`
-  - Fields: id, event_id (FK), user_id (FK), status
-  - Timestamp: registered_at
-  - Unique constraint: (event_id, user_id)
+- [x] T144 [P] [US4] Create `app/infrastructure/database/models/event_registration.py` ✅
+  - Fields: id, event_id (FK), user_id (FK), status, registered_at
+  - Foreign keys: event_id -> events, user_id -> users (CASCADE delete)
+  - Status: RegistrationStatus enum (registered, waitlisted, attended, no_show)
+  - Timestamps: registered_at (UTC, auto-set on creation)
+  - Unique constraint: (event_id, user_id) prevents duplicate registrations
+  - Indexes for efficient queries:
+    - Composite: event_id + status (filter registrations by event and status)
+    - Composite: event_id + registered_at (chronological ordering within event)
+    - Single: user_id (user's event registrations)
+  - Complete SQLAlchemy model with RegistrationStatus enum
+  - Added to models **init**.py for Alembic auto-detection
 
 - [ ] T145 [US4] Create migration: `alembic revision --autogenerate -m "Add events and registrations"`
 

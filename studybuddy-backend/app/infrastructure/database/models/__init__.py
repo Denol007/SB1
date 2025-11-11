@@ -3,6 +3,7 @@
 from app.infrastructure.database.models.comment import Comment
 from app.infrastructure.database.models.community import Community
 from app.infrastructure.database.models.event import Event
+from app.infrastructure.database.models.event_registration import EventRegistration
 from app.infrastructure.database.models.membership import Membership
 from app.infrastructure.database.models.post import Post
 from app.infrastructure.database.models.reaction import Reaction
@@ -13,6 +14,7 @@ __all__ = [
     "Comment",
     "Community",
     "Event",
+    "EventRegistration",
     "Membership",
     "Post",
     "Reaction",
