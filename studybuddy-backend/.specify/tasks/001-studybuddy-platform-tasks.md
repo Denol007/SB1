@@ -793,7 +793,21 @@ description: "Task list for StudyBuddy platform implementation"
   - Complete SQLAlchemy model with RegistrationStatus enum
   - Added to models **init**.py for Alembic auto-detection
 
-- [ ] T145 [US4] Create migration: `alembic revision --autogenerate -m "Add events and registrations"`
+- [x] T145 [US4] Create migration: `alembic revision --autogenerate -m "Add events and registrations"`
+  - Migration file: `a4905d651abd_add_events_and_registrations.py`
+  - Successfully upgraded database from `ebd7b4c4c70b` (previous migrations)
+  - Created events table with:
+    - All columns: id, community_id, creator_id, title, description, type, location, start_time, end_time, participant_limit, status, deleted_at, created_at, updated_at
+    - Check constraints: valid_time_range (end > start), positive_participant_limit
+    - Foreign keys: community_id -> communities, creator_id -> users (both CASCADE)
+    - Indexes: All 6 indexes including composites (community_start_time, status_start_time)
+  - Created event_registrations table with:
+    - All columns: id, event_id, user_id, status, registered_at
+    - Unique constraint: (event_id, user_id) prevents duplicates
+    - Foreign keys: event_id -> events, user_id -> users (both CASCADE)
+    - Indexes: All 5 indexes including composites (event_status, event_registered_at)
+  - Tested both upgrade and downgrade successfully
+  - Database is now at head (a4905d651abd)
 
 ### Repository & Service Layer for User Story 4
 
