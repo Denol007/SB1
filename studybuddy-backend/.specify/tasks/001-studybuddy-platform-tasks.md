@@ -709,7 +709,13 @@ description: "Task list for StudyBuddy platform implementation"
 
 ### Tests for User Story 4
 
-- [ ] T136 [P] [US4] Factories: `event_factory.py`, `event_registration_factory.py`
+- [x] T136 [P] [US4] Factories: `event_factory.py`, `event_registration_factory.py` ✅
+  - EventFactory with helper methods (online, offline, hybrid, published, etc.)
+  - EventRegistrationFactory with status helpers (registered, waitlisted, attended, no_show)
+  - 28 unit tests - all passing
+  - Support for event types, statuses, timing, capacity limits
+  - Realistic fake data generation with Faker
+
 - [ ] T137 [P] [US4] Unit tests: `test_event_service.py`
 - [ ] T138 [P] [US4] Integration tests: `test_event_endpoints.py`
 - [ ] T139 [US4] E2E test: `test_event_registration_flow.py`
