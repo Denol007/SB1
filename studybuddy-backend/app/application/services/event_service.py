@@ -13,14 +13,18 @@ from datetime import UTC, datetime
 from typing import Any
 from uuid import UUID
 
-from fastapi import HTTPException, status
-
 from app.application.interfaces.community_repository import CommunityRepository
 from app.application.interfaces.event_registration_repository import (
     EventRegistrationRepository,
 )
 from app.application.interfaces.event_repository import EventRepository
 from app.application.interfaces.membership_repository import MembershipRepository
+from app.core.exceptions import (
+    BadRequestException,
+    ConflictException,
+    ForbiddenException,
+    NotFoundException,
+)
 from app.domain.enums.membership_role import MembershipRole
 from app.infrastructure.database.models.event import Event
 from app.infrastructure.database.models.event_registration import EventRegistration
@@ -103,32 +107,20 @@ class EventService:
             community_id=community_id,
         )
         if not membership:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="You must be a member of this community to create events",
-            )
+            raise ForbiddenException("You must be a member of this community to create events")
 
         if membership.role not in (MembershipRole.MODERATOR, MembershipRole.ADMIN):
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Only moderators and admins can create events",
-            )
+            raise ForbiddenException("Only moderators and admins can create events")
 
         # Validate start_time is in the future
         start_time = event_data.get("start_time")
         if start_time and start_time <= datetime.now(UTC):
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Event start time must be in the future",
-            )
+            raise BadRequestException("Event start time must be in the future")
 
         # Validate end_time is after start_time
         end_time = event_data.get("end_time")
         if start_time and end_time and end_time <= start_time:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Event end time must be after start time",
-            )
+            raise BadRequestException("Event end time must be after start time")
 
         # Create the event
         event = await self.event_repository.create(
@@ -177,10 +169,7 @@ class EventService:
         """
         event = await self.event_repository.get_by_id(event_id)
         if not event:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Event not found",
-            )
+            raise NotFoundException("Event not found")
 
         # Check permissions: creator, moderator, or admin
         membership = await self.membership_repository.get_by_user_and_community(
@@ -195,9 +184,8 @@ class EventService:
         )
 
         if not (is_creator or is_moderator_or_admin):
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Only the event creator, moderators, or admins can update this event",
+            raise ForbiddenException(
+                "Only the event creator, moderators, or admins can update this event"
             )
 
         # Update the event
@@ -230,10 +218,7 @@ class EventService:
         """
         event = await self.event_repository.get_by_id(event_id)
         if not event:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Event not found",
-            )
+            raise NotFoundException("Event not found")
 
         # Check permissions: creator or admin only
         membership = await self.membership_repository.get_by_user_and_community(
@@ -245,10 +230,7 @@ class EventService:
         is_admin = membership and membership.role == MembershipRole.ADMIN
 
         if not (is_creator or is_admin):
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Only the event creator or admins can delete this event",
-            )
+            raise ForbiddenException("Only the event creator or admins can delete this event")
 
         await self.event_repository.delete(event_id)
 
@@ -283,10 +265,7 @@ class EventService:
         # Get the event
         event = await self.event_repository.get_by_id(event_id)
         if not event:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Event not found",
-            )
+            raise NotFoundException("Event not found")
 
         # Verify user is a community member
         membership = await self.membership_repository.get_by_user_and_community(
@@ -294,17 +273,13 @@ class EventService:
             community_id=event.community_id,
         )
         if not membership:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="You must be a member of this community to register for events",
+            raise ForbiddenException(
+                "You must be a member of this community to register for events"
             )
 
         # Check if event is still open for registration
         if event.status in ("completed", "cancelled"):
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Cannot register for {event.status} event",
-            )
+            raise BadRequestException(f"Cannot register for {event.status} event")
 
         # Check if user is already registered
         existing_registration = await self.registration_repository.get_by_event_and_user(
@@ -312,10 +287,7 @@ class EventService:
             user_id=user_id,
         )
         if existing_registration:
-            raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT,
-                detail="You are already registered for this event",
-            )
+            raise ConflictException("You are already registered for this event")
 
         # Determine registration status based on capacity
         registration_status = "registered"
@@ -364,10 +336,7 @@ class EventService:
         # Get the event
         event = await self.event_repository.get_by_id(event_id)
         if not event:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Event not found",
-            )
+            raise NotFoundException("Event not found")
 
         # Get the registration
         registration = await self.registration_repository.get_by_event_and_user(
@@ -375,10 +344,7 @@ class EventService:
             user_id=user_id,
         )
         if not registration:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="You are not registered for this event",
-            )
+            raise NotFoundException("You are not registered for this event")
 
         # Delete the registration
         await self.registration_repository.delete(
@@ -456,10 +422,7 @@ class EventService:
         """
         event = await self.event_repository.get_by_id(event_id)
         if not event:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Event not found",
-            )
+            raise NotFoundException("Event not found")
 
         # Check permissions: creator, moderator, or admin
         membership = await self.membership_repository.get_by_user_and_community(
@@ -474,18 +437,14 @@ class EventService:
         )
 
         if not (is_creator or is_moderator_or_admin):
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Only the event creator, moderators, or admins can change event status",
+            raise ForbiddenException(
+                "Only the event creator, moderators, or admins can change event status"
             )
 
         # Validate status transitions
         # Cannot change completed event to published or draft
         if event.status == "completed" and new_status in ("published", "draft"):
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Cannot change completed event status to published or draft",
-            )
+            raise BadRequestException("Cannot change completed event status to published or draft")
 
         # Update the status
         updated_event = await self.event_repository.update(

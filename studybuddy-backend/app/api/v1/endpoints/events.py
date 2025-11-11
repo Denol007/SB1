@@ -33,6 +33,7 @@ from app.application.schemas.event import (
 )
 from app.application.services.event_service import EventService
 from app.core.exceptions import (
+    BadRequestException,
     ConflictException,
     ForbiddenException,
     NotFoundException,
@@ -161,23 +162,11 @@ async def list_community_events(
         event_responses = []
         for event in events:
             registered_count = await event_repo.count_registered_participants(event.id)
-            event_dict = {
-                "id": event.id,
-                "community_id": event.community_id,
-                "creator_id": event.creator_id,
-                "title": event.title,
-                "description": event.description,
-                "type": event.type,
-                "location": event.location,
-                "start_time": event.start_time,
-                "end_time": event.end_time,
-                "participant_limit": event.participant_limit,
-                "registered_count": registered_count,
-                "status": event.status,
-                "created_at": event.created_at,
-                "updated_at": event.updated_at,
-            }
-            event_responses.append(EventResponse(**event_dict))
+            # Use from_attributes=True to create response from model
+            event_response = EventResponse.model_validate(event)
+            # Override registered_count
+            event_response.registered_count = registered_count
+            event_responses.append(event_response)
 
         # Calculate total (simplified - in production, use count query)
         total = len(event_responses) + (page - 1) * page_size
@@ -270,7 +259,7 @@ async def create_event(
             status_code=http_status.HTTP_403_FORBIDDEN,
             detail=str(e),
         )
-    except ValidationException as e:
+    except (BadRequestException, ValidationException) as e:
         raise HTTPException(  # noqa: B904
             status_code=http_status.HTTP_400_BAD_REQUEST,
             detail=str(e),
