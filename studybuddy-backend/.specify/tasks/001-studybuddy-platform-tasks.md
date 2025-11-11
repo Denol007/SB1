@@ -754,7 +754,11 @@ description: "Task list for StudyBuddy platform implementation"
 
 ### Domain Models for User Story 4
 
-- [ ] T140 [P] [US4] Create `app/domain/enums/event_type.py` - online, offline, hybrid
+- [x] T140 [P] [US4] Create `app/domain/enums/event_type.py` ✅
+  - Enum: `online`, `offline`, `hybrid`
+  - String enum for event delivery format
+  - 10 unit tests - all passing
+
 - [ ] T141 [P] [US4] Create `app/domain/enums/event_status.py` - draft, published, completed, cancelled
 - [ ] T142 [P] [US4] Create `app/domain/enums/registration_status.py` - registered, waitlisted, attended, no_show
 
