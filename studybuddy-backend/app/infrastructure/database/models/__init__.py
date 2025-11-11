@@ -1,13 +1,21 @@
 """Database models - SQLAlchemy ORM models (Adapters)."""
 
+from app.infrastructure.database.models.comment import Comment
 from app.infrastructure.database.models.community import Community
+from app.infrastructure.database.models.event import Event
 from app.infrastructure.database.models.membership import Membership
+from app.infrastructure.database.models.post import Post
+from app.infrastructure.database.models.reaction import Reaction
 from app.infrastructure.database.models.user import User
 from app.infrastructure.database.models.verification import Verification
 
 __all__ = [
+    "Comment",
     "Community",
+    "Event",
     "Membership",
+    "Post",
+    "Reaction",
     "User",
     "Verification",
 ]

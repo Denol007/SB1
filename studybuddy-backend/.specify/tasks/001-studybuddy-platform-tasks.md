@@ -771,10 +771,14 @@ description: "Task list for StudyBuddy platform implementation"
 
 ### Database Models for User Story 4
 
-- [ ] T143 [P] [US4] Create `app/infrastructure/database/models/event.py`
+- [x] T143 [P] [US4] Create `app/infrastructure/database/models/event.py` ✅
   - Fields: id, community_id, creator_id, title, description, type, location
-  - Fields: start_time, end_time, participant_limit, status
-  - Timestamps: created_at, updated_at
+  - Fields: start_time, end_time, participant_limit, status, deleted_at
+  - Timestamps: created_at, updated_at (from TimestampMixin)
+  - Indexes: community_start_time, status_start_time, creator_id, start_time
+  - Constraints: end_time > start_time, participant_limit > 0 if set
+  - Complete SQLAlchemy model with EventType and EventStatus enums
+  - Added to models **init**.py for Alembic auto-detection
 
 - [ ] T144 [P] [US4] Create `app/infrastructure/database/models/event_registration.py`
   - Fields: id, event_id (FK), user_id (FK), status
