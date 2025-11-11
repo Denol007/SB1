@@ -727,7 +727,17 @@ description: "Task list for StudyBuddy platform implementation"
   - Status changes (3 tests): permissions, status transition validation
   - All tests currently skip (awaiting EventService implementation - T147)
 
-- [ ] T138 [P] [US4] Integration tests: `test_event_endpoints.py`
+- [x] T138 [P] [US4] Integration tests: `test_event_endpoints.py` ✅
+  - 13 integration tests for event endpoints (TDD - tests written FIRST, endpoints not yet implemented)
+  - Event creation (4 tests): auth required, moderator role, create/get flow, time validations
+  - Event listing (1 test): list community events
+  - Event updates (2 tests): creator permissions, permission checks
+  - Event deletion (1 test): creator can delete
+  - Event registration (3 tests): register flow, capacity limits/waitlist, unregister
+  - Event participants (1 test): get participant list
+  - Status changes (1 test): change event status
+  - All tests currently skip (awaiting Event/EventRegistration models and endpoints - T143-T149)
+
 - [ ] T139 [US4] E2E test: `test_event_registration_flow.py`
 
 ### Domain Models for User Story 4
