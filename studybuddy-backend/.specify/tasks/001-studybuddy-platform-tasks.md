@@ -759,7 +759,11 @@ description: "Task list for StudyBuddy platform implementation"
   - String enum for event delivery format
   - 10 unit tests - all passing
 
-- [ ] T141 [P] [US4] Create `app/domain/enums/event_status.py` - draft, published, completed, cancelled
+- [x] T141 [P] [US4] Create `app/domain/enums/event_status.py` ✅
+  - Enum: `draft`, `published`, `completed`, `cancelled`
+  - String enum for event lifecycle states
+  - 12 unit tests - all passing
+
 - [ ] T142 [P] [US4] Create `app/domain/enums/registration_status.py` - registered, waitlisted, attended, no_show
 
 ### Database Models for User Story 4
