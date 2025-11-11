@@ -17,7 +17,8 @@ Permissions:
 
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import status as http_status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.v1.dependencies.auth import get_current_user
@@ -192,7 +193,7 @@ async def list_community_events(
 
     except Exception as e:
         raise HTTPException(  # noqa: B904
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            status_code=http_status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to list events: {str(e)}",
         )
 
@@ -200,7 +201,7 @@ async def list_community_events(
 @router.post(
     "/communities/{community_id}/events",
     response_model=EventDetailResponse,
-    status_code=status.HTTP_201_CREATED,
+    status_code=http_status.HTTP_201_CREATED,
     summary="Create a new event",
     description="Create a new event in a community. Requires moderator or admin role.",
 )
@@ -228,16 +229,18 @@ async def create_event(
     """
     try:
         event = await event_service.create_event(
+            user_id=current_user.id,
             community_id=community_id,
-            creator_id=current_user.id,
-            title=event_data.title,
-            description=event_data.description,
-            type=event_data.type.value,
-            start_time=event_data.start_time,
-            end_time=event_data.end_time,
-            location=event_data.location,
-            participant_limit=event_data.participant_limit,
-            status=event_data.status.value,
+            event_data={
+                "title": event_data.title,
+                "description": event_data.description,
+                "type": event_data.type.value,
+                "start_time": event_data.start_time,
+                "end_time": event_data.end_time,
+                "location": event_data.location,
+                "participant_limit": event_data.participant_limit,
+                "status": event_data.status.value,
+            },
         )
 
         # Get registered count
@@ -264,17 +267,17 @@ async def create_event(
 
     except ForbiddenException as e:
         raise HTTPException(  # noqa: B904
-            status_code=status.HTTP_403_FORBIDDEN,
+            status_code=http_status.HTTP_403_FORBIDDEN,
             detail=str(e),
         )
     except ValidationException as e:
         raise HTTPException(  # noqa: B904
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=http_status.HTTP_400_BAD_REQUEST,
             detail=str(e),
         )
     except Exception as e:
         raise HTTPException(  # noqa: B904
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            status_code=http_status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to create event: {str(e)}",
         )
 
@@ -307,7 +310,7 @@ async def get_event(
 
     if not event:
         raise HTTPException(  # noqa: B904
-            status_code=status.HTTP_404_NOT_FOUND,
+            status_code=http_status.HTTP_404_NOT_FOUND,
             detail="Event not found",
         )
 
@@ -412,24 +415,24 @@ async def update_event(
 
     except NotFoundException as e:
         raise HTTPException(  # noqa: B904
-            status_code=status.HTTP_404_NOT_FOUND,
+            status_code=http_status.HTTP_404_NOT_FOUND,
             detail=str(e),
         )
     except ForbiddenException as e:
         raise HTTPException(  # noqa: B904
-            status_code=status.HTTP_403_FORBIDDEN,
+            status_code=http_status.HTTP_403_FORBIDDEN,
             detail=str(e),
         )
     except ValidationException as e:
         raise HTTPException(  # noqa: B904
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=http_status.HTTP_400_BAD_REQUEST,
             detail=str(e),
         )
 
 
 @router.delete(
     "/events/{event_id}",
-    status_code=status.HTTP_204_NO_CONTENT,
+    status_code=http_status.HTTP_204_NO_CONTENT,
     summary="Delete an event",
     description="Delete an event. Requires event creator or admin role.",
 )
@@ -455,12 +458,12 @@ async def delete_event(
         )
     except NotFoundException as e:
         raise HTTPException(  # noqa: B904
-            status_code=status.HTTP_404_NOT_FOUND,
+            status_code=http_status.HTTP_404_NOT_FOUND,
             detail=str(e),
         )
     except ForbiddenException as e:
         raise HTTPException(  # noqa: B904
-            status_code=status.HTTP_403_FORBIDDEN,
+            status_code=http_status.HTTP_403_FORBIDDEN,
             detail=str(e),
         )
 
@@ -468,7 +471,7 @@ async def delete_event(
 @router.post(
     "/events/{event_id}/register",
     response_model=EventRegistrationResponse,
-    status_code=status.HTTP_201_CREATED,
+    status_code=http_status.HTTP_201_CREATED,
     summary="Register for an event",
     description="Register the current user for an event. "
     "Will be added to waitlist if event is at capacity.",
@@ -501,29 +504,29 @@ async def register_for_event(
             event_id=registration.event_id,
             user_id=registration.user_id,
             status=registration.status,
-            registered_at=registration.created_at,
+            registered_at=registration.registered_at,
         )
 
     except NotFoundException as e:
         raise HTTPException(  # noqa: B904
-            status_code=status.HTTP_404_NOT_FOUND,
+            status_code=http_status.HTTP_404_NOT_FOUND,
             detail=str(e),
         )
     except ForbiddenException as e:
         raise HTTPException(  # noqa: B904
-            status_code=status.HTTP_403_FORBIDDEN,
+            status_code=http_status.HTTP_403_FORBIDDEN,
             detail=str(e),
         )
     except ConflictException as e:
         raise HTTPException(  # noqa: B904
-            status_code=status.HTTP_409_CONFLICT,
+            status_code=http_status.HTTP_409_CONFLICT,
             detail=str(e),
         )
 
 
 @router.delete(
     "/events/{event_id}/register",
-    status_code=status.HTTP_204_NO_CONTENT,
+    status_code=http_status.HTTP_204_NO_CONTENT,
     summary="Unregister from an event",
     description="Unregister the current user from an event. "
     "If user is registered, next waitlisted user will be auto-promoted.",
@@ -550,7 +553,7 @@ async def unregister_from_event(
         )
     except NotFoundException as e:
         raise HTTPException(  # noqa: B904
-            status_code=status.HTTP_404_NOT_FOUND,
+            status_code=http_status.HTTP_404_NOT_FOUND,
             detail=str(e),
         )
 
@@ -607,7 +610,7 @@ async def list_event_participants(
                         email=user.email,
                         full_name=user.full_name,
                         status=registration.status,
-                        registered_at=registration.created_at,
+                        registered_at=registration.registered_at,
                     )
                 )
 
@@ -615,6 +618,6 @@ async def list_event_participants(
 
     except NotFoundException as e:
         raise HTTPException(  # noqa: B904
-            status_code=status.HTTP_404_NOT_FOUND,
+            status_code=http_status.HTTP_404_NOT_FOUND,
             detail=str(e),
         )

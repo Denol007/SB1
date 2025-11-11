@@ -108,7 +108,7 @@ class EventService:
                 detail="You must be a member of this community to create events",
             )
 
-        if membership.role not in (MembershipRole.MODERATOR.value, MembershipRole.ADMIN.value):
+        if membership.role not in (MembershipRole.MODERATOR, MembershipRole.ADMIN):
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Only moderators and admins can create events",
@@ -190,8 +190,8 @@ class EventService:
 
         is_creator = event.creator_id == user_id
         is_moderator_or_admin = membership and membership.role in (
-            MembershipRole.MODERATOR.value,
-            MembershipRole.ADMIN.value,
+            MembershipRole.MODERATOR,
+            MembershipRole.ADMIN,
         )
 
         if not (is_creator or is_moderator_or_admin):
@@ -242,7 +242,7 @@ class EventService:
         )
 
         is_creator = event.creator_id == user_id
-        is_admin = membership and membership.role == MembershipRole.ADMIN.value
+        is_admin = membership and membership.role == MembershipRole.ADMIN
 
         if not (is_creator or is_admin):
             raise HTTPException(
@@ -469,8 +469,8 @@ class EventService:
 
         is_creator = event.creator_id == user_id
         is_moderator_or_admin = membership and membership.role in (
-            MembershipRole.MODERATOR.value,
-            MembershipRole.ADMIN.value,
+            MembershipRole.MODERATOR,
+            MembershipRole.ADMIN,
         )
 
         if not (is_creator or is_moderator_or_admin):
