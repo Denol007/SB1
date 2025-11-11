@@ -675,15 +675,27 @@ description: "Task list for StudyBuddy platform implementation"
   - All 5 integration tests passing
   - All 63 post-related tests passing (unit + schema + integration)
 
-- [ ] T134 [US3] Create `app/api/v1/endpoints/comments.py`
-  - `GET /api/v1/posts/{post_id}/comments` - List
-  - `POST /api/v1/posts/{post_id}/comments` - Create
-  - `PATCH /api/v1/comments/{comment_id}` - Update
-  - `DELETE /api/v1/comments/{comment_id}` - Delete
+- [x] T134 [US3] Create `app/api/v1/endpoints/comments.py` ✅
+  - `GET /api/v1/posts/{post_id}/comments` - List with pagination
+  - `POST /api/v1/posts/{post_id}/comments` - Create (with optional parent_id for threading)
+  - `PATCH /api/v1/comments/{comment_id}` - Update (author only)
+  - `DELETE /api/v1/comments/{comment_id}` - Delete (author or community moderator+)
+  - Implemented proper permission checks using community membership roles
+  - All 12 integration tests passing
+  - E2E test (test_post_creation_flow) now passing
 
-- [ ] T135 [US3] Update router to include posts and comments
+- [x] T135 [US3] Update router to include posts and comments ✅
+  - Comments router already included in app/api/v1/router.py (completed in T134)
+  - All endpoints accessible and tested
 
 **Checkpoint**: US3 complete - Social feed functional ✅
+
+- 9 post endpoints implemented (CRUD, reactions, pinning)
+- 4 comment endpoints implemented (CRUD with threading)
+- 12 integration tests passing (comments)
+- 5 integration tests passing (posts)
+- 1 E2E test passing (complete post creation flow)
+- Total: 87 tests passing for User Story 3
 
 ---
 
