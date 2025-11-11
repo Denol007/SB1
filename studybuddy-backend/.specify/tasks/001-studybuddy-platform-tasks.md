@@ -716,7 +716,17 @@ description: "Task list for StudyBuddy platform implementation"
   - Support for event types, statuses, timing, capacity limits
   - Realistic fake data generation with Faker
 
-- [ ] T137 [P] [US4] Unit tests: `test_event_service.py`
+- [x] T137 [P] [US4] Unit tests: `test_event_service.py` ✅
+  - 26 unit tests for EventService (TDD - tests written FIRST, service not yet implemented)
+  - Event creation (5 tests): valid data, moderator check, membership check, time validations
+  - Event updates (4 tests): creator/moderator permissions, not found handling
+  - Event deletion (3 tests): creator/admin permissions, permission checks
+  - Event registration (6 tests): capacity handling, waitlist, unlimited events, validation
+  - Event unregistration (3 tests): waitlist auto-promotion, empty waitlist, not registered
+  - Get participants (2 tests): registered and waitlisted lists
+  - Status changes (3 tests): permissions, status transition validation
+  - All tests currently skip (awaiting EventService implementation - T147)
+
 - [ ] T138 [P] [US4] Integration tests: `test_event_endpoints.py`
 - [ ] T139 [US4] E2E test: `test_event_registration_flow.py`
 
