@@ -738,7 +738,19 @@ description: "Task list for StudyBuddy platform implementation"
   - Status changes (1 test): change event status
   - All tests currently skip (awaiting Event/EventRegistration models and endpoints - T143-T149)
 
-- [ ] T139 [US4] E2E test: `test_event_registration_flow.py`
+- [x] T139 [US4] E2E test: `test_event_registration_flow.py` ✅
+  - Complete end-to-end test for event management lifecycle (TDD - test written FIRST)
+  - 14-step comprehensive flow testing event system integration:
+    - Step 1-2: Moderator creates event with capacity limit, retrieve details
+    - Step 3-4: 3 users register (fill capacity), 2 more users waitlisted
+    - Step 5: Retrieve participant lists (registered + waitlisted)
+    - Step 6-7: User unregisters, waitlist auto-promotion verified
+    - Step 8-9: Moderator updates event, permission checks (non-moderator blocked)
+    - Step 10-11: Event cancelled, registration blocked for cancelled event
+    - Step 12-14: List community events, delete event, verify soft delete (404)
+  - Tests complete user story: create → register → capacity → waitlist → update → cancel → delete
+  - Validates permissions: moderator-only create/update/delete, member registration
+  - Currently skips (awaiting Event/EventRegistration models - T143-T144, T149)
 
 ### Domain Models for User Story 4
 
