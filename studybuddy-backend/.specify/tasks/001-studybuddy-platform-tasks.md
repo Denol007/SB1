@@ -905,7 +905,7 @@ description: "Task list for StudyBuddy platform implementation"
 
 ### Tests for User Story 5
 
-- [ ] T151 [P] [US5] Factories: `chat_factory.py`, `message_factory.py`
+- [x] T151 [P] [US5] Factories: `chat_factory.py`, `message_factory.py` ✅ Commit: 714aaf8
 - [ ] T152 [P] [US5] Unit tests: `test_chat_service.py`
 - [ ] T153 [P] [US5] Integration tests: `test_chat_endpoints.py`
 - [ ] T154 [P] [US5] WebSocket tests: `test_chat_websocket.py`
