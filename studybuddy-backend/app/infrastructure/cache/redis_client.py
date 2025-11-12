@@ -52,8 +52,7 @@ class RedisClient:
         Returns:
             True if successful, None otherwise.
         """
-        result = await self.client.set(key, value, ex=ttl)
-        return cast(bool | None, result)
+        return await self.client.set(key, value, ex=ttl)  # type: ignore[no-any-return]
 
     async def setex(self, key: str, seconds: int, value: str | int) -> bool | None:
         """Set value with expiration time.
@@ -78,8 +77,7 @@ class RedisClient:
         Returns:
             The new value after incrementing.
         """
-        result = await self.client.incr(key)
-        return cast(int, result)
+        return await self.client.incr(key)  # type: ignore[no-any-return]
 
     async def ttl(self, key: str) -> int:
         """Get time to live for key.
@@ -90,8 +88,7 @@ class RedisClient:
         Returns:
             TTL in seconds, -1 if no expiry, -2 if key doesn't exist.
         """
-        result = await self.client.ttl(key)
-        return cast(int, result)
+        return await self.client.ttl(key)  # type: ignore[no-any-return]
 
     async def delete(self, key: str) -> int:
         """Delete key from Redis.
@@ -102,8 +99,7 @@ class RedisClient:
         Returns:
             Number of keys deleted (0 or 1).
         """
-        result = await self.client.delete(key)
-        return cast(int, result)
+        return await self.client.delete(key)  # type: ignore[no-any-return]
 
     async def ping(self) -> bool:
         """Ping Redis to check connection.
@@ -111,8 +107,7 @@ class RedisClient:
         Returns:
             True if connection is alive, False otherwise.
         """
-        result = await self.client.ping()
-        return cast(bool, result)
+        return await self.client.ping()  # type: ignore[no-any-return]
 
     async def close(self) -> None:
         """Close Redis connection."""
