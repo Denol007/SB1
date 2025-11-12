@@ -112,14 +112,21 @@ class EventService:
         if membership.role not in (MembershipRole.MODERATOR, MembershipRole.ADMIN):
             raise ForbiddenException("Only moderators and admins can create events")
 
-        # Validate start_time is in the future
+        # Get and validate required datetime fields
         start_time = event_data.get("start_time")
-        if start_time and start_time <= datetime.now(UTC):
+        end_time = event_data.get("end_time")
+
+        if not start_time:
+            raise BadRequestException("Event start time is required")
+        if not end_time:
+            raise BadRequestException("Event end time is required")
+
+        # Validate start_time is in the future
+        if start_time <= datetime.now(UTC):
             raise BadRequestException("Event start time must be in the future")
 
         # Validate end_time is after start_time
-        end_time = event_data.get("end_time")
-        if start_time and end_time and end_time <= start_time:
+        if end_time <= start_time:
             raise BadRequestException("Event end time must be after start time")
 
         # Create the event
@@ -366,13 +373,14 @@ class EventService:
     async def get_event_participants(
         self,
         event_id: UUID,
-        status: str = "registered",
+        status: str | None = None,
     ) -> list[EventRegistration]:
         """Get participants for an event by status.
 
         Args:
             event_id: UUID of the event.
             status: Registration status filter (registered, waitlisted, attended, no_show).
+                    If None, returns all participants regardless of status.
 
         Returns:
             List of EventRegistration instances.

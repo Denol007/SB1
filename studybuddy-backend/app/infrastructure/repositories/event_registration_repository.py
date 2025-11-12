@@ -13,6 +13,7 @@ from app.application.interfaces.event_registration_repository import (
     EventRegistrationRepository,
 )
 from app.core.exceptions import ConflictException
+from app.domain.enums.registration_status import RegistrationStatus
 from app.infrastructure.database.models.event_registration import EventRegistration
 
 
@@ -138,7 +139,7 @@ class SQLAlchemyEventRegistrationRepository(EventRegistrationRepository):
         if not registration:
             raise ValueError(f"Registration {registration_id} not found")
 
-        registration.status = status
+        registration.status = RegistrationStatus(status)
         await self.session.commit()
         await self.session.refresh(registration)
         return registration

@@ -15,6 +15,7 @@ Permissions:
 - Users can unregister from events they're registered for
 """
 
+from typing import Any
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -369,7 +370,7 @@ async def update_event(
     """
     try:
         # Build update dict
-        update_data = {}
+        update_data: dict[str, Any] = {}
         if event_data.title is not None:
             update_data["title"] = event_data.title
         if event_data.description is not None:
