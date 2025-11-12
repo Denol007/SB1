@@ -149,7 +149,7 @@ class CacheService:
             ...     user = await cache.get("user:123")
         """
         result = await self.redis_client.client.exists(key)
-        return result > 0  # type: ignore[no-any-return]
+        return result > 0
 
     async def expire(self, key: str, ttl: int) -> bool:
         """Set TTL on existing key.
@@ -164,4 +164,4 @@ class CacheService:
         Example:
             >>> success = await cache.expire("user:123", 3600)
         """
-        return await self.redis_client.client.expire(key, ttl)  # type: ignore[no-any-return]
+        return await self.redis_client.client.expire(key, ttl)
