@@ -4,7 +4,7 @@ This module provides async Redis client with connection pooling.
 Follows singleton pattern to reuse connections across the application.
 """
 
-from typing import Optional
+from typing import Optional, cast
 
 from redis import asyncio as aioredis
 
@@ -38,7 +38,8 @@ class RedisClient:
         Returns:
             The cached value or None if not found.
         """
-        return await self.client.get(key)
+        result = await self.client.get(key)
+        return cast(str | None, result)
 
     async def set(self, key: str, value: str, ttl: int | None = None) -> bool | None:
         """Set value in Redis with optional TTL.
@@ -51,7 +52,8 @@ class RedisClient:
         Returns:
             True if successful, None otherwise.
         """
-        return await self.client.set(key, value, ex=ttl)
+        result = await self.client.set(key, value, ex=ttl)
+        return cast(bool | None, result)
 
     async def setex(self, key: str, seconds: int, value: str | int) -> bool | None:
         """Set value with expiration time.
@@ -64,7 +66,8 @@ class RedisClient:
         Returns:
             True if successful, None otherwise.
         """
-        return await self.client.setex(key, seconds, str(value))
+        result = await self.client.setex(key, seconds, str(value))
+        return cast(bool | None, result)
 
     async def incr(self, key: str) -> int:
         """Increment value by 1.
@@ -75,7 +78,8 @@ class RedisClient:
         Returns:
             The new value after incrementing.
         """
-        return await self.client.incr(key)
+        result = await self.client.incr(key)
+        return cast(int, result)
 
     async def ttl(self, key: str) -> int:
         """Get time to live for key.
@@ -86,7 +90,8 @@ class RedisClient:
         Returns:
             TTL in seconds, -1 if no expiry, -2 if key doesn't exist.
         """
-        return await self.client.ttl(key)
+        result = await self.client.ttl(key)
+        return cast(int, result)
 
     async def delete(self, key: str) -> int:
         """Delete key from Redis.
@@ -97,7 +102,8 @@ class RedisClient:
         Returns:
             Number of keys deleted (0 or 1).
         """
-        return await self.client.delete(key)
+        result = await self.client.delete(key)
+        return cast(int, result)
 
     async def ping(self) -> bool:
         """Ping Redis to check connection.
@@ -105,7 +111,8 @@ class RedisClient:
         Returns:
             True if connection is alive, False otherwise.
         """
-        return await self.client.ping()
+        result = await self.client.ping()
+        return cast(bool, result)
 
     async def close(self) -> None:
         """Close Redis connection."""

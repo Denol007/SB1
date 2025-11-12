@@ -13,6 +13,7 @@ Usage:
 """
 
 from datetime import UTC, datetime, timedelta
+from typing import Any, cast
 
 import bcrypt
 from jose import JWTError, jwt
@@ -89,7 +90,7 @@ def create_refresh_token(user_id: str) -> str:
     return encoded_jwt
 
 
-def verify_token(token: str, expected_type: str | None = None) -> dict:
+def verify_token(token: str, expected_type: str | None = None) -> dict[Any, Any]:
     """Verify and decode a JWT token.
 
     Args:
@@ -130,7 +131,7 @@ def verify_token(token: str, expected_type: str | None = None) -> dict:
                     f"Invalid token type. Expected '{expected_type}', got '{token_type}'"
                 )
 
-        return payload
+        return cast(dict[Any, Any], payload)
 
     except JWTError as e:
         # Re-raise JWTError for expired, invalid signature, etc.

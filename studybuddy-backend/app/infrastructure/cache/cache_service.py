@@ -9,7 +9,7 @@ with convenient methods for caching operations including:
 """
 
 import json
-from typing import Any
+from typing import Any, cast
 
 from app.infrastructure.cache.redis_client import RedisClient
 
@@ -149,7 +149,7 @@ class CacheService:
             ...     user = await cache.get("user:123")
         """
         result = await self.redis_client.client.exists(key)
-        return result > 0
+        return cast(bool, result > 0)
 
     async def expire(self, key: str, ttl: int) -> bool:
         """Set TTL on existing key.
@@ -164,4 +164,5 @@ class CacheService:
         Example:
             >>> success = await cache.expire("user:123", 3600)
         """
-        return await self.redis_client.client.expire(key, ttl)
+        result = await self.redis_client.client.expire(key, ttl)
+        return cast(bool, result)
