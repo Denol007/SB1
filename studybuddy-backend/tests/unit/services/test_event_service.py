@@ -20,8 +20,13 @@ from unittest.mock import AsyncMock, MagicMock
 from uuid import uuid4
 
 import pytest
-from fastapi import HTTPException
 
+from app.core.exceptions import (
+    BadRequestException,
+    ConflictException,
+    ForbiddenException,
+    NotFoundException,
+)
 from app.domain.enums.membership_role import MembershipRole
 
 
@@ -204,13 +209,12 @@ class TestCreateEvent:
         }
 
         # Act & Assert
-        with pytest.raises(HTTPException) as exc_info:
+        with pytest.raises(ForbiddenException):
             await event_service.create_event(
                 user_id=user_id,
                 community_id=community_id,
                 event_data=event_data,
             )
-        assert exc_info.value.status_code == 403
 
     @pytest.mark.asyncio
     async def test_fails_if_user_not_member(
@@ -234,13 +238,12 @@ class TestCreateEvent:
         }
 
         # Act & Assert
-        with pytest.raises(HTTPException) as exc_info:
+        with pytest.raises(ForbiddenException):
             await event_service.create_event(
                 user_id=user_id,
                 community_id=community_id,
                 event_data=event_data,
             )
-        assert exc_info.value.status_code == 403
 
     @pytest.mark.asyncio
     async def test_validates_start_time_in_future(
@@ -266,13 +269,12 @@ class TestCreateEvent:
         }
 
         # Act & Assert
-        with pytest.raises(HTTPException) as exc_info:
+        with pytest.raises(BadRequestException):
             await event_service.create_event(
                 user_id=creator_id,
                 community_id=community_id,
                 event_data=event_data,
             )
-        assert exc_info.value.status_code == 400
 
     @pytest.mark.asyncio
     async def test_validates_end_time_after_start(
@@ -299,13 +301,12 @@ class TestCreateEvent:
         }
 
         # Act & Assert
-        with pytest.raises(HTTPException) as exc_info:
+        with pytest.raises(BadRequestException):
             await event_service.create_event(
                 user_id=creator_id,
                 community_id=community_id,
                 event_data=event_data,
             )
-        assert exc_info.value.status_code == 400
 
 
 # ============================================================================
@@ -401,13 +402,12 @@ class TestUpdateEvent:
         update_data = {"title": "Updated Title"}
 
         # Act & Assert
-        with pytest.raises(HTTPException) as exc_info:
+        with pytest.raises(ForbiddenException):
             await event_service.update_event(
                 event_id=event_id,
                 user_id=user_id,
                 update_data=update_data,
             )
-        assert exc_info.value.status_code == 403
 
     @pytest.mark.asyncio
     async def test_fails_if_event_not_found(
@@ -424,13 +424,12 @@ class TestUpdateEvent:
         update_data = {"title": "Updated Title"}
 
         # Act & Assert
-        with pytest.raises(HTTPException) as exc_info:
+        with pytest.raises(NotFoundException):
             await event_service.update_event(
                 event_id=event_id,
                 user_id=user_id,
                 update_data=update_data,
             )
-        assert exc_info.value.status_code == 404
 
 
 # ============================================================================
@@ -464,7 +463,7 @@ class TestDeleteEvent:
         await event_service.delete_event(event_id=event_id, user_id=creator_id)
 
         # Assert
-        mock_event_repository.delete.assert_called_once_with(event_id=event_id)
+        mock_event_repository.delete.assert_called_once_with(event_id)
 
     @pytest.mark.asyncio
     async def test_deletes_event_as_admin(
@@ -487,7 +486,7 @@ class TestDeleteEvent:
         await event_service.delete_event(event_id=event_id, user_id=user_id)
 
         # Assert
-        mock_event_repository.delete.assert_called_once_with(event_id=event_id)
+        mock_event_repository.delete.assert_called_once_with(event_id)
 
     @pytest.mark.asyncio
     async def test_fails_if_not_creator_or_admin(
@@ -507,9 +506,8 @@ class TestDeleteEvent:
         )
 
         # Act & Assert
-        with pytest.raises(HTTPException) as exc_info:
+        with pytest.raises(ForbiddenException):
             await event_service.delete_event(event_id=event_id, user_id=user_id)
-        assert exc_info.value.status_code == 403
 
 
 # ============================================================================
@@ -540,7 +538,7 @@ class TestRegisterForEvent:
         mock_membership_repository.get_by_user_and_community.return_value = MagicMock(
             role=MembershipRole.MEMBER
         )
-        mock_event_registration_repository.get_by_user_and_event.return_value = None
+        mock_event_registration_repository.get_by_event_and_user.return_value = None
         mock_event_registration_repository.count_by_event_and_status.return_value = 25
         mock_event_registration_repository.create.return_value = sample_registration
 
@@ -572,7 +570,7 @@ class TestRegisterForEvent:
         mock_membership_repository.get_by_user_and_community.return_value = MagicMock(
             role=MembershipRole.MEMBER
         )
-        mock_event_registration_repository.get_by_user_and_event.return_value = None
+        mock_event_registration_repository.get_by_event_and_user.return_value = None
         mock_event_registration_repository.count_by_event_and_status.return_value = 50
         waitlist_registration = MagicMock(
             id=uuid4(),
@@ -611,7 +609,7 @@ class TestRegisterForEvent:
         mock_membership_repository.get_by_user_and_community.return_value = MagicMock(
             role=MembershipRole.MEMBER
         )
-        mock_event_registration_repository.get_by_user_and_event.return_value = None
+        mock_event_registration_repository.get_by_event_and_user.return_value = None
         mock_event_registration_repository.create.return_value = sample_registration
 
         # Act
@@ -641,15 +639,14 @@ class TestRegisterForEvent:
         mock_membership_repository.get_by_user_and_community.return_value = MagicMock(
             role=MembershipRole.MEMBER
         )
-        mock_event_registration_repository.get_by_user_and_event.return_value = sample_registration
+        mock_event_registration_repository.get_by_event_and_user.return_value = sample_registration
 
         # Act & Assert
-        with pytest.raises(HTTPException) as exc_info:
+        with pytest.raises(ConflictException):
             await event_service.register_for_event(
                 event_id=event_id,
                 user_id=user_id,
             )
-        assert exc_info.value.status_code == 409
 
     @pytest.mark.asyncio
     async def test_fails_if_not_community_member(
@@ -667,12 +664,11 @@ class TestRegisterForEvent:
         mock_membership_repository.get_by_user_and_community.return_value = None
 
         # Act & Assert
-        with pytest.raises(HTTPException) as exc_info:
+        with pytest.raises(ForbiddenException):
             await event_service.register_for_event(
                 event_id=event_id,
                 user_id=user_id,
             )
-        assert exc_info.value.status_code == 403
 
     @pytest.mark.asyncio
     async def test_fails_if_event_completed(
@@ -693,12 +689,11 @@ class TestRegisterForEvent:
         )
 
         # Act & Assert
-        with pytest.raises(HTTPException) as exc_info:
+        with pytest.raises(BadRequestException):
             await event_service.register_for_event(
                 event_id=event_id,
                 user_id=user_id,
             )
-        assert exc_info.value.status_code == 400
 
 
 # ============================================================================
@@ -725,7 +720,7 @@ class TestUnregisterFromEvent:
         """Test that unregister_from_event removes user and promotes from waitlist."""
         # Arrange
         mock_event_repository.get_by_id.return_value = sample_event
-        mock_event_registration_repository.get_by_user_and_event.return_value = sample_registration
+        mock_event_registration_repository.get_by_event_and_user.return_value = sample_registration
         waitlisted_user = MagicMock(
             id=uuid4(),
             event_id=event_id,
@@ -733,7 +728,7 @@ class TestUnregisterFromEvent:
             status="waitlisted",
             registered_at=datetime.now(UTC),
         )
-        mock_event_registration_repository.get_next_waitlisted.return_value = waitlisted_user
+        mock_event_registration_repository.get_first_waitlisted.return_value = waitlisted_user
 
         # Act
         await event_service.unregister_from_event(
@@ -743,11 +738,12 @@ class TestUnregisterFromEvent:
 
         # Assert
         mock_event_registration_repository.delete.assert_called_once_with(
-            registration_id=sample_registration.id
+            event_id=event_id,
+            user_id=user_id,
         )
-        mock_event_registration_repository.update.assert_called_once_with(
+        mock_event_registration_repository.update_status.assert_called_once_with(
             registration_id=waitlisted_user.id,
-            update_data={"status": "registered"},
+            status="registered",
         )
 
     @pytest.mark.asyncio
@@ -764,8 +760,8 @@ class TestUnregisterFromEvent:
         """Test that unregister_from_event works when waitlist is empty."""
         # Arrange
         mock_event_repository.get_by_id.return_value = sample_event
-        mock_event_registration_repository.get_by_user_and_event.return_value = sample_registration
-        mock_event_registration_repository.get_next_waitlisted.return_value = None
+        mock_event_registration_repository.get_by_event_and_user.return_value = sample_registration
+        mock_event_registration_repository.get_first_waitlisted.return_value = None
 
         # Act
         await event_service.unregister_from_event(
@@ -790,15 +786,14 @@ class TestUnregisterFromEvent:
         """Test that unregister_from_event fails if user not registered."""
         # Arrange
         mock_event_repository.get_by_id.return_value = sample_event
-        mock_event_registration_repository.get_by_user_and_event.return_value = None
+        mock_event_registration_repository.get_by_event_and_user.return_value = None
 
         # Act & Assert
-        with pytest.raises(HTTPException) as exc_info:
+        with pytest.raises(NotFoundException):
             await event_service.unregister_from_event(
                 event_id=event_id,
                 user_id=user_id,
             )
-        assert exc_info.value.status_code == 404
 
 
 # ============================================================================
@@ -833,7 +828,7 @@ class TestGetEventParticipants:
             )
             for _ in range(3)
         ]
-        mock_event_registration_repository.list_by_event_and_status.return_value = participants
+        mock_event_registration_repository.list_by_event.return_value = participants
 
         # Act
         result = await event_service.get_event_participants(
@@ -843,7 +838,7 @@ class TestGetEventParticipants:
 
         # Assert
         assert len(result) == 3
-        mock_event_registration_repository.list_by_event_and_status.assert_called_once_with(
+        mock_event_registration_repository.list_by_event.assert_called_once_with(
             event_id=event_id,
             status="registered",
         )
@@ -870,7 +865,7 @@ class TestGetEventParticipants:
             )
             for _ in range(2)
         ]
-        mock_event_registration_repository.list_by_event_and_status.return_value = waitlist
+        mock_event_registration_repository.list_by_event.return_value = waitlist
 
         # Act
         result = await event_service.get_event_participants(
@@ -939,13 +934,12 @@ class TestChangeEventStatus:
         )
 
         # Act & Assert
-        with pytest.raises(HTTPException) as exc_info:
+        with pytest.raises(ForbiddenException):
             await event_service.change_event_status(
                 event_id=event_id,
                 user_id=user_id,
                 new_status="cancelled",
             )
-        assert exc_info.value.status_code == 403
 
     @pytest.mark.asyncio
     async def test_validates_status_transition(
@@ -966,10 +960,9 @@ class TestChangeEventStatus:
         )
 
         # Act & Assert - cannot change completed event to published
-        with pytest.raises(HTTPException) as exc_info:
+        with pytest.raises(BadRequestException):
             await event_service.change_event_status(
                 event_id=event_id,
                 user_id=creator_id,
                 new_status="published",
             )
-        assert exc_info.value.status_code == 400
