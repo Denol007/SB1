@@ -31,7 +31,9 @@ from app.main import app
 class TestCommunityCreationFlow:
     """End-to-end test for complete community creation and management flow."""
 
-    async def test_complete_community_creation_flow(self, db_session, test_user, another_user):
+    async def test_complete_community_creation_flow(
+        self, db_session, test_user, another_user, auth_headers
+    ):
         """Test complete flow: Create → Configure → Add members → Sub-community → Manage roles.
 
         This E2E test validates the entire community management journey:
@@ -46,6 +48,7 @@ class TestCommunityCreationFlow:
             db_session: Database session fixture.
             test_user: Primary test user (will be community creator/admin).
             another_user: Secondary test user (will be added as member/moderator).
+            auth_headers: Fixture to create JWT auth headers.
 
         Expected behavior:
             - Community created successfully with creator as admin
@@ -56,13 +59,9 @@ class TestCommunityCreationFlow:
             - Permission enforcement works across hierarchy
         """
         async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
-            # Generate auth token for test_user (community creator)
-            creator_token = f"test-token-{test_user.id}"
-            creator_headers = {"Authorization": f"Bearer {creator_token}"}
-
-            # Generate auth token for another_user
-            member_token = f"test-token-{another_user.id}"
-            member_headers = {"Authorization": f"Bearer {member_token}"}
+            # Generate auth headers with real JWT tokens
+            creator_headers = auth_headers(test_user.id)
+            member_headers = auth_headers(another_user.id)
 
             # ========== Step 1: Create University Community ==========
             community_data = {
@@ -246,7 +245,9 @@ class TestCommunityCreationFlow:
             error = last_admin_leave_response.json()
             assert "last admin" in error["detail"].lower()
 
-    async def test_community_visibility_enforcement(self, db_session, test_user, another_user):
+    async def test_community_visibility_enforcement(
+        self, db_session, test_user, another_user, auth_headers
+    ):
         """Test that visibility settings properly control access.
 
         Validates:
@@ -258,13 +259,11 @@ class TestCommunityCreationFlow:
             db_session: Database session fixture.
             test_user: Community creator.
             another_user: Non-member attempting access.
+            auth_headers: Fixture to create JWT auth headers.
         """
         async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
-            creator_token = f"test-token-{test_user.id}"
-            creator_headers = {"Authorization": f"Bearer {creator_token}"}
-
-            non_member_token = f"test-token-{another_user.id}"
-            non_member_headers = {"Authorization": f"Bearer {non_member_token}"}
+            creator_headers = auth_headers(test_user.id)
+            non_member_headers = auth_headers(another_user.id)
 
             # ========== Create Public Community ==========
             public_community = {
@@ -328,8 +327,8 @@ class TestCommunityCreationFlow:
             )
             assert private_join_response.status_code == 403
 
-    async def test_hierarchical_community_structure(self, db_session, test_user):
-        """Test creation and management of hierarchical community structures.
+    async def test_hierarchical_community_structure(self, db_session, test_user, auth_headers):
+        """Test creation and management of nested sub-communities.
 
         Validates:
         - Sub-communities can be created under parent communities
@@ -339,10 +338,10 @@ class TestCommunityCreationFlow:
         Args:
             db_session: Database session fixture.
             test_user: Community creator.
+            auth_headers: Fixture to create JWT auth headers.
         """
         async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
-            token = f"test-token-{test_user.id}"
-            headers = {"Authorization": f"Bearer {token}"}
+            headers = auth_headers(test_user.id)
 
             # ========== Create Parent Community ==========
             parent_data = {
@@ -420,7 +419,9 @@ class TestCommunityCreationFlow:
             # Should return parent + 3 departments + 1 nested = 5 total
             assert len(communities) >= 5
 
-    async def test_verification_requirement_enforcement(self, db_session, test_user, another_user):
+    async def test_verification_requirement_enforcement(
+        self, db_session, test_user, another_user, auth_headers
+    ):
         """Test that verification requirements are properly enforced.
 
         Validates:
@@ -432,13 +433,11 @@ class TestCommunityCreationFlow:
             db_session: Database session fixture.
             test_user: Verified user (community creator).
             another_user: Unverified user attempting to join.
+            auth_headers: Fixture to create JWT auth headers.
         """
         async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
-            creator_token = f"test-token-{test_user.id}"
-            creator_headers = {"Authorization": f"Bearer {creator_token}"}
-
-            unverified_token = f"test-token-{another_user.id}"
-            unverified_headers = {"Authorization": f"Bearer {unverified_token}"}
+            creator_headers = auth_headers(test_user.id)
+            unverified_headers = auth_headers(another_user.id)
 
             # ========== Create Verification-Required Community ==========
             verified_community = {
