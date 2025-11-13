@@ -247,7 +247,7 @@ class TestUpdateCommunity:
 
         # Assert
         assert result == updated_community
-        mock_community_repository.update.assert_called_once_with(community_id, update_data)
+        mock_community_repository.update.assert_called_once_with(community_id, **update_data)
 
     @pytest.mark.asyncio
     async def test_raises_forbidden_when_user_not_admin(

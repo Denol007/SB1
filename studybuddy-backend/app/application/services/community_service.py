@@ -189,7 +189,7 @@ class CommunityService:
             )
 
         # Perform update
-        updated_community = await self.community_repository.update(community_id, data)
+        updated_community = await self.community_repository.update(community_id, **data)
         if not updated_community:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
