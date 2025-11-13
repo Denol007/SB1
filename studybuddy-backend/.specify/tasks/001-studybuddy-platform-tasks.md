@@ -912,7 +912,15 @@ description: "Task list for StudyBuddy platform implementation"
   - Message sending (text + attachments), deletion, read receipts
   - Participant management, message history, search
   - All tests skip until service implementation (TDD)
-- [ ] T153 [P] [US5] Integration tests: `test_chat_endpoints.py`
+- [x] T153 [P] [US5] Integration tests: `test_chat_endpoints.py` ✅
+  - 22 integration tests for Chat REST API endpoints
+  - TestChatEndpoints: direct/group chat creation, validation, retrieval (8 tests)
+  - TestMessageEndpoints: send/delete messages, pagination, attachments (7 tests)
+  - TestReadReceipts: mark as read, get receipts (2 tests)
+  - TestGroupChatManagement: add/remove participants (3 tests)
+  - TestMessageSearch: search messages with access control (2 tests)
+  - Tests use AsyncClient, real database, proper authentication
+  - All tests will fail until endpoints are implemented (TDD)
 - [ ] T154 [P] [US5] WebSocket tests: `test_chat_websocket.py`
 - [ ] T155 [US5] E2E test: `test_messaging_flow.py`
 
