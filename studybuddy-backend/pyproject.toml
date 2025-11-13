@@ -180,9 +180,6 @@ testpaths = ["tests"]
 pythonpath = ["."]
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
-env = [
-    "DATABASE_URL=postgresql+asyncpg://studybuddy:studybuddy_dev@localhost:5432/studybuddy_test",
-]
 markers = [
     "asyncio: Mark test as async",
     "unit: Unit tests",
