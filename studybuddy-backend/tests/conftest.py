@@ -1,5 +1,6 @@
 """Pytest configuration and fixtures for StudyBuddy tests."""
 
+import asyncio
 import os
 from collections.abc import Callable
 from uuid import UUID, uuid4
@@ -10,6 +11,17 @@ from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import NullPool
+
+# Set event loop policy for consistent async behavior across tests
+if os.name == "nt":  # Windows
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+else:  # Unix/Linux/Mac
+    try:
+        import uvloop
+
+        asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
+    except ImportError:
+        pass  # Use default policy if uvloop not available
 
 # Disable rate limiting for tests BEFORE importing app modules
 os.environ["RATE_LIMIT_ENABLED"] = "false"
@@ -33,6 +45,13 @@ from app.main import app
 TEST_DATABASE_URL = os.getenv(
     "DATABASE_URL", "postgresql+asyncpg://studybuddy:studybuddy_dev@localhost:5432/studybuddy_test"
 )
+
+
+@pytest.fixture(scope="session")
+def event_loop_policy():
+    """Set event loop policy for the test session."""
+    policy = asyncio.get_event_loop_policy()
+    return policy
 
 
 @pytest.fixture(scope="session")
