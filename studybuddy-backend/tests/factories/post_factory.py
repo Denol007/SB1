@@ -128,8 +128,12 @@ class PostFactory(factory.Factory):
             >>> post = PostFactory.edited()
             >>> assert post['edited_at'] is not None
         """
+        from datetime import timedelta
+
         created_at = kwargs.pop("created_at", datetime.now(UTC))
-        edited_at = fake.date_time_between(start_date=created_at, end_date="now", tzinfo=UTC)
+        # Add 1 second to ensure edited_at is after created_at
+        start_date = created_at + timedelta(seconds=1)
+        edited_at = fake.date_time_between(start_date=start_date, end_date="now", tzinfo=UTC)
         return cls.build(created_at=created_at, edited_at=edited_at, **kwargs)
 
 

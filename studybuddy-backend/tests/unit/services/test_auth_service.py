@@ -69,18 +69,20 @@ class TestAuthService:
     @pytest.fixture
     def existing_user(self):
         """Sample existing user data."""
-        return {
-            "id": str(uuid4()),
-            "google_id": "google-oauth-id-12345",
-            "email": "student@university.edu",
-            "name": "John Doe",
-            "bio": None,
-            "avatar_url": "https://example.com/avatar.jpg",
-            "role": "prospective_student",
-            "created_at": datetime.now(UTC),
-            "updated_at": datetime.now(UTC),
-            "deleted_at": None,
-        }
+        from unittest.mock import MagicMock
+
+        user = MagicMock()
+        user.id = str(uuid4())
+        user.google_id = "google-oauth-id-12345"
+        user.email = "student@university.edu"
+        user.name = "John Doe"
+        user.bio = None
+        user.avatar_url = "https://example.com/avatar.jpg"
+        user.role = "prospective_student"
+        user.created_at = datetime.now(UTC)
+        user.updated_at = datetime.now(UTC)
+        user.deleted_at = None
+        return user
 
 
 class TestCreateUserFromGoogle(TestAuthService):
@@ -125,8 +127,8 @@ class TestCreateUserFromGoogle(TestAuthService):
         user = await auth_service.create_user_from_google(google_user_info)
 
         # Assert
-        assert user["id"] == existing_user["id"]
-        assert user["google_id"] == existing_user["google_id"]
+        assert user.id == existing_user.id
+        assert user.google_id == existing_user.google_id
         mock_user_repository.create.assert_not_called()
 
     @pytest.mark.asyncio
@@ -135,17 +137,20 @@ class TestCreateUserFromGoogle(TestAuthService):
     ):
         """Should link Google account to existing user with same email."""
         # Arrange
-        existing_user["google_id"] = None  # User exists but no Google link
+        from unittest.mock import MagicMock
+
+        existing_user.google_id = None  # User exists but no Google link
         mock_user_repository.get_by_google_id.return_value = None
         mock_user_repository.get_by_email.return_value = existing_user
-        updated_user = {**existing_user, "google_id": google_user_info["sub"]}
+        updated_user = MagicMock()
+        updated_user.google_id = google_user_info["sub"]
         mock_user_repository.update.return_value = updated_user
 
         # Act
         user = await auth_service.create_user_from_google(google_user_info)
 
         # Assert
-        assert user["google_id"] == google_user_info["sub"]
+        assert user.google_id == google_user_info["sub"]
         mock_user_repository.update.assert_called_once()
 
     @pytest.mark.asyncio
@@ -154,7 +159,7 @@ class TestCreateUserFromGoogle(TestAuthService):
     ):
         """Should raise ConflictException when email is taken by different Google account."""
         # Arrange
-        existing_user["google_id"] = "different-google-id"
+        existing_user.google_id = "different-google-id"
         mock_user_repository.get_by_google_id.return_value = None
         mock_user_repository.get_by_email.return_value = existing_user
 
@@ -162,7 +167,7 @@ class TestCreateUserFromGoogle(TestAuthService):
         with pytest.raises(ConflictException) as exc_info:
             await auth_service.create_user_from_google(google_user_info)
 
-        assert "already exists" in str(exc_info.value.detail).lower()
+        assert "already exists" in str(exc_info.value.message).lower()
 
     @pytest.mark.asyncio
     async def test_sets_default_role_to_prospective_student(

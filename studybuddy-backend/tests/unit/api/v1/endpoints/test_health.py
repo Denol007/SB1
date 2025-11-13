@@ -27,72 +27,102 @@ class TestReadinessCheck:
     """Tests for GET /api/v1/health/ready endpoint (readiness probe)."""
 
     @patch("app.api.v1.endpoints.health.get_redis_client")
-    @patch("app.api.v1.endpoints.health.get_db")
-    def test_readiness_check_healthy(self, mock_get_db, mock_get_redis_client):
+    def test_readiness_check_healthy(self, mock_get_redis_client):
         """Test readiness check when DB and Redis are healthy."""
+        from app.infrastructure.database.session import get_db
+
         # Mock database session
-        mock_db = AsyncMock(spec=AsyncSession)
-        mock_db.execute = AsyncMock()
-        mock_get_db.return_value.__aenter__ = AsyncMock(return_value=mock_db)
-        mock_get_db.return_value.__aexit__ = AsyncMock()
+        async def mock_get_db():
+            mock_db = AsyncMock(spec=AsyncSession)
+            mock_db.execute = AsyncMock()
+            yield mock_db
 
         # Mock Redis client
-        mock_redis = AsyncMock()
-        mock_redis.ping = AsyncMock(return_value=True)
-        mock_get_redis_client.return_value = mock_redis
+        async def mock_redis_client():
+            mock_redis = AsyncMock()
+            mock_redis.ping = AsyncMock(return_value=True)
+            return mock_redis
 
-        response = client.get("/api/v1/health/ready")
+        mock_get_redis_client.side_effect = mock_redis_client
 
-        assert response.status_code == 200
-        data = response.json()
-        assert data["status"] == "ready"
-        assert data["checks"]["database"] == "healthy"
-        assert data["checks"]["redis"] == "healthy"
+        # Override dependencies
+        app.dependency_overrides[get_db] = mock_get_db
+
+        try:
+            response = client.get("/api/v1/health/ready")
+
+            assert response.status_code == 200
+            data = response.json()
+            assert data["status"] == "ready"
+            assert data["checks"]["database"] == "healthy"
+            assert data["checks"]["redis"] == "healthy"
+        finally:
+            app.dependency_overrides.clear()
 
     @patch("app.api.v1.endpoints.health.get_redis_client")
-    @patch("app.api.v1.endpoints.health.get_db")
-    def test_readiness_check_database_unhealthy(self, mock_get_db, mock_get_redis_client):
+    def test_readiness_check_database_unhealthy(self, mock_get_redis_client):
         """Test readiness check when database is unavailable."""
+        from app.infrastructure.database.session import get_db
+
         # Mock database session that raises exception
-        mock_get_db.return_value.__aenter__ = AsyncMock(
-            side_effect=Exception("DB connection failed")
-        )
+        async def mock_get_db_fn():
+            raise Exception("DB connection failed")
+            yield  # noqa: unreachable
 
         # Mock healthy Redis
-        mock_redis = AsyncMock()
-        mock_redis.ping = AsyncMock(return_value=True)
-        mock_get_redis_client.return_value = mock_redis
+        async def mock_redis_client():
+            mock_redis = AsyncMock()
+            mock_redis.ping = AsyncMock(return_value=True)
+            return mock_redis
 
-        response = client.get("/api/v1/health/ready")
+        mock_get_redis_client.side_effect = mock_redis_client
 
-        assert response.status_code == 503
-        data = response.json()
-        assert data["status"] == "unhealthy"
-        assert data["checks"]["database"] == "unhealthy"
-        assert data["checks"]["redis"] == "healthy"
+        # Override dependencies
+        app.dependency_overrides[get_db] = mock_get_db_fn
+
+        try:
+            response = client.get("/api/v1/health/ready")
+
+            assert response.status_code == 503
+            data = response.json()
+            assert data["status"] == "unhealthy"
+            assert data["checks"]["database"] == "unhealthy"
+            assert data["checks"]["redis"] == "healthy"
+        finally:
+            app.dependency_overrides.clear()
 
     @patch("app.api.v1.endpoints.health.get_redis_client")
-    @patch("app.api.v1.endpoints.health.get_db")
-    def test_readiness_check_redis_unhealthy(self, mock_get_db, mock_get_redis_client):
+    def test_readiness_check_redis_unhealthy(self, mock_get_redis_client):
         """Test readiness check when Redis is unavailable."""
+        from app.infrastructure.database.session import get_db
+
         # Mock healthy database
-        mock_db = AsyncMock(spec=AsyncSession)
-        mock_db.execute = AsyncMock()
-        mock_get_db.return_value.__aenter__ = AsyncMock(return_value=mock_db)
-        mock_get_db.return_value.__aexit__ = AsyncMock()
+        async def mock_get_db_fn():
+            mock_db = AsyncMock(spec=AsyncSession)
+            mock_db.execute = AsyncMock()
+            yield mock_db
 
         # Mock Redis client that raises exception on ping
-        mock_redis = AsyncMock()
-        mock_redis.ping = AsyncMock(side_effect=Exception("Redis connection failed"))
-        mock_get_redis_client.return_value = mock_redis
+        async def mock_redis_client():
+            mock_redis = AsyncMock()
+            mock_redis.ping = AsyncMock(side_effect=Exception("Redis connection failed"))
+            return mock_redis
 
-        response = client.get("/api/v1/health/ready")
+        mock_get_redis_client.side_effect = mock_redis_client
 
-        assert response.status_code == 503
-        data = response.json()
-        assert data["status"] == "unhealthy"
-        assert data["checks"]["database"] == "healthy"
-        assert data["checks"]["redis"] == "unhealthy"
+        # Override dependencies
+        app.dependency_overrides[get_db] = mock_get_db_fn
+
+        try:
+            response = client.get("/api/v1/health/ready")
+
+            assert response.status_code == 503
+            data = response.json()
+            assert data["status"] == "unhealthy"
+            assert data["checks"]["database"] == "healthy"
+            assert data["checks"]["redis"] == "unhealthy"
+        finally:
+            app.dependency_overrides.clear()
 
     @patch("app.api.v1.endpoints.health.get_redis_client")
     @patch("app.api.v1.endpoints.health.get_db")
