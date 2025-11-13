@@ -40,47 +40,45 @@ class TestAPISmoke:
                 assert response.status_code != 404, f"{method} {path} returned 404"
                 print(f"✓ {method:6} {path:45} → {response.status_code}")
 
-    async def test_all_user_endpoints_registered(self):
+    async def test_all_user_endpoints_registered(self, async_client: AsyncClient):
         """Verify all user endpoints return responses (not 404)."""
-        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
-            # These will fail authentication but should not 404
-            endpoints = [
-                ("GET", "/api/v1/users/me"),
-                ("PATCH", "/api/v1/users/me"),
-                ("DELETE", "/api/v1/users/me"),
-                ("GET", "/api/v1/users/00000000-0000-0000-0000-000000000000"),
-            ]
+        # These will fail authentication but should not 404
+        endpoints = [
+            ("GET", "/api/v1/users/me"),
+            ("PATCH", "/api/v1/users/me"),
+            ("DELETE", "/api/v1/users/me"),
+            ("GET", "/api/v1/users/00000000-0000-0000-0000-000000000000"),
+        ]
 
-            for method, path in endpoints:
-                if method == "GET":
-                    response = await client.get(path)
-                elif method == "PATCH":
-                    response = await client.patch(path, json={})
-                elif method == "DELETE":
-                    response = await client.delete(path)
+        for method, path in endpoints:
+            if method == "GET":
+                response = await async_client.get(path)
+            elif method == "PATCH":
+                response = await async_client.patch(path, json={})
+            elif method == "DELETE":
+                response = await async_client.delete(path)
 
-                assert response.status_code != 404, f"{method} {path} returned 404"
-                print(f"✓ {method:6} {path:45} → {response.status_code}")
+            assert response.status_code != 404, f"{method} {path} returned 404"
+            print(f"✓ {method:6} {path:45} → {response.status_code}")
 
-    async def test_all_verification_endpoints_registered(self):
+    async def test_all_verification_endpoints_registered(self, async_client: AsyncClient):
         """Verify all verification endpoints return responses (not 404)."""
-        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
-            # These will fail authentication but should not 404
-            endpoints = [
-                ("POST", "/api/v1/verifications"),
-                ("POST", "/api/v1/verifications/confirm/test-token"),
-                ("GET", "/api/v1/verifications/me"),
-                ("POST", "/api/v1/verifications/00000000-0000-0000-0000-000000000000/resend"),
-            ]
+        # These will fail authentication but should not 404
+        endpoints = [
+            ("POST", "/api/v1/verifications"),
+            ("POST", "/api/v1/verifications/confirm/test-token"),
+            ("GET", "/api/v1/verifications/me"),
+            ("POST", "/api/v1/verifications/00000000-0000-0000-0000-000000000000/resend"),
+        ]
 
-            for method, path in endpoints:
-                if method == "POST":
-                    response = await client.post(path, json={})
-                elif method == "GET":
-                    response = await client.get(path)
+        for method, path in endpoints:
+            if method == "POST":
+                response = await async_client.post(path, json={})
+            elif method == "GET":
+                response = await async_client.get(path)
 
-                assert response.status_code != 404, f"{method} {path} returned 404"
-                print(f"✓ {method:6} {path:45} → {response.status_code}")
+            assert response.status_code != 404, f"{method} {path} returned 404"
+            print(f"✓ {method:6} {path:45} → {response.status_code}")
 
     async def test_endpoint_count(self):
         """Verify we have the expected number of endpoints."""
@@ -93,9 +91,9 @@ class TestAPISmoke:
         print("Expected: 12 endpoints (4 auth + 4 users + 4 verifications)")
 
         # We should have exactly 12 endpoints
-        assert (
-            len(non_health_routes) >= 12
-        ), f"Expected at least 12 endpoints, found {len(non_health_routes)}"
+        assert len(non_health_routes) >= 12, (
+            f"Expected at least 12 endpoints, found {len(non_health_routes)}"
+        )
 
         # Print all registered endpoints
         print("\n📍 Registered endpoints:")
