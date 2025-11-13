@@ -26,7 +26,6 @@ from app.domain.value_objects.verification_token import VerificationToken
 from app.infrastructure.database.models.university import University
 from app.infrastructure.database.models.user import User
 from app.infrastructure.database.models.verification import Verification
-from app.infrastructure.database.session import SessionFactory
 
 
 @pytest.mark.asyncio
@@ -126,7 +125,7 @@ class TestFullAPIIntegration:
         assert data["is_new_user"] is False
 
     async def test_token_refresh_returns_new_access_token(
-        self, async_client: AsyncClient, test_user: User
+        self, async_client: AsyncClient, test_user: User, db_session: AsyncSession
     ):
         """Test token refresh endpoint returns new access token."""
         # Arrange - Generate tokens properly through auth service
@@ -135,13 +134,12 @@ class TestFullAPIIntegration:
         from app.infrastructure.cache.redis_client import get_redis_client
         from app.infrastructure.repositories.user_repository import SQLAlchemyUserRepository
 
-        async with SessionFactory() as session:
-            user_repo = SQLAlchemyUserRepository(session)
-            redis_client = await get_redis_client()
-            cache_service = CacheService(redis_client)
-            auth_service = AuthService(user_repository=user_repo, cache_service=cache_service)
-            tokens = await auth_service.generate_tokens(str(test_user.id))
-            refresh_token = tokens["refresh_token"]
+        user_repo = SQLAlchemyUserRepository(db_session)
+        redis_client = await get_redis_client()
+        cache_service = CacheService(redis_client)
+        auth_service = AuthService(user_repository=user_repo, cache_service=cache_service)
+        tokens = await auth_service.generate_tokens(str(test_user.id))
+        refresh_token = tokens["refresh_token"]
 
         # Act
         response = await async_client.post(
@@ -155,7 +153,7 @@ class TestFullAPIIntegration:
         assert data["token_type"] == "bearer"
 
     async def test_logout_invalidates_refresh_token(
-        self, async_client: AsyncClient, test_user: User
+        self, async_client: AsyncClient, test_user: User, db_session: AsyncSession
     ):
         """Test logout endpoint invalidates refresh token."""
         # Arrange - Generate tokens properly through auth service
@@ -164,14 +162,13 @@ class TestFullAPIIntegration:
         from app.infrastructure.cache.redis_client import get_redis_client
         from app.infrastructure.repositories.user_repository import SQLAlchemyUserRepository
 
-        async with SessionFactory() as session:
-            user_repo = SQLAlchemyUserRepository(session)
-            redis_client = await get_redis_client()
-            cache_service = CacheService(redis_client)
-            auth_service = AuthService(user_repository=user_repo, cache_service=cache_service)
-            tokens = await auth_service.generate_tokens(str(test_user.id))
-            access_token = tokens["access_token"]
-            refresh_token = tokens["refresh_token"]
+        user_repo = SQLAlchemyUserRepository(db_session)
+        redis_client = await get_redis_client()
+        cache_service = CacheService(redis_client)
+        auth_service = AuthService(user_repository=user_repo, cache_service=cache_service)
+        tokens = await auth_service.generate_tokens(str(test_user.id))
+        access_token = tokens["access_token"]
+        refresh_token = tokens["refresh_token"]
 
         # Act
         response = await async_client.post(

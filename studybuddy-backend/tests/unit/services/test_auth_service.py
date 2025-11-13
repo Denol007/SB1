@@ -107,9 +107,10 @@ class TestCreateUserFromGoogle(TestAuthService):
         }
 
         # Act
-        user = await auth_service.create_user_from_google(google_user_info)
+        user, is_new_user = await auth_service.create_user_from_google(google_user_info)
 
         # Assert
+        assert is_new_user is True
         assert user["id"] == new_user_id
         assert user["google_id"] == google_user_info["sub"]
         assert user["email"] == google_user_info["email"]
@@ -124,9 +125,10 @@ class TestCreateUserFromGoogle(TestAuthService):
         mock_user_repository.get_by_google_id.return_value = existing_user
 
         # Act
-        user = await auth_service.create_user_from_google(google_user_info)
+        user, is_new_user = await auth_service.create_user_from_google(google_user_info)
 
         # Assert
+        assert is_new_user is False
         assert user.id == existing_user.id
         assert user.google_id == existing_user.google_id
         mock_user_repository.create.assert_not_called()
@@ -147,9 +149,10 @@ class TestCreateUserFromGoogle(TestAuthService):
         mock_user_repository.update.return_value = updated_user
 
         # Act
-        user = await auth_service.create_user_from_google(google_user_info)
+        user, is_new_user = await auth_service.create_user_from_google(google_user_info)
 
         # Assert
+        assert is_new_user is False
         assert user.google_id == google_user_info["sub"]
         mock_user_repository.update.assert_called_once()
 
@@ -183,9 +186,10 @@ class TestCreateUserFromGoogle(TestAuthService):
         }
 
         # Act
-        user = await auth_service.create_user_from_google(google_user_info)
+        user, is_new_user = await auth_service.create_user_from_google(google_user_info)
 
         # Assert
+        assert is_new_user is True
         assert user["role"] == "prospective_student"
 
     @pytest.mark.asyncio
@@ -202,9 +206,10 @@ class TestCreateUserFromGoogle(TestAuthService):
         }
 
         # Act
-        user = await auth_service.create_user_from_google(google_user_info)
+        user, is_new_user = await auth_service.create_user_from_google(google_user_info)
 
         # Assert
+        assert is_new_user is True
         assert user["avatar_url"] == google_user_info["picture"]
 
 

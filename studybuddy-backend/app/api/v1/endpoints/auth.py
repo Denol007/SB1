@@ -142,19 +142,9 @@ async def google_oauth_callback(
         # Get user information from Google
         google_user_info = await google_client.get_user_info(google_tokens["access_token"])
 
-        # Check if this is a new user (before creating/updating)
-        # We'll determine this by checking if user exists
-        from app.infrastructure.database.session import SessionFactory
-
-        async with SessionFactory() as session:
-            temp_repo = SQLAlchemyUserRepository(session)
-            existing_user = await temp_repo.get_by_google_id(google_user_info["sub"])
-            if not existing_user:
-                existing_user = await temp_repo.get_by_email(google_user_info["email"])
-            is_new_user = existing_user is None
-
         # Create or update user from Google info
-        user = await auth_service.create_user_from_google(google_user_info)
+        # The auth_service will return the user and indicate if it's new
+        user, is_new_user = await auth_service.create_user_from_google(google_user_info)
 
         # Generate JWT tokens
         tokens = await auth_service.generate_tokens(str(user.id))
