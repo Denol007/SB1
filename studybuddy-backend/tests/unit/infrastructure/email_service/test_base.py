@@ -65,6 +65,11 @@ class TestEmailBackend:
             async def send_event_reminder(self, to, event_title, event_time, event_location):
                 pass
 
+            async def send_event_cancellation(
+                self, to, event_title, event_time, cancellation_reason
+            ):
+                pass
+
         # Should not raise
         backend = CompleteEmailBackend()
         assert backend is not None
