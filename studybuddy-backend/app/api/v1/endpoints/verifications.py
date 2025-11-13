@@ -32,6 +32,7 @@ from app.infrastructure.database.session import get_db
 from app.infrastructure.repositories.university_repository import (
     SQLAlchemyUniversityRepository,
 )
+from app.infrastructure.repositories.user_repository import SQLAlchemyUserRepository
 from app.infrastructure.repositories.verification_repository import (
     SQLAlchemyVerificationRepository,
 )
@@ -74,8 +75,11 @@ async def get_verification_service(
     """
     verification_repository = SQLAlchemyVerificationRepository(db)
     university_repository = SQLAlchemyUniversityRepository(db)
+    user_repository = SQLAlchemyUserRepository(db)
     email_service = CeleryEmailService()
-    return VerificationService(verification_repository, university_repository, email_service)
+    return VerificationService(
+        verification_repository, university_repository, user_repository, email_service
+    )
 
 
 @router.post(

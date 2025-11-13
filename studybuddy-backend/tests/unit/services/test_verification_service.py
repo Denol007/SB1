@@ -48,10 +48,17 @@ class TestVerificationService:
         return service
 
     @pytest.fixture
+    def mock_user_repository(self):
+        """Mock user repository for testing."""
+        repository = AsyncMock()
+        return repository
+
+    @pytest.fixture
     def verification_service(
         self,
         mock_verification_repository,
         mock_university_repository,
+        mock_user_repository,
         mock_email_service,
     ):
         """Create VerificationService instance with mocked dependencies."""
@@ -65,6 +72,7 @@ class TestVerificationService:
             return VerificationService(
                 verification_repository=mock_verification_repository,
                 university_repository=mock_university_repository,
+                user_repository=mock_user_repository,
                 email_service=mock_email_service,
             )
         except ImportError:
@@ -373,6 +381,7 @@ class TestConfirmVerification(TestVerificationService):
         self,
         verification_service,
         mock_verification_repository,
+        mock_user_repository,
         pending_verification,
     ):
         """Should verify pending verification when token is valid."""
@@ -386,6 +395,9 @@ class TestConfirmVerification(TestVerificationService):
         verified_result.status = VerificationStatus.VERIFIED
         verified_result.verified_at = datetime.now(UTC)
         mock_verification_repository.update.return_value = verified_result
+
+        # Mock user_repository to return None (no user role upgrade needed)
+        mock_user_repository.get_by_id.return_value = None
 
         # Act
         verification = await verification_service.confirm_verification(token)
@@ -456,6 +468,7 @@ class TestConfirmVerification(TestVerificationService):
         self,
         verification_service,
         mock_verification_repository,
+        mock_user_repository,
         pending_verification,
     ):
         """Should update verification status from pending to verified."""
@@ -465,6 +478,9 @@ class TestConfirmVerification(TestVerificationService):
         token = str(uuid4())
         pending_verification.token_hash = sha256(token.encode()).hexdigest()
         mock_verification_repository.get_by_token.return_value = pending_verification
+
+        # Mock user_repository to return None (no user role upgrade needed)
+        mock_user_repository.get_by_id.return_value = None
 
         # Act
         await verification_service.confirm_verification(token)
@@ -478,6 +494,7 @@ class TestConfirmVerification(TestVerificationService):
         self,
         verification_service,
         mock_verification_repository,
+        mock_user_repository,
         pending_verification,
     ):
         """Should set verified_at timestamp when confirming verification."""
@@ -486,6 +503,9 @@ class TestConfirmVerification(TestVerificationService):
         pending_verification.token_hash = sha256(token.encode()).hexdigest()
         mock_verification_repository.get_by_token.return_value = pending_verification
         before_verification = datetime.now(UTC)
+
+        # Mock user_repository to return None (no user role upgrade needed)
+        mock_user_repository.get_by_id.return_value = None
 
         # Act
         await verification_service.confirm_verification(token)

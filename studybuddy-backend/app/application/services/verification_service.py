@@ -14,6 +14,7 @@ from typing import Protocol
 from uuid import UUID
 
 from app.application.interfaces.university_repository import UniversityRepository
+from app.application.interfaces.user_repository import UserRepository
 from app.application.interfaces.verification_repository import VerificationRepository
 from app.core.exceptions import (
     BadRequestException,
@@ -57,6 +58,7 @@ class VerificationService:
     Attributes:
         verification_repository: Repository for verification data access.
         university_repository: Repository for university data access.
+        user_repository: Repository for user data access.
         email_service: Service for sending verification emails.
     """
 
@@ -64,6 +66,7 @@ class VerificationService:
         self,
         verification_repository: VerificationRepository,
         university_repository: UniversityRepository,
+        user_repository: UserRepository,
         email_service: EmailService,
     ) -> None:
         """Initialize the verification service.
@@ -71,10 +74,12 @@ class VerificationService:
         Args:
             verification_repository: Repository for verification CRUD operations.
             university_repository: Repository for university queries.
+            user_repository: Repository for user CRUD operations.
             email_service: Service for sending verification emails.
         """
         self.verification_repository = verification_repository
         self.university_repository = university_repository
+        self.user_repository = user_repository
         self.email_service = email_service
 
     async def request_verification(
