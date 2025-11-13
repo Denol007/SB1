@@ -234,6 +234,14 @@ class VerificationService:
         verification.verified_at = verified_at
         updated = await self.verification_repository.update(verification)
 
+        # Upgrade user role to STUDENT if they're currently a PROSPECTIVE_STUDENT
+        from app.domain.enums.user_role import UserRole
+
+        user = await self.user_repository.get_by_id(verification.user_id)
+        if user and user.role == UserRole.PROSPECTIVE_STUDENT:
+            user.role = UserRole.STUDENT
+            await self.user_repository.update(user)
+
         return updated
 
     async def is_verified_for_university(
