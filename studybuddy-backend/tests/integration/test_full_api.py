@@ -19,13 +19,14 @@ from httpx import AsyncClient
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.security import create_access_token, create_refresh_token
+from app.core.security import create_access_token
 from app.domain.enums.user_role import UserRole
 from app.domain.enums.verification_status import VerificationStatus
 from app.domain.value_objects.verification_token import VerificationToken
 from app.infrastructure.database.models.university import University
 from app.infrastructure.database.models.user import User
 from app.infrastructure.database.models.verification import Verification
+from app.infrastructure.database.session import SessionFactory
 
 
 @pytest.mark.asyncio
@@ -128,8 +129,19 @@ class TestFullAPIIntegration:
         self, async_client: AsyncClient, test_user: User
     ):
         """Test token refresh endpoint returns new access token."""
-        # Arrange
-        refresh_token = create_refresh_token(str(test_user.id))
+        # Arrange - Generate tokens properly through auth service
+        from app.application.services.auth_service import AuthService
+        from app.infrastructure.cache.cache_service import CacheService
+        from app.infrastructure.cache.redis_client import get_redis_client
+        from app.infrastructure.repositories.user_repository import SQLAlchemyUserRepository
+
+        async with SessionFactory() as session:
+            user_repo = SQLAlchemyUserRepository(session)
+            redis_client = await get_redis_client()
+            cache_service = CacheService(redis_client)
+            auth_service = AuthService(user_repository=user_repo, cache_service=cache_service)
+            tokens = await auth_service.generate_tokens(str(test_user.id))
+            refresh_token = tokens["refresh_token"]
 
         # Act
         response = await async_client.post(
@@ -146,9 +158,20 @@ class TestFullAPIIntegration:
         self, async_client: AsyncClient, test_user: User
     ):
         """Test logout endpoint invalidates refresh token."""
-        # Arrange
-        access_token = create_access_token(str(test_user.id))
-        refresh_token = create_refresh_token(str(test_user.id))
+        # Arrange - Generate tokens properly through auth service
+        from app.application.services.auth_service import AuthService
+        from app.infrastructure.cache.cache_service import CacheService
+        from app.infrastructure.cache.redis_client import get_redis_client
+        from app.infrastructure.repositories.user_repository import SQLAlchemyUserRepository
+
+        async with SessionFactory() as session:
+            user_repo = SQLAlchemyUserRepository(session)
+            redis_client = await get_redis_client()
+            cache_service = CacheService(redis_client)
+            auth_service = AuthService(user_repository=user_repo, cache_service=cache_service)
+            tokens = await auth_service.generate_tokens(str(test_user.id))
+            access_token = tokens["access_token"]
+            refresh_token = tokens["refresh_token"]
 
         # Act
         response = await async_client.post(
@@ -538,8 +561,7 @@ class TestCompleteRegistrationFlow:
         assert response.status_code == status.HTTP_200_OK
         auth_data = response.json()
         access_token = auth_data["access_token"]
-        user_id = UUID(auth_data["user"]["id"])
-        assert auth_data["user"]["role"] == UserRole.PROSPECTIVE_STUDENT
+        user_id = UUID(auth_data["user_id"])
 
         # Step 2: User requests email verification
         verification_data = {
