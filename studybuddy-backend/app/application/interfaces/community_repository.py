@@ -208,13 +208,13 @@ class CommunityRepository(ABC):
     async def update(
         self,
         community_id: UUID,
-        data: dict[str, Any],
+        **kwargs: Any,
     ) -> Community | None:
         """Update community fields.
 
         Args:
             community_id: UUID of the community to update.
-            data: Dictionary of fields to update (name, description, visibility, etc.).
+            **kwargs: Fields to update (name, description, visibility, etc.).
 
         Returns:
             Updated Community instance if found, None otherwise.
@@ -225,7 +225,8 @@ class CommunityRepository(ABC):
         Example:
             >>> community = await repository.update(
             ...     community_id=uuid,
-            ...     data={"description": "Updated description", "visibility": CommunityVisibility.PRIVATE}
+            ...     description="Updated description",
+            ...     visibility=CommunityVisibility.PRIVATE
             ... )
         """
         pass

@@ -41,16 +41,15 @@ class TestAPISmoke:
                 print(f"✓ {method:6} {path:45} → {response.status_code}")
 
     async def test_all_user_endpoints_registered(self, async_client: AsyncClient):
-        """Verify all user endpoints return responses (not 404)."""
-        # These will fail authentication but should not 404
-        endpoints = [
+        """Verify all user endpoints are registered and return valid responses."""
+        # Endpoints that require authentication - should return 401, not 404
+        auth_required_endpoints = [
             ("GET", "/api/v1/users/me"),
             ("PATCH", "/api/v1/users/me"),
             ("DELETE", "/api/v1/users/me"),
-            ("GET", "/api/v1/users/00000000-0000-0000-0000-000000000000"),
         ]
 
-        for method, path in endpoints:
+        for method, path in auth_required_endpoints:
             if method == "GET":
                 response = await async_client.get(path)
             elif method == "PATCH":
@@ -58,27 +57,54 @@ class TestAPISmoke:
             elif method == "DELETE":
                 response = await async_client.delete(path)
 
-            assert response.status_code != 404, f"{method} {path} returned 404"
-            print(f"✓ {method:6} {path:45} → {response.status_code}")
+            # Should return 401 (unauthorized), not 404 (not found)
+            assert response.status_code == 401, (
+                f"{method} {path} returned {response.status_code} instead of 401"
+            )
+            print(f"✓ {method:6} {path:45} → {response.status_code} (401 Unauthorized)")
+
+        # Public endpoint - will return 404 for non-existent user, which is correct
+        response = await async_client.get("/api/v1/users/00000000-0000-0000-0000-000000000000")
+        assert response.status_code in [
+            404,
+            401,
+        ], f"GET /api/v1/users/{{user_id}} returned unexpected {response.status_code}"
+        print(
+            f"✓ GET    /api/v1/users/{{user_id}}                         → {response.status_code}"
+        )
 
     async def test_all_verification_endpoints_registered(self, async_client: AsyncClient):
-        """Verify all verification endpoints return responses (not 404)."""
-        # These will fail authentication but should not 404
-        endpoints = [
+        """Verify all verification endpoints are registered and return valid responses."""
+        # Endpoints that require authentication - should return 401, not 404
+        auth_required_endpoints = [
             ("POST", "/api/v1/verifications"),
-            ("POST", "/api/v1/verifications/confirm/test-token"),
             ("GET", "/api/v1/verifications/me"),
             ("POST", "/api/v1/verifications/00000000-0000-0000-0000-000000000000/resend"),
         ]
 
-        for method, path in endpoints:
+        for method, path in auth_required_endpoints:
             if method == "POST":
                 response = await async_client.post(path, json={})
             elif method == "GET":
                 response = await async_client.get(path)
 
-            assert response.status_code != 404, f"{method} {path} returned 404"
+            # Should return 401 (unauthorized) or 422 (validation error), not 404 (not found)
+            assert response.status_code in [
+                401,
+                422,
+            ], f"{method} {path} returned {response.status_code}"
             print(f"✓ {method:6} {path:45} → {response.status_code}")
+
+        # Public confirmation endpoint - will return 404 for invalid token, which is expected
+        response = await async_client.post("/api/v1/verifications/confirm/test-token")
+        assert response.status_code in [
+            404,
+            400,
+            422,
+        ], (
+            f"POST /api/v1/verifications/confirm/{{token}} returned unexpected {response.status_code}"
+        )
+        print(f"✓ POST   /api/v1/verifications/confirm/{{token}}         → {response.status_code}")
 
     async def test_endpoint_count(self):
         """Verify we have the expected number of endpoints."""
@@ -91,9 +117,9 @@ class TestAPISmoke:
         print("Expected: 12 endpoints (4 auth + 4 users + 4 verifications)")
 
         # We should have exactly 12 endpoints
-        assert (
-            len(non_health_routes) >= 12
-        ), f"Expected at least 12 endpoints, found {len(non_health_routes)}"
+        assert len(non_health_routes) >= 12, (
+            f"Expected at least 12 endpoints, found {len(non_health_routes)}"
+        )
 
         # Print all registered endpoints
         print("\n📍 Registered endpoints:")
