@@ -11,7 +11,7 @@ Tests follow TDD principles - written before implementation.
 
 from datetime import UTC, datetime, timedelta
 from hashlib import sha256
-from unittest.mock import AsyncMock
+from unittest.mock import AsyncMock, MagicMock
 from uuid import uuid4
 
 import pytest
@@ -73,15 +73,15 @@ class TestVerificationService:
     @pytest.fixture
     def university(self):
         """Sample university data."""
-        return {
-            "id": str(uuid4()),
-            "name": "Stanford University",
-            "domain": "stanford.edu",
-            "logo_url": "https://example.com/stanford-logo.png",
-            "country": "US",
-            "created_at": datetime.now(UTC),
-            "updated_at": datetime.now(UTC),
-        }
+        university = MagicMock()
+        university.id = str(uuid4())
+        university.name = "Stanford University"
+        university.domain = "stanford.edu"
+        university.logo_url = "https://example.com/stanford-logo.png"
+        university.country = "US"
+        university.created_at = datetime.now(UTC)
+        university.updated_at = datetime.now(UTC)
+        return university
 
     @pytest.fixture
     def user_id(self):
@@ -96,35 +96,39 @@ class TestVerificationService:
     @pytest.fixture
     def pending_verification(self, user_id, university):
         """Sample pending verification data."""
+        from app.domain.enums.verification_status import VerificationStatus
+
         token = str(uuid4())
-        return {
-            "id": str(uuid4()),
-            "user_id": user_id,
-            "university_id": university["id"],
-            "email": "student@stanford.edu",
-            "token_hash": sha256(token.encode()).hexdigest(),
-            "status": "pending",
-            "verified_at": None,
-            "expires_at": datetime.now(UTC) + timedelta(hours=24),
-            "created_at": datetime.now(UTC),
-            "updated_at": datetime.now(UTC),
-        }
+        verification = MagicMock()
+        verification.id = str(uuid4())
+        verification.user_id = user_id
+        verification.university_id = university.id
+        verification.email = "student@stanford.edu"
+        verification.token_hash = sha256(token.encode()).hexdigest()
+        verification.status = VerificationStatus.PENDING
+        verification.verified_at = None
+        verification.expires_at = datetime.now(UTC) + timedelta(hours=24)
+        verification.created_at = datetime.now(UTC)
+        verification.updated_at = datetime.now(UTC)
+        return verification
 
     @pytest.fixture
     def verified_verification(self, user_id, university):
         """Sample verified verification data."""
-        return {
-            "id": str(uuid4()),
-            "user_id": user_id,
-            "university_id": university["id"],
-            "email": "student@stanford.edu",
-            "token_hash": sha256(str(uuid4()).encode()).hexdigest(),
-            "status": "verified",
-            "verified_at": datetime.now(UTC),
-            "expires_at": datetime.now(UTC) + timedelta(hours=24),
-            "created_at": datetime.now(UTC),
-            "updated_at": datetime.now(UTC),
-        }
+        from app.domain.enums.verification_status import VerificationStatus
+
+        verification = MagicMock()
+        verification.id = str(uuid4())
+        verification.user_id = user_id
+        verification.university_id = university.id
+        verification.email = "student@stanford.edu"
+        verification.token_hash = sha256(str(uuid4()).encode()).hexdigest()
+        verification.status = VerificationStatus.VERIFIED
+        verification.verified_at = datetime.now(UTC)
+        verification.expires_at = datetime.now(UTC) + timedelta(hours=24)
+        verification.created_at = datetime.now(UTC)
+        verification.updated_at = datetime.now(UTC)
+        return verification
 
 
 class TestRequestVerification(TestVerificationService):
@@ -143,29 +147,30 @@ class TestRequestVerification(TestVerificationService):
     ):
         """Should create new verification when user hasn't verified this university."""
         # Arrange
+        from app.domain.enums.verification_status import VerificationStatus
+
         mock_university_repository.get_by_domain.return_value = university
         mock_verification_repository.get_by_user_and_university.return_value = None
-        new_verification = {
-            "id": str(uuid4()),
-            "user_id": user_id,
-            "university_id": university["id"],
-            "email": verification_email,
-            "status": "pending",
-        }
+        new_verification = MagicMock()
+        new_verification.id = str(uuid4())
+        new_verification.user_id = user_id
+        new_verification.university_id = university.id
+        new_verification.email = verification_email
+        new_verification.status = VerificationStatus.PENDING
         mock_verification_repository.create.return_value = new_verification
 
         # Act
         verification = await verification_service.request_verification(
             user_id=user_id,
-            university_id=university["id"],
+            university_id=university.id,
             email=verification_email,
         )
 
         # Assert
-        assert verification["user_id"] == user_id
-        assert verification["university_id"] == university["id"]
-        assert verification["email"] == verification_email
-        assert verification["status"] == "pending"
+        assert verification.user_id == user_id
+        assert verification.university_id == university.id
+        assert verification.email == verification_email
+        assert verification.status == VerificationStatus.PENDING
         mock_verification_repository.create.assert_called_once()
         mock_email_service.send_verification_email.assert_called_once()
 
@@ -186,7 +191,7 @@ class TestRequestVerification(TestVerificationService):
         with pytest.raises(BadRequestException) as exc_info:
             await verification_service.request_verification(
                 user_id=user_id,
-                university_id=university["id"],
+                university_id=university.id,
                 email=invalid_email,
             )
 
@@ -235,7 +240,7 @@ class TestRequestVerification(TestVerificationService):
         with pytest.raises(ConflictException) as exc_info:
             await verification_service.request_verification(
                 user_id=user_id,
-                university_id=university["id"],
+                university_id=university.id,
                 email=verification_email,
             )
 
@@ -263,7 +268,7 @@ class TestRequestVerification(TestVerificationService):
         # Act
         await verification_service.request_verification(
             user_id=user_id,
-            university_id=university["id"],
+            university_id=university.id,
             email=verification_email,
         )
 
@@ -289,14 +294,14 @@ class TestRequestVerification(TestVerificationService):
         # Act
         await verification_service.request_verification(
             user_id=user_id,
-            university_id=university["id"],
+            university_id=university.id,
             email=verification_email,
         )
 
         # Assert
-        call_args = mock_verification_repository.create.call_args[1]
-        assert "token_hash" in call_args
-        assert len(call_args["token_hash"]) == 64  # SHA-256 produces 64 hex chars
+        call_args = mock_verification_repository.create.call_args[0][0]  # First positional arg
+        assert hasattr(call_args, "token_hash")
+        assert len(call_args.token_hash) == 64  # SHA-256 produces 64 hex chars
 
     @pytest.mark.asyncio
     async def test_sets_expiration_to_24_hours(
@@ -317,13 +322,13 @@ class TestRequestVerification(TestVerificationService):
         # Act
         await verification_service.request_verification(
             user_id=user_id,
-            university_id=university["id"],
+            university_id=university.id,
             email=verification_email,
         )
 
         # Assert
-        call_args = mock_verification_repository.create.call_args[1]
-        expires_at = call_args["expires_at"]
+        call_args = mock_verification_repository.create.call_args[0][0]  # First positional arg
+        expires_at = call_args.expires_at
         expected_expiry = before_request + timedelta(hours=24)
 
         # Allow 5 second tolerance for test execution time
@@ -348,7 +353,7 @@ class TestRequestVerification(TestVerificationService):
         # Act
         await verification_service.request_verification(
             user_id=user_id,
-            university_id=university["id"],
+            university_id=university.id,
             email=verification_email,
         )
 
@@ -356,7 +361,7 @@ class TestRequestVerification(TestVerificationService):
         mock_email_service.send_verification_email.assert_called_once()
         call_args = mock_email_service.send_verification_email.call_args[1]
         assert call_args["to"] == verification_email
-        assert call_args["university_name"] == university["name"]
+        assert call_args["university_name"] == university.name
         assert "token" in call_args
 
 
@@ -372,22 +377,22 @@ class TestConfirmVerification(TestVerificationService):
     ):
         """Should verify pending verification when token is valid."""
         # Arrange
+        from app.domain.enums.verification_status import VerificationStatus
+
         token = str(uuid4())
-        pending_verification["token_hash"] = sha256(token.encode()).hexdigest()
-        mock_verification_repository.get_by_token_hash.return_value = pending_verification
-        verified_result = {
-            **pending_verification,
-            "status": "verified",
-            "verified_at": datetime.now(UTC),
-        }
+        pending_verification.token_hash = sha256(token.encode()).hexdigest()
+        mock_verification_repository.get_by_token.return_value = pending_verification
+        verified_result = MagicMock()
+        verified_result.status = VerificationStatus.VERIFIED
+        verified_result.verified_at = datetime.now(UTC)
         mock_verification_repository.update.return_value = verified_result
 
         # Act
         verification = await verification_service.confirm_verification(token)
 
         # Assert
-        assert verification["status"] == "verified"
-        assert verification["verified_at"] is not None
+        assert verification.status == VerificationStatus.VERIFIED
+        assert verification.verified_at is not None
         mock_verification_repository.update.assert_called_once()
 
     @pytest.mark.asyncio
@@ -399,7 +404,7 @@ class TestConfirmVerification(TestVerificationService):
         """Should raise NotFoundException when token doesn't match any verification."""
         # Arrange
         invalid_token = str(uuid4())
-        mock_verification_repository.get_by_token_hash.return_value = None
+        mock_verification_repository.get_by_token.return_value = None
 
         # Act & Assert
         with pytest.raises(NotFoundException) as exc_info:
@@ -417,9 +422,9 @@ class TestConfirmVerification(TestVerificationService):
         """Should raise UnauthorizedException when verification token expired."""
         # Arrange
         token = str(uuid4())
-        pending_verification["token_hash"] = sha256(token.encode()).hexdigest()
-        pending_verification["expires_at"] = datetime.now(UTC) - timedelta(hours=1)
-        mock_verification_repository.get_by_token_hash.return_value = pending_verification
+        pending_verification.token_hash = sha256(token.encode()).hexdigest()
+        pending_verification.expires_at = datetime.now(UTC) - timedelta(hours=1)
+        mock_verification_repository.get_by_token.return_value = pending_verification
 
         # Act & Assert
         with pytest.raises(UnauthorizedException) as exc_info:
@@ -437,8 +442,8 @@ class TestConfirmVerification(TestVerificationService):
         """Should raise ConflictException when verification already completed."""
         # Arrange
         token = str(uuid4())
-        verified_verification["token_hash"] = sha256(token.encode()).hexdigest()
-        mock_verification_repository.get_by_token_hash.return_value = verified_verification
+        verified_verification.token_hash = sha256(token.encode()).hexdigest()
+        mock_verification_repository.get_by_token.return_value = verified_verification
 
         # Act & Assert
         with pytest.raises(ConflictException) as exc_info:
@@ -455,16 +460,18 @@ class TestConfirmVerification(TestVerificationService):
     ):
         """Should update verification status from pending to verified."""
         # Arrange
+        from app.domain.enums.verification_status import VerificationStatus
+
         token = str(uuid4())
-        pending_verification["token_hash"] = sha256(token.encode()).hexdigest()
-        mock_verification_repository.get_by_token_hash.return_value = pending_verification
+        pending_verification.token_hash = sha256(token.encode()).hexdigest()
+        mock_verification_repository.get_by_token.return_value = pending_verification
 
         # Act
         await verification_service.confirm_verification(token)
 
         # Assert
-        call_args = mock_verification_repository.update.call_args[1]
-        assert call_args["status"] == "verified"
+        call_args = mock_verification_repository.update.call_args[0][0]  # First positional arg
+        assert call_args.status == VerificationStatus.VERIFIED
 
     @pytest.mark.asyncio
     async def test_sets_verified_at_timestamp(
@@ -476,16 +483,16 @@ class TestConfirmVerification(TestVerificationService):
         """Should set verified_at timestamp when confirming verification."""
         # Arrange
         token = str(uuid4())
-        pending_verification["token_hash"] = sha256(token.encode()).hexdigest()
-        mock_verification_repository.get_by_token_hash.return_value = pending_verification
+        pending_verification.token_hash = sha256(token.encode()).hexdigest()
+        mock_verification_repository.get_by_token.return_value = pending_verification
         before_verification = datetime.now(UTC)
 
         # Act
         await verification_service.confirm_verification(token)
 
         # Assert
-        call_args = mock_verification_repository.update.call_args[1]
-        verified_at = call_args["verified_at"]
+        call_args = mock_verification_repository.update.call_args[0][0]  # First positional arg
+        verified_at = call_args.verified_at
 
         # Allow 5 second tolerance
         assert abs((verified_at - before_verification).total_seconds()) < 5
@@ -510,7 +517,7 @@ class TestIsVerifiedForUniversity(TestVerificationService):
         # Act
         is_verified = await verification_service.is_verified_for_university(
             user_id=user_id,
-            university_id=university["id"],
+            university_id=university.id,
         )
 
         # Assert
@@ -532,7 +539,7 @@ class TestIsVerifiedForUniversity(TestVerificationService):
         # Act
         is_verified = await verification_service.is_verified_for_university(
             user_id=user_id,
-            university_id=university["id"],
+            university_id=university.id,
         )
 
         # Assert
@@ -553,7 +560,7 @@ class TestIsVerifiedForUniversity(TestVerificationService):
         # Act
         is_verified = await verification_service.is_verified_for_university(
             user_id=user_id,
-            university_id=university["id"],
+            university_id=university.id,
         )
 
         # Assert
@@ -570,13 +577,15 @@ class TestIsVerifiedForUniversity(TestVerificationService):
     ):
         """Should return False when verification is expired."""
         # Arrange
-        pending_verification["status"] = "expired"
+        from app.domain.enums.verification_status import VerificationStatus
+
+        pending_verification.status = VerificationStatus.EXPIRED
         mock_verification_repository.get_by_user_and_university.return_value = pending_verification
 
         # Act
         is_verified = await verification_service.is_verified_for_university(
             user_id=user_id,
-            university_id=university["id"],
+            university_id=university.id,
         )
 
         # Assert
@@ -643,11 +652,11 @@ class TestGetUserVerifications(TestVerificationService):
 
         # Assert
         verification = result[0]
-        assert "id" in verification
-        assert "user_id" in verification
-        assert "university_id" in verification
-        assert "email" in verification
-        assert "status" in verification
-        assert "verified_at" in verification
-        assert "expires_at" in verification
-        assert "created_at" in verification
+        assert hasattr(verification, "id")
+        assert hasattr(verification, "user_id")
+        assert hasattr(verification, "university_id")
+        assert hasattr(verification, "email")
+        assert hasattr(verification, "status")
+        assert hasattr(verification, "verified_at")
+        assert hasattr(verification, "expires_at")
+        assert hasattr(verification, "created_at")

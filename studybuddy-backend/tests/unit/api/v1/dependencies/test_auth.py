@@ -1,7 +1,7 @@
 """Unit tests for authentication dependencies."""
 
 from datetime import UTC, datetime, timedelta
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 from fastapi import HTTPException, status
@@ -17,6 +17,8 @@ class TestGetCurrentUser:
     @pytest.mark.asyncio
     async def test_valid_token_returns_user(self):
         """Test that valid JWT token returns user."""
+        from uuid import UUID
+
         from fastapi.security import HTTPAuthorizationCredentials
 
         from app.api.v1.dependencies.auth import get_current_user
@@ -30,19 +32,17 @@ class TestGetCurrentUser:
 
         # Mock the user repository
         mock_user = MagicMock()
-        mock_user.id = user_id
+        mock_user.id = UUID(user_id)
         mock_user.email = "test@example.com"
         mock_user.deleted_at = None
 
-        with patch("app.api.v1.dependencies.auth.get_user_repository") as mock_get_repo:
-            mock_repo = AsyncMock()
-            mock_repo.get_by_id.return_value = mock_user
-            mock_get_repo.return_value = mock_repo
+        mock_repo = AsyncMock()
+        mock_repo.get_by_id.return_value = mock_user
 
-            user = await get_current_user(credentials=credentials)
+        user = await get_current_user(credentials=credentials, user_repo=mock_repo)
 
-            assert user == mock_user
-            mock_repo.get_by_id.assert_called_once_with(user_id)
+        assert user == mock_user
+        mock_repo.get_by_id.assert_called_once()
 
     @pytest.mark.asyncio
     async def test_invalid_token_raises_unauthorized(self):
@@ -112,16 +112,14 @@ class TestGetCurrentUser:
 
         credentials = HTTPAuthorizationCredentials(scheme="Bearer", credentials=token)
 
-        with patch("app.api.v1.dependencies.auth.get_user_repository") as mock_get_repo:
-            mock_repo = AsyncMock()
-            mock_repo.get_by_id.return_value = None
-            mock_get_repo.return_value = mock_repo
+        mock_repo = AsyncMock()
+        mock_repo.get_by_id.return_value = None
 
-            with pytest.raises(HTTPException) as exc_info:
-                await get_current_user(credentials=credentials)
+        with pytest.raises(HTTPException) as exc_info:
+            await get_current_user(credentials=credentials, user_repo=mock_repo)
 
-            assert exc_info.value.status_code == status.HTTP_401_UNAUTHORIZED
-            assert "User not found" in str(exc_info.value.detail)
+        assert exc_info.value.status_code == status.HTTP_401_UNAUTHORIZED
+        assert "User not found" in str(exc_info.value.detail)
 
 
 class TestGetCurrentActiveUser:
@@ -168,18 +166,16 @@ class TestRequireVerifiedStudent:
         mock_user.id = "550e8400-e29b-41d4-a716-446655440000"
         mock_user.role = "student"
 
-        with patch("app.api.v1.dependencies.auth.get_verification_repository") as mock_get_repo:
-            mock_repo = AsyncMock()
-            # User has at least one verified verification
-            mock_verification = MagicMock()
-            mock_verification.status = "verified"
-            mock_repo.get_user_verifications.return_value = [mock_verification]
-            mock_get_repo.return_value = mock_repo
+        mock_repo = AsyncMock()
+        # User has at least one verified verification
+        mock_verification = MagicMock()
+        mock_verification.status = "verified"
+        mock_repo.get_all_by_user.return_value = [mock_verification]
 
-            result = await require_verified_student(current_user=mock_user)
+        result = await require_verified_student(current_user=mock_user, verification_repo=mock_repo)
 
-            assert result == mock_user
-            mock_repo.get_user_verifications.assert_called_once_with(mock_user.id)
+        assert result == mock_user
+        mock_repo.get_all_by_user.assert_called_once_with(mock_user.id)
 
     @pytest.mark.asyncio
     async def test_unverified_student_raises_forbidden(self):
@@ -190,19 +186,17 @@ class TestRequireVerifiedStudent:
         mock_user.id = "550e8400-e29b-41d4-a716-446655440000"
         mock_user.role = "student"
 
-        with patch("app.api.v1.dependencies.auth.get_verification_repository") as mock_get_repo:
-            mock_repo = AsyncMock()
-            # No verified verifications
-            mock_verification = MagicMock()
-            mock_verification.status = "pending"
-            mock_repo.get_user_verifications.return_value = [mock_verification]
-            mock_get_repo.return_value = mock_repo
+        mock_repo = AsyncMock()
+        # No verified verifications
+        mock_verification = MagicMock()
+        mock_verification.status = "pending"
+        mock_repo.get_all_by_user.return_value = [mock_verification]
 
-            with pytest.raises(HTTPException) as exc_info:
-                await require_verified_student(current_user=mock_user)
+        with pytest.raises(HTTPException) as exc_info:
+            await require_verified_student(current_user=mock_user, verification_repo=mock_repo)
 
-            assert exc_info.value.status_code == status.HTTP_403_FORBIDDEN
-            assert "Student verification required" in str(exc_info.value.detail)
+        assert exc_info.value.status_code == status.HTTP_403_FORBIDDEN
+        assert "Student verification required" in str(exc_info.value.detail)
 
     @pytest.mark.asyncio
     async def test_no_verifications_raises_forbidden(self):
@@ -213,16 +207,14 @@ class TestRequireVerifiedStudent:
         mock_user.id = "550e8400-e29b-41d4-a716-446655440000"
         mock_user.role = "student"
 
-        with patch("app.api.v1.dependencies.auth.get_verification_repository") as mock_get_repo:
-            mock_repo = AsyncMock()
-            mock_repo.get_user_verifications.return_value = []
-            mock_get_repo.return_value = mock_repo
+        mock_repo = AsyncMock()
+        mock_repo.get_all_by_user.return_value = []
 
-            with pytest.raises(HTTPException) as exc_info:
-                await require_verified_student(current_user=mock_user)
+        with pytest.raises(HTTPException) as exc_info:
+            await require_verified_student(current_user=mock_user, verification_repo=mock_repo)
 
-            assert exc_info.value.status_code == status.HTTP_403_FORBIDDEN
-            assert "Student verification required" in str(exc_info.value.detail)
+        assert exc_info.value.status_code == status.HTTP_403_FORBIDDEN
+        assert "Student verification required" in str(exc_info.value.detail)
 
     @pytest.mark.asyncio
     async def test_admin_bypasses_verification(self):
@@ -245,6 +237,7 @@ class TestGetOptionalCurrentUser:
     @pytest.mark.asyncio
     async def test_valid_token_returns_user(self):
         """Test that valid token returns user."""
+
         from fastapi.security import HTTPAuthorizationCredentials
 
         from app.api.v1.dependencies.auth import get_optional_current_user
@@ -257,14 +250,13 @@ class TestGetOptionalCurrentUser:
         mock_user = MagicMock()
         mock_user.id = user_id
 
-        with patch("app.api.v1.dependencies.auth.get_user_repository") as mock_get_repo:
-            mock_repo = AsyncMock()
-            mock_repo.get_by_id.return_value = mock_user
-            mock_get_repo.return_value = mock_repo
+        mock_repo = AsyncMock()
+        mock_repo.get_by_id.return_value = mock_user
 
-            result = await get_optional_current_user(credentials=credentials)
+        result = await get_optional_current_user(credentials=credentials, user_repo=mock_repo)
 
-            assert result == mock_user
+        assert result == mock_user
+        mock_repo.get_by_id.assert_called_once()
 
     @pytest.mark.asyncio
     async def test_no_token_returns_none(self):
