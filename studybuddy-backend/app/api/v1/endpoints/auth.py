@@ -164,9 +164,21 @@ async def google_oauth_callback(
             detail=str(e),
         ) from e
     except Exception as e:
+        # Log the full exception for debugging
+        import traceback
+
+        import structlog
+
+        logger = structlog.get_logger()
+        logger.error(
+            "OAuth callback failed",
+            error=str(e),
+            error_type=type(e).__name__,
+            traceback=traceback.format_exc(),
+        )
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=f"OAuth authentication failed: {str(e)}",
+            detail=f"OAuth authentication failed: {type(e).__name__}: {str(e)}",
         ) from e
 
 
