@@ -29,8 +29,10 @@ from app.infrastructure.database.models.user import User
 from app.infrastructure.database.models.verification import Verification  # noqa: F401
 from app.main import app
 
-# Test database URL
-TEST_DATABASE_URL = "postgresql+asyncpg://studybuddy:studybuddy_dev@localhost:5432/studybuddy_test"
+# Test database URL - use DATABASE_URL from environment if available (CI), otherwise use local default
+TEST_DATABASE_URL = os.getenv(
+    "DATABASE_URL", "postgresql+asyncpg://studybuddy:studybuddy_dev@localhost:5432/studybuddy_test"
+)
 
 
 @pytest.fixture(scope="session")
