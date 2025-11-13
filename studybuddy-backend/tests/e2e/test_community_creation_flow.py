@@ -74,7 +74,7 @@ class TestCommunityCreationFlow:
             }
 
             create_response = await client.post(
-                "/api/v1/communities",
+                "/api/v1/communities/",
                 json=community_data,
                 headers=creator_headers,
             )
@@ -156,7 +156,7 @@ class TestCommunityCreationFlow:
             }
 
             subcommunity_response = await client.post(
-                "/api/v1/communities",
+                "/api/v1/communities/",
                 json=subcommunity_data,
                 headers=member_headers,  # Moderator creating sub-community
             )
@@ -276,7 +276,7 @@ class TestCommunityCreationFlow:
             }
 
             public_response = await client.post(
-                "/api/v1/communities",
+                "/api/v1/communities/",
                 json=public_community,
                 headers=creator_headers,
             )
@@ -307,7 +307,7 @@ class TestCommunityCreationFlow:
             }
 
             private_response = await client.post(
-                "/api/v1/communities",
+                "/api/v1/communities/",
                 json=private_community,
                 headers=creator_headers,
             )
@@ -354,7 +354,7 @@ class TestCommunityCreationFlow:
             }
 
             parent_response = await client.post(
-                "/api/v1/communities",
+                "/api/v1/communities/",
                 json=parent_data,
                 headers=headers,
             )
@@ -380,7 +380,7 @@ class TestCommunityCreationFlow:
                 }
 
                 sub_response = await client.post(
-                    "/api/v1/communities",
+                    "/api/v1/communities/",
                     json=sub_data,
                     headers=headers,
                 )
@@ -401,7 +401,7 @@ class TestCommunityCreationFlow:
             }
 
             nested_response = await client.post(
-                "/api/v1/communities",
+                "/api/v1/communities/",
                 json=nested_data,
                 headers=headers,
             )
@@ -450,7 +450,7 @@ class TestCommunityCreationFlow:
             }
 
             create_response = await client.post(
-                "/api/v1/communities",
+                "/api/v1/communities/",
                 json=verified_community,
                 headers=creator_headers,
             )
@@ -477,7 +477,7 @@ class TestCommunityCreationFlow:
             }
 
             open_response = await client.post(
-                "/api/v1/communities",
+                "/api/v1/communities/",
                 json=open_community,
                 headers=creator_headers,
             )
