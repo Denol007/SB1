@@ -921,7 +921,19 @@ description: "Task list for StudyBuddy platform implementation"
   - TestMessageSearch: search messages with access control (2 tests)
   - Tests use AsyncClient, real database, proper authentication
   - All tests will fail until endpoints are implemented (TDD)
-- [ ] T154 [P] [US5] WebSocket tests: `test_chat_websocket.py`
+- [x] T154 [P] [US5] WebSocket tests: `test_chat_websocket.py` ✅
+  - 22 WebSocket integration tests for real-time chat features
+  - TestWebSocketConnection: auth, connect, disconnect, reconnect (4 tests)
+  - TestRealtimeMessageDelivery: message delivery, access control (2 tests)
+  - TestTypingIndicators: start/stop typing, 3-second timeout (3 tests)
+  - TestReadReceipts: broadcast receipts with timestamps (2 tests)
+  - TestGroupChatBroadcast: multi-user message/typing delivery (2 tests)
+  - TestOnlineStatus: online/offline status broadcasting (2 tests)
+  - TestWebSocketErrorHandling: validation, auth, errors (3 tests)
+  - TestWebSocketReconnection: reconnect, multi-device (2 tests)
+  - TestWebSocketMessageAttachments: attachments, size limits (2 tests)
+  - Tests use FastAPI TestClient WebSocket support
+  - All tests will fail until WebSocket endpoints are implemented (TDD)
 - [ ] T155 [US5] E2E test: `test_messaging_flow.py`
 
 ### Domain Models for User Story 5
