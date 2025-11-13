@@ -32,7 +32,7 @@ client = TestClient(app)
 class TestRegistrationFlow:
     """End-to-end test for complete user registration and verification flow."""
 
-    @patch("app.infrastructure.email_service.smtp_email.SMTPEmailService")
+    @patch("app.infrastructure.email_service.smtp_email.SMTPEmail")
     @patch("app.api.v1.endpoints.verifications.VerificationService")
     @patch("app.api.v1.endpoints.auth.AuthService")
     @patch("app.api.v1.endpoints.auth.GoogleOAuthClient")
@@ -309,7 +309,7 @@ class TestRegistrationFlow:
         print("  9. ✓ Verified community access granted")
         print("=" * 60)
 
-    @patch("app.infrastructure.email_service.smtp_email.SMTPEmailService")
+    @patch("app.infrastructure.email_service.smtp_email.SMTPEmail")
     @patch("app.api.v1.endpoints.verifications.VerificationService")
     @patch("app.api.v1.endpoints.auth.AuthService")
     @patch("app.api.v1.endpoints.auth.GoogleOAuthClient")

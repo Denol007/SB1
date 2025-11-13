@@ -297,7 +297,7 @@ class TestLogout:
     """Integration tests for POST /api/v1/auth/logout endpoint."""
 
     @patch("app.api.v1.endpoints.auth.AuthService")
-    @patch("app.api.v1.endpoints.auth.get_current_user")
+    @patch("app.api.v1.dependencies.auth.get_current_user")
     def test_logout_invalidates_refresh_token(self, mock_get_current_user, mock_auth_service_class):
         """Should invalidate refresh token on logout."""
         # Skip until endpoint is implemented
@@ -345,7 +345,7 @@ class TestLogout:
         # Assert
         assert response.status_code == 401
 
-    @patch("app.api.v1.endpoints.auth.get_current_user")
+    @patch("app.api.v1.dependencies.auth.get_current_user")
     def test_logout_missing_refresh_token_returns_422(self, mock_get_current_user):
         """Should return 422 when refresh token is missing from request."""
         # Skip until endpoint is implemented
@@ -376,7 +376,7 @@ class TestLogout:
         assert response.status_code == 422  # Validation error
 
     @patch("app.api.v1.endpoints.auth.AuthService")
-    @patch("app.api.v1.endpoints.auth.get_current_user")
+    @patch("app.api.v1.dependencies.auth.get_current_user")
     def test_logout_adds_token_to_blacklist(self, mock_get_current_user, mock_auth_service_class):
         """Should add refresh token to blacklist/cache to prevent reuse."""
         # Skip until endpoint is implemented
