@@ -91,9 +91,9 @@ class TestAPISmoke:
         print("Expected: 12 endpoints (4 auth + 4 users + 4 verifications)")
 
         # We should have exactly 12 endpoints
-        assert len(non_health_routes) >= 12, (
-            f"Expected at least 12 endpoints, found {len(non_health_routes)}"
-        )
+        assert (
+            len(non_health_routes) >= 12
+        ), f"Expected at least 12 endpoints, found {len(non_health_routes)}"
 
         # Print all registered endpoints
         print("\n📍 Registered endpoints:")
