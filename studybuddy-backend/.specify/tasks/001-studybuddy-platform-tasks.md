@@ -952,10 +952,10 @@ T156 [P] [US5] Create `app/domain/enums/chat_type.py` - direct, group, community
 
 ### Database Models for User Story 5
 
-- [ ] T157 [P] [US5] Create `app/infrastructure/database/models/chat.py`
+- [x] T157 [P] [US5] Create `app/infrastructure/database/models/chat.py`
   - Fields: id, type, name, community_id (nullable), created_at
 
-- [ ] T158 [P] [US5] Create `app/infrastructure/database/models/chat_participant.py`
+- [x] T158 [P] [US5] Create `app/infrastructure/database/models/chat_participant.py`
   - Fields: id, chat_id (FK), user_id (FK), joined_at, last_read_at
 
 - [ ] T159 [P] [US5] Create `app/infrastructure/database/models/message.py`
