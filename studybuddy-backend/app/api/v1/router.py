@@ -11,6 +11,7 @@ from fastapi import APIRouter
 
 from app.api.v1.endpoints import (
     auth,
+    chats,
     comments,
     communities,
     events,
@@ -46,6 +47,9 @@ router.include_router(comments.router)
 
 # Include event endpoints
 router.include_router(events.router)
+
+# Include chat endpoints
+router.include_router(chats.router)
 
 
 @router.get("/")

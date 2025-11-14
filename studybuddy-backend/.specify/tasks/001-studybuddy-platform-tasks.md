@@ -934,11 +934,21 @@ description: "Task list for StudyBuddy platform implementation"
   - TestWebSocketMessageAttachments: attachments, size limits (2 tests)
   - Tests use FastAPI TestClient WebSocket support
   - All tests will fail until WebSocket endpoints are implemented (TDD)
-- [ ] T155 [US5] E2E test: `test_messaging_flow.py`
+
+  - [x] T155 [US5] E2E test: `test_messaging_flow.py` ✅
+  - Simulates full user journey for direct messaging
+  - Create direct chat, connect both users via WebSocket
+  - User A sends message, User B receives in real-time
+  - User B replies, User A receives
+  - Typing indicators sent and received
+  - User B marks message as read, User A receives read receipt
+  - Verifies message persistence via REST API
+  - All features tested in one flow: REST + WebSocket
+  - Follows TDD - test will fail until chat and WebSocket are implemented
 
 ### Domain Models for User Story 5
 
-- [ ] T156 [P] [US5] Create `app/domain/enums/chat_type.py` - direct, group, community
+T156 [P] [US5] Create `app/domain/enums/chat_type.py` - direct, group, community
 
 ### Database Models for User Story 5
 
